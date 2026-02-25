@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import type { SiteContent } from "@/lib/types";
 import { Reveal } from "@/components/ui/Reveal";
 
@@ -7,7 +9,11 @@ type AboutSectionProps = {
 
 export function AboutSection({ about }: AboutSectionProps) {
   return (
-    <section id="bio" aria-labelledby="over-title" className="bg-[var(--color-bg-soft)] py-16">
+    <section
+      id="bio"
+      aria-labelledby="over-title"
+      className="section-ambient section-ambient-bio bg-[linear-gradient(180deg,#1b2d47_0%,#212f44_100%)] py-16"
+    >
       <div className="mx-auto w-full max-w-[1120px] px-6">
         <Reveal>
           <h2 id="over-title" className="mb-4 font-display text-4xl leading-tight sm:text-5xl">
@@ -15,6 +21,26 @@ export function AboutSection({ about }: AboutSectionProps) {
           </h2>
           <p className="mb-6 max-w-[74ch]">{about.intro}</p>
         </Reveal>
+
+        {about.photoMoments && about.photoMoments.length > 0 ? (
+          <div className="mb-6 grid gap-4 md:grid-cols-2" aria-label="Fotomomenten">
+            {about.photoMoments.map((photo, index) => (
+              <Reveal key={photo.src} delayMs={index * 120}>
+                <figure className="aspect-[4/3] overflow-hidden rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.24)]">
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    width={photo.width}
+                    height={photo.height}
+                    className="h-full w-full object-cover object-center"
+                    loading="lazy"
+                  />
+                </figure>
+              </Reveal>
+            ))}
+          </div>
+        ) : null}
+
         <div className="grid gap-6 md:grid-cols-2" aria-label="Bio's">
           {about.bios.map((bio, index) => (
             <Reveal key={bio.name} delayMs={index * 120} className="h-full">

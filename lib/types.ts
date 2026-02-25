@@ -34,6 +34,12 @@ export type SiteContent = {
     intro: string;
     lineupTitle?: string;
     lineupItems?: string[];
+    photoMoments?: Array<{
+      src: string;
+      alt: string;
+      width: number;
+      height: number;
+    }>;
     bios: Array<{
       name: string;
       text: string;
@@ -81,6 +87,26 @@ export type SiteContent = {
   bookings: {
     title: string;
     body: string;
+    socialProofTitle?: string;
+    socialProof?: Array<{
+      quote: string;
+      source: string;
+    }>;
+    pressQuotes?: string[];
+    upcomingShows?: Array<{
+      date: string;
+      venue: string;
+      city: string;
+      ctaLabel: string;
+      ctaHref: string;
+    }>;
+    highlightImage?: {
+      src: string;
+      alt: string;
+      width: number;
+      height: number;
+      caption?: string;
+    };
     cta: Cta;
     infoTitle: string;
     infoItems: string[];
@@ -90,10 +116,12 @@ export type SiteContent = {
     intro: string;
     ctaLabel: string;
     email: string;
+    responseTimeText?: string;
+    subjectOptions?: string[];
     fields: Array<{
-      id: "name" | "email" | "message";
+      id: "name" | "email" | "phone" | "message" | "subject";
       label: string;
-      type: "text" | "email" | "textarea";
+      type: "text" | "email" | "tel" | "textarea" | "select";
       autoComplete?: string;
       required: boolean;
     }>;

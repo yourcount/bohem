@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -13,7 +13,8 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeHref, setActiveHref] = useState<string>(navigation[0]?.href ?? "#main-content");
+  const [activeHref, setActiveHref] = useState<string>("");
+  const pendingHrefRef = useRef<string | null>(null);
 
   const sectionIds = useMemo(
     () =>
@@ -26,7 +27,15 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
 
   const handleCloseMenu = () => setIsMenuOpen(false);
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+  const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    pendingHrefRef.current = null;
+    setActiveHref("");
+    setIsMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   const handleNavClick = (href: string) => {
+    pendingHrefRef.current = href;
     setActiveHref(href);
     handleCloseMenu();
   };
@@ -34,7 +43,26 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
   useEffect(() => {
     const updateActiveSection = () => {
       const viewportOffset = window.innerHeight * 0.35;
-      let current = navigation[0]?.href ?? "#main-content";
+      const pendingHref = pendingHrefRef.current;
+
+      if (pendingHref) {
+        const pendingId = pendingHref.slice(1);
+        const pendingSection = document.getElementById(pendingId);
+        if (!pendingSection) {
+          pendingHrefRef.current = null;
+        } else {
+          const rect = pendingSection.getBoundingClientRect();
+          const isReached = rect.top <= viewportOffset && rect.bottom > viewportOffset;
+          if (isReached) {
+            pendingHrefRef.current = null;
+          } else {
+            // While smooth-scrolling to a clicked target, keep its active state stable.
+            return;
+          }
+        }
+      }
+
+      let current = "";
 
       sectionIds.forEach((id) => {
         const section = document.getElementById(id);
@@ -50,6 +78,7 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
 
     const updateFromHash = () => {
       if (window.location.hash) {
+        pendingHrefRef.current = null;
         setActiveHref(window.location.hash);
       }
     };
@@ -69,7 +98,7 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.82)] backdrop-blur">
       <div className="mx-auto flex min-h-16 w-full max-w-[1120px] items-center justify-between gap-4 px-6">
-        <Link href="#main-content" className="inline-flex items-center">
+        <Link href="#" onClick={handleLogoClick} className="inline-flex items-center">
           <Image
             src="/brand/logos/bohem-logo-white-moon-color.webp"
             alt={brandName}

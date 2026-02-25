@@ -21,15 +21,25 @@
       "src": "/images/bohem-hero.jpg",
       "alt": "Arthur Bont en Bettina Kraaieveld in warm podiumlicht"
     },
-    "ctas": [
-      { "label": "Boek Bohèm", "href": "#boekingen", "variant": "primary" },
-      { "label": "Luister naar Bohèm", "href": "#discografie", "variant": "secondary" },
-      { "label": "Neem contact op", "href": "#contact", "variant": "secondary" }
-    ]
+    "ctas": [{ "label": "Boek Bohèm", "href": "#boekingen", "variant": "primary" }]
   },
   "about": {
     "title": "Over Bohèm",
     "intro": "BOHÈM is een muzikale samenwerking tussen Arthur Bont en Bettina Kraaieveld. Hun liedjes zijn melodisch, verhalend en persoonlijk, met teksten in het Nederlands en Engels over het leven in al zijn facetten: over verbinding en afstand, twijfel en verlangen. Wat begon met het schrijven van een song voor het Nationale Songfestival (2024) groeide uit tot een eigen repertoire en de EP Wolkentranen (2026).",
+    "photoMoments": [
+      {
+        "src": "/images/nieuw/bohem-nieuw-tree.webp",
+        "alt": "Arthur en Bettina in open veld bij een boom, met gitaar en warme avondlucht",
+        "width": 2200,
+        "height": 1573
+      },
+      {
+        "src": "/images/nieuw/bohem-nieuw-road.webp",
+        "alt": "Bohèm op een landelijke weg in een verstild moment",
+        "width": 1800,
+        "height": 2165
+      }
+    ],
     "lineupTitle": "Bezetting",
     "lineupItems": [
       "Leadvocal en mondharmonica: Bettina Kraaieveld",
@@ -76,11 +86,11 @@
         "note": "De eerste nieuwe single: samen zijn, maar elkaar niet meer kunnen bereiken als het stil wordt tussen twee mensen.",
         "links": [
           {
-            "label": "Spotify",
+            "label": "Luister op Spotify",
             "href": "https://open.spotify.com/track/2TaHQl5PVOSHIs1xCjbD1W?si=117282ba1c4740b1"
           },
           {
-            "label": "Artist",
+            "label": "Open artiestprofiel",
             "href": "https://open.spotify.com/artist/7MZs9HjZfvICRqVXENFcoa?si=OykX8uRmQcawyF4woCaciQ"
           }
         ]
@@ -92,7 +102,7 @@
         "note": "Eigen repertoire waarin melodie, verhaal en contrast samenkomen in NL en EN.",
         "links": [
           {
-            "label": "Spotify",
+            "label": "Luister op Spotify",
             "href": "https://open.spotify.com/artist/7MZs9HjZfvICRqVXENFcoa?si=OykX8uRmQcawyF4woCaciQ"
           }
         ]
@@ -102,17 +112,67 @@
   "musicExperience": {
     "title": "Muziekbeleving",
     "body": "Live, onder de noemer Reizigers, neemt Bohèm het publiek mee op een muzikale mini-trip: verrassende arrangementen, diepgang, flair, humor en interactie. Liedjes om bij stil te staan en energie om in mee te bewegen.",
-    "cta": { "label": "Beluister een fragment", "href": "#discografie" },
+    "cta": { "label": "Bekijk boekingsopties", "href": "#boekingen" },
     "image": {
-      "src": "/images/bohem-stage.jpg",
-      "alt": "Bohèm op een podiumsetting met amberkleurig licht",
-      "width": 1536,
-      "height": 864
+      "src": "/images/nieuw/bohem-nieuw-field-wide.webp",
+      "alt": "Arthur en Bettina in tegenlicht in het veld, met gitaar en warme avondzon",
+      "width": 2200,
+      "height": 1469
     }
   },
   "bookings": {
     "title": "Live & Boekingen",
     "body": "Bohèm speelt als Reizigers op theaters, kleinschalige culturele podia en intieme concertavonden. Voor aanvragen en beschikbaarheid reageren we persoonlijk en snel.",
+    "pressQuotes": [
+      "“Een warm, volwassen geluid met een theatrale ziel.”",
+      "“Verhalende songs die direct binnenkomen.”",
+      "“Bohèm balanceert moeiteloos tussen intimiteit en flair.”"
+    ],
+    "socialProofTitle": "Wat organisatoren zeggen",
+    "socialProof": [
+      {
+        "quote": "Intiem, stijlvol en muzikaal sterk. Het publiek bleef nog lang napraten.",
+        "source": "Programmeur, kleinschalig theater"
+      },
+      {
+        "quote": "De combinatie van storytelling, humor en muzikaliteit werkte direct in de zaal.",
+        "source": "Organisator culturele avond"
+      },
+      {
+        "quote": "Professioneel in voorbereiding en warm op het podium.",
+        "source": "Podiumcoördinator"
+      }
+    ],
+    "upcomingShows": [
+      {
+        "date": "12 apr 2026",
+        "venue": "Theater het Nest",
+        "city": "Nijmegen",
+        "ctaLabel": "Informatie",
+        "ctaHref": "#contact"
+      },
+      {
+        "date": "08 mei 2026",
+        "venue": "Podium De Lantaarn",
+        "city": "Utrecht",
+        "ctaLabel": "Tickets",
+        "ctaHref": "#contact"
+      },
+      {
+        "date": "29 mei 2026",
+        "venue": "Cultuurhuis Zuid",
+        "city": "Eindhoven",
+        "ctaLabel": "Boek direct",
+        "ctaHref": "#contact"
+      }
+    ],
+    "highlightImage": {
+      "src": "/images/nieuw/bohem-nieuw-sunset-portrait.webp",
+      "alt": "Bohèm in gouden zonsondergang, klaar voor liveoptreden",
+      "width": 1800,
+      "height": 1202,
+      "caption": "Nieuwe fotoserie 2026"
+    },
     "cta": { "label": "Vraag beschikbaarheid aan", "href": "#contact", "variant": "primary" },
     "infoTitle": "Boekingsinformatie",
     "infoItems": [
@@ -126,7 +186,15 @@
     "intro": "Stuur een bericht voor boekingen, beschikbaarheid of praktische vragen.",
     "ctaLabel": "Stuur een bericht",
     "email": "boekingen@bohem.nl",
+    "responseTimeText": "We reageren meestal binnen 2 werkdagen.",
+    "subjectOptions": ["Boeking", "Pers", "Algemene vraag"],
     "fields": [
+      {
+        "id": "subject",
+        "label": "Onderwerp",
+        "type": "select",
+        "required": true
+      },
       {
         "id": "name",
         "label": "Naam",
@@ -139,6 +207,13 @@
         "label": "E-mail",
         "type": "email",
         "autoComplete": "email",
+        "required": true
+      },
+      {
+        "id": "phone",
+        "label": "Telefoonnummer",
+        "type": "tel",
+        "autoComplete": "tel",
         "required": true
       },
       {

@@ -6,6 +6,8 @@ import { HeroSection } from "@/components/sections/HeroSection";
 import { MusicExperienceSection } from "@/components/sections/MusicExperienceSection";
 import { SiteFooter } from "@/components/sections/SiteFooter";
 import { SiteHeader } from "@/components/sections/SiteHeader";
+import { MobileStickyCta } from "@/components/ui/MobileStickyCta";
+import { StickyListenBar } from "@/components/ui/StickyListenBar";
 import { siteContent } from "@/lib/content";
 
 export default function HomePage() {
@@ -25,6 +27,14 @@ export default function HomePage() {
         <BookingsSection bookings={siteContent.bookings} />
         <ContactSection contact={siteContent.contact} />
       </main>
+      <StickyListenBar
+        sectionId="discografie"
+        contactId="contact"
+        trackTitle={siteContent.discography.featuredSingle.title}
+        trackHref={siteContent.discography.featuredSingle.href}
+        artistHref={siteContent.discography.artist.href}
+      />
+      <MobileStickyCta href="#boekingen" label="Boek Bohèm" />
 
       <SiteFooter footer={siteContent.footer} />
     </>

@@ -9,9 +9,13 @@ type DiscographySectionProps = {
 
 export function DiscographySection({ discography }: DiscographySectionProps) {
   return (
-    <section id="discografie" aria-labelledby="discografie-title" className="relative overflow-hidden py-16">
+    <section
+      id="discografie"
+      aria-labelledby="discografie-title"
+      className="section-ambient section-ambient-discography relative overflow-hidden bg-[linear-gradient(180deg,#212f44_0%,#26263a_100%)] py-16"
+    >
       <div
-        className="pointer-events-none absolute inset-0"
+        className="discography-parallax pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
             "linear-gradient(165deg, rgba(13,20,31,0.86) 0%, rgba(24,41,63,0.82) 45%, rgba(77,65,110,0.82) 100%), url('/brand/docs/roest-en-metaal.webp')",
@@ -34,9 +38,9 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
           <p className="mb-7 max-w-[70ch]">{discography.intro}</p>
         </Reveal>
 
-        <div className="mb-6 grid gap-6 md:grid-cols-[1.3fr_1fr]">
-          <Reveal>
-            <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(165deg,rgba(244,233,220,0.12)_0%,rgba(244,233,220,0.04)_100%)] p-6">
+        <div className="mb-6 grid gap-6 md:grid-cols-[1.3fr_1fr] md:items-stretch">
+          <Reveal className="h-full">
+            <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(165deg,rgba(244,233,220,0.12)_0%,rgba(244,233,220,0.04)_100%)] p-6">
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Nieuw uitgelicht</p>
               <h3 className="mb-2 font-display text-3xl">{discography.featuredSingle.title}</h3>
               <p className="mb-4 text-[#e7d6c1]">{discography.featuredSingle.description}</p>
@@ -60,8 +64,8 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
             </article>
           </Reveal>
 
-          <Reveal delayMs={120}>
-            <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
+          <Reveal delayMs={120} className="h-full">
+            <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Spotify</p>
               <h3 className="mb-2 font-display text-3xl">{discography.artist.title}</h3>
               <p className="mb-4 text-[#e7d6c1]">{discography.artist.description}</p>
@@ -87,6 +91,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
                   {discography.legal ? <p className="text-xs text-[#d9c6ac]">{discography.legal}</p> : null}
                 </div>
               ) : null}
+
             </article>
           </Reveal>
         </div>

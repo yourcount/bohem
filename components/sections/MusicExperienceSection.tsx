@@ -10,7 +10,11 @@ type MusicExperienceSectionProps = {
 
 export function MusicExperienceSection({ musicExperience }: MusicExperienceSectionProps) {
   return (
-    <section id="muziek" aria-labelledby="muziek-title" className="py-16">
+    <section
+      id="muziek"
+      aria-labelledby="muziek-title"
+      className="section-ambient section-ambient-experience bg-[linear-gradient(180deg,#26263a_0%,#252238_55%,#232031_100%)] py-16"
+    >
       <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-6 md:grid-cols-[1.15fr_1fr]">
         <Reveal>
           <div>

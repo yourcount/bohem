@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Reveal } from "@/components/ui/Reveal";
@@ -9,6 +12,21 @@ type HeroSectionProps = {
 };
 
 export function HeroSection({ hero }: HeroSectionProps) {
+  const [parallaxY, setParallaxY] = useState(0);
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    const updateParallax = () => {
+      setParallaxY(Math.min(window.scrollY, 320));
+    };
+
+    updateParallax();
+    window.addEventListener("scroll", updateParallax, { passive: true });
+    return () => window.removeEventListener("scroll", updateParallax);
+  }, []);
+
   return (
     <section aria-labelledby="hero-title" className="relative grid min-h-[85svh] items-end overflow-clip pb-24 pt-12">
       <div className="absolute inset-0">
@@ -28,6 +46,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
         width={420}
         height={420}
         className="pointer-events-none absolute -right-20 top-20 hidden opacity-20 md:block"
+        style={{ transform: `translateY(${parallaxY * 0.08}px)` }}
         aria-hidden="true"
       />
       <Image
@@ -36,6 +55,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
         width={160}
         height={152}
         className="pointer-events-none absolute bottom-8 right-8 hidden opacity-30 md:block"
+        style={{ transform: `translateY(${-parallaxY * 0.06}px)` }}
         aria-hidden="true"
       />
 

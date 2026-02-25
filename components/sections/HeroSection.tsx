@@ -21,8 +21,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
           sizes="100vw"
         />
       </div>
-      <div className="absolute inset-0 bg-[linear-gradient(160deg,#1a1412cc_0%,#1a141255_45%,#1a1412d6_100%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(14,22,34,0.76)_0%,rgba(14,22,34,0.3)_42%,rgba(14,22,34,0.84)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(14,22,34,0.58)_0%,rgba(14,22,34,0.2)_42%,rgba(14,22,34,0.68)_100%)]" />
       <Image
         src="/brand/elements/bohem-moon-element.webp"
         alt=""

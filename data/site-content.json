@@ -10,6 +10,7 @@
   "navigation": [
     { "label": "Bio", "href": "#bio" },
     { "label": "Discografie", "href": "#discografie" },
+    { "label": "Kampvuurklanken", "href": "#kampvuurklanken" },
     { "label": "Boekingen", "href": "#boekingen" },
     { "label": "Contact", "href": "#contact" }
   ],
@@ -118,6 +119,32 @@
       "alt": "Arthur en Bettina in tegenlicht in het veld, met gitaar en warme avondzon",
       "width": 2200,
       "height": 1469
+    }
+  },
+  "kampvuur": {
+    "title": "Kampvuurklanken",
+    "intro": "Een speciale avond die mensen echt samenbrengt.",
+    "body": [
+      "Geen zweverig gedoe, maar herkenbare thema's en eerlijke woorden die raken aan wie we zijn, ook achter onze functie. Een moment van vertraging, verbinding, menselijkheid en humor.",
+      "Het team verzamelt zich rond het vuur. Misschien net uit een vergadering, nog in de volle agenda. Even weg uit de waan van de dag.",
+      "Bij het licht van de vlammen verschuift de dynamiek. De liedjes en verhalen van BOHÈM gaan niet over deadlines of efficiëntie, maar over mens zijn: geluk, verdriet, twijfel en veerkracht."
+    ],
+    "benefitsTitle": "Waarom Kampvuurklanken werkt",
+    "benefits": [
+      "Versterkt betrokkenheid, verbinding en vertrouwen",
+      "Creëert een rustpunt in drukke tijden",
+      "Verhoogt psychologische veiligheid",
+      "Verfrissend alternatief voor traditionele teambuilding"
+    ],
+    "quote": "Een bijeenkomst die blijft hangen, een team dat lichter naar huis gaat.",
+    "contactPrompt": "Neem gerust contact op, we denken graag mee.",
+    "contactEmail": "info@musicbybohem.nl",
+    "contactPhone": "+31 6 36313948",
+    "image": {
+      "src": "/images/nieuw/bohem-nieuw-sunset-portrait.webp",
+      "alt": "Bohèm in warm avondlicht als uitnodiging voor een intieme teamsessie",
+      "width": 1800,
+      "height": 1202
     }
   },
   "bookings": {

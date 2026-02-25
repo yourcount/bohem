@@ -3,6 +3,7 @@ import { BookingsSection } from "@/components/sections/BookingsSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { DiscographySection } from "@/components/sections/DiscographySection";
 import { HeroSection } from "@/components/sections/HeroSection";
+import { KampvuurSection } from "@/components/sections/KampvuurSection";
 import { MusicExperienceSection } from "@/components/sections/MusicExperienceSection";
 import { SiteFooter } from "@/components/sections/SiteFooter";
 import { SiteHeader } from "@/components/sections/SiteHeader";
@@ -24,6 +25,7 @@ export default function HomePage() {
         <AboutSection about={siteContent.about} />
         <DiscographySection discography={siteContent.discography} />
         <MusicExperienceSection musicExperience={siteContent.musicExperience} />
+        <KampvuurSection kampvuur={siteContent.kampvuur} />
         <BookingsSection bookings={siteContent.bookings} />
         <ContactSection contact={siteContent.contact} />
       </main>

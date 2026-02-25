@@ -84,6 +84,23 @@ export type SiteContent = {
       height: number;
     };
   };
+  kampvuur: {
+    title: string;
+    intro: string;
+    body: string[];
+    benefitsTitle: string;
+    benefits: string[];
+    quote: string;
+    contactPrompt: string;
+    contactEmail: string;
+    contactPhone: string;
+    image?: {
+      src: string;
+      alt: string;
+      width: number;
+      height: number;
+    };
+  };
   bookings: {
     title: string;
     body: string;

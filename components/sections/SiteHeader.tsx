@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -13,9 +13,58 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeHref, setActiveHref] = useState<string>(navigation[0]?.href ?? "#main-content");
+
+  const sectionIds = useMemo(
+    () =>
+      navigation
+        .map((item) => item.href)
+        .filter((href) => href.startsWith("#"))
+        .map((href) => href.slice(1)),
+    [navigation]
+  );
 
   const handleCloseMenu = () => setIsMenuOpen(false);
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+  const handleNavClick = (href: string) => {
+    setActiveHref(href);
+    handleCloseMenu();
+  };
+
+  useEffect(() => {
+    const updateActiveSection = () => {
+      const viewportOffset = window.innerHeight * 0.35;
+      let current = navigation[0]?.href ?? "#main-content";
+
+      sectionIds.forEach((id) => {
+        const section = document.getElementById(id);
+        if (!section) return;
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= viewportOffset) {
+          current = `#${id}`;
+        }
+      });
+
+      setActiveHref(current);
+    };
+
+    const updateFromHash = () => {
+      if (window.location.hash) {
+        setActiveHref(window.location.hash);
+      }
+    };
+
+    updateFromHash();
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+    window.addEventListener("hashchange", updateFromHash);
+    return () => {
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
+      window.removeEventListener("hashchange", updateFromHash);
+    };
+  }, [navigation, sectionIds]);
 
   return (
     <header className="sticky top-0 z-30 border-b border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.82)] backdrop-blur">
@@ -46,7 +95,14 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
           <ul className="flex min-w-max gap-5 text-sm">
             {navigation.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="transition-colors hover:text-[#f3d7b0] focus-visible:text-[#f3d7b0]">
+                <Link
+                  href={item.href}
+                  aria-current={activeHref === item.href ? "page" : undefined}
+                  onClick={() => handleNavClick(item.href)}
+                  className={`transition-colors hover:text-[#f3d7b0] focus-visible:text-[#f3d7b0] ${
+                    activeHref === item.href ? "text-[#f3d7b0] underline decoration-[1.5px] underline-offset-[6px]" : ""
+                  }`}
+                >
                   {item.label}
                 </Link>
               </li>
@@ -66,8 +122,11 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
               <li key={`mobile-${item.href}`}>
                 <Link
                   href={item.href}
-                  className="mobile-menu-link block rounded-xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] px-4 py-3 text-base font-medium transition-colors hover:border-[#c8873e] hover:text-[#f3d7b0] active:scale-[0.99]"
-                  onClick={handleCloseMenu}
+                  aria-current={activeHref === item.href ? "page" : undefined}
+                  className={`mobile-menu-link block rounded-xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] px-4 py-3 text-base font-medium transition-colors hover:border-[#c8873e] hover:text-[#f3d7b0] active:scale-[0.99] ${
+                    activeHref === item.href ? "border-[#c8873e] text-[#f3d7b0]" : ""
+                  }`}
+                  onClick={() => handleNavClick(item.href)}
                 >
                   {item.label}
                 </Link>

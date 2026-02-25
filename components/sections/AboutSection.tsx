@@ -25,6 +25,19 @@ export function AboutSection({ about }: AboutSectionProps) {
             </Reveal>
           ))}
         </div>
+
+        {about.lineupItems && about.lineupItems.length > 0 ? (
+          <Reveal delayMs={220}>
+            <article className="mt-6 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.04)] p-6">
+              {about.lineupTitle ? <h3 className="mb-3 font-display text-3xl">{about.lineupTitle}</h3> : null}
+              <ul className="space-y-2">
+                {about.lineupItems.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+          </Reveal>
+        ) : null}
       </div>
     </section>
   );

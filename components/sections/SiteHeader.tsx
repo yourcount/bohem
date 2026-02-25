@@ -23,7 +23,7 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
 
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-sm font-semibold md:hidden"
+          className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-sm font-semibold transition-transform active:scale-[0.98] md:hidden"
           aria-expanded={isMenuOpen}
           aria-controls="mobile-nav"
           aria-label={isMenuOpen ? "Sluit menu" : "Open menu"}
@@ -46,13 +46,17 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
       </div>
 
       {isMenuOpen ? (
-        <nav id="mobile-nav" aria-label="Mobiel menu" className="border-t border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.96)] md:hidden">
+        <nav
+          id="mobile-nav"
+          aria-label="Mobiel menu"
+          className="mobile-menu-panel border-t border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.96)] md:hidden"
+        >
           <ul className="mx-auto flex w-full max-w-[1120px] flex-col gap-2 px-6 py-4">
             {navigation.map((item) => (
               <li key={`mobile-${item.href}`}>
                 <Link
                   href={item.href}
-                  className="block rounded-xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] px-4 py-3 text-base font-medium transition-colors hover:border-[#c8873e] hover:text-[#f3d7b0]"
+                  className="mobile-menu-link block rounded-xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] px-4 py-3 text-base font-medium transition-colors hover:border-[#c8873e] hover:text-[#f3d7b0] active:scale-[0.99]"
                   onClick={handleCloseMenu}
                 >
                   {item.label}

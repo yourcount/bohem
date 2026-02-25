@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Bohèm | Liedjes met licht en schaduw",
-    "description": "Bohèm brengt melodische NL/EN songs met onverwachte wendingen, warm van toon en dichtbij verteld.",
+    "description": "Bohèm is de muzikale samenwerking tussen Arthur Bont en Bettina Kraaieveld met melodische, verhalende songs in NL en EN.",
     "locale": "nl-NL"
   },
   "brand": {
@@ -11,79 +11,98 @@
     { "label": "Bio", "href": "#bio" },
     { "label": "Discografie", "href": "#discografie" },
     { "label": "Boekingen", "href": "#boekingen" },
-    { "label": "Luisteren", "href": "#media" },
     { "label": "Contact", "href": "#contact" }
   ],
   "hero": {
     "eyebrow": "Bohèm",
     "headline": "Liedjes met licht en schaduw",
-    "subhead": "Bohèm brengt melodische NL/EN songs met onverwachte wendingen, warm van toon en dichtbij verteld.",
+    "subhead": "Melodisch, verhalend en persoonlijk: Nederlandstalige en Engelstalige songs over het leven in al zijn facetten.",
     "image": {
       "src": "/images/bohem-hero.jpg",
       "alt": "Arthur Bont en Bettina Kraaieveld in warm podiumlicht"
     },
     "ctas": [
       { "label": "Boek Bohèm", "href": "#boekingen", "variant": "primary" },
-      { "label": "Luister naar Bohèm", "href": "#media", "variant": "secondary" },
+      { "label": "Luister naar Bohèm", "href": "#discografie", "variant": "secondary" },
       { "label": "Neem contact op", "href": "#contact", "variant": "secondary" }
     ]
   },
   "about": {
     "title": "Over Bohèm",
-    "intro": "Bohèm is het duo van Arthur Bont en Bettina Kraaieveld. Ze maken melodische nummers in het Nederlands en Engels, met arrangementen die net anders lopen dan je verwacht. Hun liedjes gaan over wat mensen bezighoudt: nabijheid, twijfel, hoop, verlies, opnieuw beginnen. Op het podium klinkt dat warm en theatraal, zonder groot gebaar. Persoonlijk, zorgvuldig en met ruimte voor stilte.",
+    "intro": "BOHÈM is een muzikale samenwerking tussen Arthur Bont en Bettina Kraaieveld. Hun liedjes zijn melodisch, verhalend en persoonlijk, met teksten in het Nederlands en Engels over het leven in al zijn facetten: over verbinding en afstand, twijfel en verlangen. Wat begon met het schrijven van een song voor het Nationale Songfestival (2024) groeide uit tot een eigen repertoire en de EP Wolkentranen (2026).",
+    "lineupTitle": "Bezetting",
+    "lineupItems": [
+      "Leadvocal en mondharmonica: Bettina Kraaieveld",
+      "Backingvocals en percussie: Arthur Bont",
+      "Gitaar, bas en piano: Evert Zeevalkink"
+    ],
     "bios": [
       {
         "name": "Arthur",
-        "text": "Arthur Bont schrijft, componeert en bouwt mee aan de muzikale gelaagdheid van Bohèm. Zijn spel en stem zoeken naar spanning tussen eenvoud en detail: een heldere melodie, een onverwachte beweging, precies op het juiste moment. In zijn teksten laat hij ruimte voor interpretatie, zonder afstand te creëren. Altijd met aandacht voor ritme, verhaal en samenspel."
+        "text": "Arthur Bont is drummer, percussionist en songwriter. Hij werkte samen met onder anderen Sjors van der Panne, Jack Poels, Mick Taylor en Smokey Wilson. Binnen Bohèm geeft hij ritmische gelaagdheid, backingvocals en percussie vorm, met een sterke focus op dynamiek en songverhaal."
       },
       {
         "name": "Bettina",
-        "text": "Bettina Kraaieveld geeft Bohèm een stem die nabij voelt en tegelijk draagt. In zang en interpretatie verbindt ze het persoonlijke met het theatrale: klein wanneer het kan, krachtig wanneer het nodig is. Ze schrijft en vormt teksten die direct zijn, maar meerlagig blijven. Haar presence op het podium brengt rust, focus en emotionele precisie."
+        "text": "Bettina Kraaieveld is zangeres, theatermaker en songwriter met een sterke podiumaanwezigheid en een liefde voor verhalen die raken. Als leadvocalist en mondharmonicaspeler geeft zij de songs van Bohèm een direct, persoonlijk en theatraal karakter."
       }
     ]
   },
   "discography": {
     "title": "Discografie",
-    "intro": "Een groeiende catalogus met melodische songs in NL en EN, van intieme studio-opnames tot live sessies.",
+    "intro": "Van eerste songs tot nieuw repertoire: luister naar Bohèm op Spotify en ontdek de lijn van Vroeger naar Wolkentranen.",
+    "featuredSingle": {
+      "title": "Eerste nieuwe single: Vroeger",
+      "description": "Vroeger zet direct de toon: samen zijn, maar elkaar niet meer kunnen bereiken als het stil wordt tussen twee mensen.",
+      "href": "https://open.spotify.com/track/2TaHQl5PVOSHIs1xCjbD1W?si=117282ba1c4740b1",
+      "embedUrl": "https://open.spotify.com/embed/track/2TaHQl5PVOSHIs1xCjbD1W?utm_source=generator"
+    },
+    "artist": {
+      "title": "Spotify Artist",
+      "description": "Volg Bohèm op Spotify voor nieuwe releases, updates en live materiaal.",
+      "href": "https://open.spotify.com/artist/7MZs9HjZfvICRqVXENFcoa?si=OykX8uRmQcawyF4woCaciQ"
+    },
+    "productionTitle": "Productie & Opname",
+    "productionItems": [
+      "Productie: Evert Zeevalkink en Bohèm",
+      "Opnamestudio: Evert Zeevalkink Nijmegen",
+      "Mastering: Da Goose Mastering"
+    ],
+    "legal": "Tekst en muziek is geschreven door Bohèm. Kraaieveld/Bont (c) Bohèm Records 2026.",
     "releases": [
       {
-        "title": "Lichtval",
+        "title": "Vroeger",
         "year": "2026",
         "format": "Single",
-        "note": "NL/EN • akoestisch met gelaagde strijkers",
+        "note": "De eerste nieuwe single: samen zijn, maar elkaar niet meer kunnen bereiken als het stil wordt tussen twee mensen.",
         "links": [
-          { "label": "Spotify", "href": "#" },
-          { "label": "Apple Music", "href": "#" },
-          { "label": "YouTube", "href": "#" }
+          {
+            "label": "Spotify",
+            "href": "https://open.spotify.com/track/2TaHQl5PVOSHIs1xCjbD1W?si=117282ba1c4740b1"
+          },
+          {
+            "label": "Artist",
+            "href": "https://open.spotify.com/artist/7MZs9HjZfvICRqVXENFcoa?si=OykX8uRmQcawyF4woCaciQ"
+          }
         ]
       },
       {
-        "title": "Tussenstilte",
-        "year": "2025",
+        "title": "Wolkentranen",
+        "year": "2026",
         "format": "EP",
-        "note": "5 tracks • intiem, theatraal en verhalend",
+        "note": "Eigen repertoire waarin melodie, verhaal en contrast samenkomen in NL en EN.",
         "links": [
-          { "label": "Spotify", "href": "#" },
-          { "label": "Bandcamp", "href": "#" },
-          { "label": "YouTube", "href": "#" }
-        ]
-      },
-      {
-        "title": "Bohèm Live Sessions",
-        "year": "2025",
-        "format": "Live Session",
-        "note": "Opgenomen in podiumlicht-setting",
-        "links": [
-          { "label": "YouTube", "href": "#" },
-          { "label": "Instagram", "href": "#" }
+          {
+            "label": "Spotify",
+            "href": "https://open.spotify.com/artist/7MZs9HjZfvICRqVXENFcoa?si=OykX8uRmQcawyF4woCaciQ"
+          }
         ]
       }
     ]
   },
   "musicExperience": {
     "title": "Muziekbeleving",
-    "body": "Melodische lijnen, gelaagde arrangementen en teksten in twee talen. Bohèm beweegt tussen intimiteit en theatrale spanning, met liedjes die dichtbij blijven en toch blijven verrassen.",
-    "cta": { "label": "Beluister een fragment", "href": "#media" },
+    "body": "Live, onder de noemer Reizigers, neemt Bohèm het publiek mee op een muzikale mini-trip: verrassende arrangementen, diepgang, flair, humor en interactie. Liedjes om bij stil te staan en energie om in mee te bewegen.",
+    "cta": { "label": "Beluister een fragment", "href": "#discografie" },
     "image": {
       "src": "/images/bohem-stage.jpg",
       "alt": "Bohèm op een podiumsetting met amberkleurig licht",
@@ -93,29 +112,13 @@
   },
   "bookings": {
     "title": "Live & Boekingen",
-    "body": "Geschikt voor theaters, kleinschalige culturele podia en intieme concertavonden. Voor aanvragen en beschikbaarheid reageren we persoonlijk en snel.",
+    "body": "Bohèm speelt als Reizigers op theaters, kleinschalige culturele podia en intieme concertavonden. Voor aanvragen en beschikbaarheid reageren we persoonlijk en snel.",
     "cta": { "label": "Vraag beschikbaarheid aan", "href": "#contact", "variant": "primary" },
     "infoTitle": "Boekingsinformatie",
     "infoItems": [
-      "Format: duo-set met zang, gitaar en eigen repertoire in NL/EN.",
-      "Duur: in overleg, afgestemd op locatie en programma.",
+      "Format: duo-set met zang, mondharmonica, backingvocals en percussie.",
+      "Live-concept: Reizigers - muzikale mini-trip met interactie.",
       "Reactietijd: meestal binnen 2 werkdagen."
-    ]
-  },
-  "media": {
-    "title": "Media",
-    "cards": [
-      {
-        "title": "Live video",
-        "description": "Bekijk live",
-        "type": "video"
-      },
-      {
-        "title": "Audiofragment",
-        "description": "Beluister een fragment",
-        "type": "audio",
-        "source": ""
-      }
     ]
   },
   "contact": {

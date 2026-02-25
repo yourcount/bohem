@@ -16,7 +16,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
           src={hero.image.src}
           alt={hero.image.alt}
           fill
-          className="object-cover object-top"
+          className="hero-mobile-zoom object-cover object-top"
           priority
           sizes="100vw"
         />

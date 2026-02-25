@@ -32,6 +32,8 @@ export type SiteContent = {
   about: {
     title: string;
     intro: string;
+    lineupTitle?: string;
+    lineupItems?: string[];
     bios: Array<{
       name: string;
       text: string;
@@ -40,6 +42,20 @@ export type SiteContent = {
   discography: {
     title: string;
     intro: string;
+    featuredSingle: {
+      title: string;
+      description: string;
+      href: string;
+      embedUrl: string;
+    };
+    artist: {
+      title: string;
+      description: string;
+      href: string;
+    };
+    productionTitle?: string;
+    productionItems?: string[];
+    legal?: string;
     releases: Array<{
       title: string;
       year: string;
@@ -68,15 +84,6 @@ export type SiteContent = {
     cta: Cta;
     infoTitle: string;
     infoItems: string[];
-  };
-  media: {
-    title: string;
-    cards: Array<{
-      title: string;
-      description: string;
-      type: "video" | "audio";
-      source?: string;
-    }>;
   };
   contact: {
     title: string;

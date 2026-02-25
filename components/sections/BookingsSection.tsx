@@ -20,9 +20,11 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
               {bookings.title}
             </h2>
             <p>{bookings.body}</p>
-            <ButtonLink href={bookings.cta.href} variant={bookings.cta.variant ?? "primary"}>
-              {bookings.cta.label}
-            </ButtonLink>
+            <div className="mt-5">
+              <ButtonLink href={bookings.cta.href} variant={bookings.cta.variant ?? "primary"}>
+                {bookings.cta.label}
+              </ButtonLink>
+            </div>
           </div>
         </Reveal>
 

@@ -3,7 +3,6 @@ import { BookingsSection } from "@/components/sections/BookingsSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { DiscographySection } from "@/components/sections/DiscographySection";
 import { HeroSection } from "@/components/sections/HeroSection";
-import { MediaSection } from "@/components/sections/MediaSection";
 import { MusicExperienceSection } from "@/components/sections/MusicExperienceSection";
 import { SiteFooter } from "@/components/sections/SiteFooter";
 import { SiteHeader } from "@/components/sections/SiteHeader";
@@ -24,7 +23,6 @@ export default function HomePage() {
         <DiscographySection discography={siteContent.discography} />
         <MusicExperienceSection musicExperience={siteContent.musicExperience} />
         <BookingsSection bookings={siteContent.bookings} />
-        <MediaSection media={siteContent.media} />
         <ContactSection contact={siteContent.contact} />
       </main>
 

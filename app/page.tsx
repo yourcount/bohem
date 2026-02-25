@@ -34,7 +34,7 @@ export default function HomePage() {
         trackHref={siteContent.discography.featuredSingle.href}
         artistHref={siteContent.discography.artist.href}
       />
-      <MobileStickyCta href="#boekingen" label="Boek Bohèm" />
+      <MobileStickyCta href="#boekingen" label="Boek Bohèm" visibleSectionIds={["bio", "discografie"]} />
 
       <SiteFooter footer={siteContent.footer} />
     </>

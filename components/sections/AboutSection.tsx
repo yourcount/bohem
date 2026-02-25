@@ -17,8 +17,8 @@ export function AboutSection({ about }: AboutSectionProps) {
         </Reveal>
         <div className="grid gap-6 md:grid-cols-2" aria-label="Bio's">
           {about.bios.map((bio, index) => (
-            <Reveal key={bio.name} delayMs={index * 120}>
-              <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
+            <Reveal key={bio.name} delayMs={index * 120} className="h-full">
+              <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
                 <h3 className="mb-3 font-display text-3xl">{bio.name}</h3>
                 <p className="mb-0">{bio.text}</p>
               </article>

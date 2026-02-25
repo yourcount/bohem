@@ -2,17 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Backslash";
+  src: url("/brand/font/backslash-regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+  --font-display: "Backslash", "Times New Roman", serif;
   --font-body: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
-  --color-bg-deep: #1a1412;
-  --color-bg-soft: #2a211e;
-  --color-surface: #f4e9dc;
-  --color-text-primary: #f7f1ea;
-  --color-text-dark: #241b17;
-  --color-accent-amber: #c8873e;
-  --color-accent-copper: #a65a3a;
-  --color-line-muted: #6e5a52;
+  --color-bg-deep: #18293f;
+  --color-bg-soft: #2b3550;
+  --color-surface: #f2eee8;
+  --color-text-primary: #f8f5f1;
+  --color-text-dark: #1f2530;
+  --color-accent-amber: #f28b0e;
+  --color-accent-copper: #b52f1d;
+  --color-line-muted: #438785;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -24,7 +32,7 @@
   --space-8: 64px;
   --space-9: 96px;
 
-  --focus-ring: #f7f1ea;
+  --focus-ring: #28a7c1;
 }
 
 * {
@@ -45,7 +53,10 @@ body {
   font-family: var(--font-body), "Avenir Next", "Segoe UI", sans-serif;
   line-height: 1.6;
   color: var(--color-text-primary);
-  background: radial-gradient(circle at top, #3b2a22 0%, var(--color-bg-deep) 40%, #140f0d 100%);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(40, 167, 193, 0.24) 0%, transparent 38%),
+    radial-gradient(circle at 86% 10%, rgba(242, 139, 14, 0.3) 0%, transparent 36%),
+    linear-gradient(165deg, #101a2a 0%, #1b2d47 45%, #4d416e 100%);
 }
 
 .reveal {
@@ -78,6 +89,7 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display), "Times New Roman", serif;
+  letter-spacing: 0.01em;
 }
 
 p {

@@ -5,7 +5,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["Cormorant Garamond", "Times New Roman", "serif"],
+        display: ["Backslash", "Times New Roman", "serif"],
         body: ["Manrope", "Avenir Next", "Segoe UI", "sans-serif"]
       }
     }

@@ -9,8 +9,24 @@ type DiscographySectionProps = {
 
 export function DiscographySection({ discography }: DiscographySectionProps) {
   return (
-    <section id="discografie" aria-labelledby="discografie-title" className="bg-[var(--color-bg-soft)]/40 py-16">
-      <div className="mx-auto w-full max-w-[1120px] px-6">
+    <section id="discografie" aria-labelledby="discografie-title" className="relative overflow-hidden py-16">
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(165deg, rgba(13,20,31,0.86) 0%, rgba(24,41,63,0.82) 45%, rgba(77,65,110,0.82) 100%), url('/brand/docs/roest-en-metaal.webp')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -left-16 top-8 hidden h-56 w-56 opacity-[0.1] md:block"
+        style={{ backgroundImage: "url('/brand/elements/bohem-b-monogram-color.webp')", backgroundSize: "contain", backgroundRepeat: "no-repeat" }}
+        aria-hidden="true"
+      />
+      <div className="relative z-10 mx-auto w-full max-w-[1120px] px-6">
         <Reveal>
           <h2 id="discografie-title" className="mb-4 font-display text-4xl leading-tight sm:text-5xl">
             {discography.title}

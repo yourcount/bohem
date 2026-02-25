@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 import type { NavItem } from "@/lib/types";
 
@@ -19,7 +20,16 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.82)] backdrop-blur">
       <div className="mx-auto flex min-h-16 w-full max-w-[1120px] items-center justify-between gap-4 px-6">
-        <p className="font-display text-[2rem] leading-none tracking-[0.02em]">{brandName}</p>
+        <Link href="#main-content" className="inline-flex items-center">
+          <Image
+            src="/brand/logos/bohem-logo-white-moon-color.webp"
+            alt={brandName}
+            width={220}
+            height={84}
+            className="h-10 w-auto sm:h-11"
+            priority
+          />
+        </Link>
 
         <button
           type="button"

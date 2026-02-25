@@ -22,6 +22,23 @@ export function HeroSection({ hero }: HeroSectionProps) {
         />
       </div>
       <div className="absolute inset-0 bg-[linear-gradient(160deg,#1a1412cc_0%,#1a141255_45%,#1a1412d6_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(14,22,34,0.76)_0%,rgba(14,22,34,0.3)_42%,rgba(14,22,34,0.84)_100%)]" />
+      <Image
+        src="/brand/elements/bohem-moon-element.webp"
+        alt=""
+        width={420}
+        height={420}
+        className="pointer-events-none absolute -right-20 top-20 hidden opacity-20 md:block"
+        aria-hidden="true"
+      />
+      <Image
+        src="/brand/elements/bohem-crow-element.webp"
+        alt=""
+        width={160}
+        height={152}
+        className="pointer-events-none absolute bottom-8 right-8 hidden opacity-30 md:block"
+        aria-hidden="true"
+      />
 
       <div className="relative z-10 mx-auto w-full max-w-[1120px] px-6">
         <Reveal className="hero-intro" delayMs={40}>

@@ -166,7 +166,9 @@ p {
 }
 
 .section-ambient-bio::before {
-  background-image: radial-gradient(circle at 12% 12%, rgba(40, 167, 193, 0.24) 0%, transparent 44%);
+  background-image:
+    radial-gradient(circle at 16% 14%, rgba(242, 139, 14, 0.16) 0%, transparent 42%),
+    radial-gradient(circle at 82% 78%, rgba(67, 135, 133, 0.16) 0%, transparent 46%);
 }
 
 .section-ambient-discography::before {

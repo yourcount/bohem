@@ -28,7 +28,10 @@ export function HeroSection({ hero }: HeroSectionProps) {
   }, []);
 
   return (
-    <section aria-labelledby="hero-title" className="relative grid min-h-[82svh] items-end overflow-clip pb-20 pt-10 sm:min-h-[85svh] sm:pb-24 sm:pt-12">
+    <section
+      aria-labelledby="hero-title"
+      className="relative grid min-h-[82svh] items-end overflow-clip pb-20 pt-10 sm:min-h-[85svh] sm:pb-24 sm:pt-12 md:min-h-[calc(100svh-4rem)]"
+    >
       <div className="absolute inset-0">
         <Image
           src={hero.image.src}

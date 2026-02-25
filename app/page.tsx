@@ -28,11 +28,9 @@ export default function HomePage() {
         <ContactSection contact={siteContent.contact} />
       </main>
       <StickyListenBar
-        sectionId="discografie"
-        contactId="contact"
+        visibleSectionIds={["bio", "discografie"]}
         trackTitle={siteContent.discography.featuredSingle.title}
         trackHref={siteContent.discography.featuredSingle.href}
-        artistHref={siteContent.discography.artist.href}
       />
       <MobileStickyCta href="#boekingen" label="Boek Bohèm" visibleSectionIds={["bio", "discografie"]} />
 

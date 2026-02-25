@@ -2,36 +2,33 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 type StickyListenBarProps = {
-  sectionId: string;
-  contactId: string;
+  visibleSectionIds: string[];
   trackTitle: string;
   trackHref: string;
-  artistHref: string;
 };
 
 export function StickyListenBar({
-  sectionId,
-  contactId,
+  visibleSectionIds,
   trackTitle,
-  trackHref,
-  artistHref
+  trackHref
 }: StickyListenBarProps) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isEligible, setIsEligible] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
+  const [isManuallyOpen, setIsManuallyOpen] = useState(false);
 
   useEffect(() => {
     const updateVisibility = () => {
-      const section = document.getElementById(sectionId);
-      const contactSection = document.getElementById(contactId);
-      if (!section) return;
-
-      const sectionRect = section.getBoundingClientRect();
-      const contactRect = contactSection?.getBoundingClientRect();
-      const enteredDiscography = sectionRect.top <= window.innerHeight * 0.8;
-      const beforeContact = contactRect ? contactRect.top > window.innerHeight * 0.24 : true;
-
-      setIsVisible(enteredDiscography && beforeContact);
+      const viewportOffset = window.innerHeight * 0.35;
+      const shouldShow = visibleSectionIds.some((id) => {
+        const section = document.getElementById(id);
+        if (!section) return false;
+        const rect = section.getBoundingClientRect();
+        return rect.top <= viewportOffset && rect.bottom > viewportOffset;
+      });
+      setIsEligible(shouldShow);
     };
 
     updateVisibility();
@@ -42,33 +39,68 @@ export function StickyListenBar({
       window.removeEventListener("scroll", updateVisibility);
       window.removeEventListener("resize", updateVisibility);
     };
-  }, [contactId, sectionId]);
+  }, [visibleSectionIds]);
+
+  const showBar = !isDismissed && (isEligible || isManuallyOpen);
+  const showLauncher = !showBar;
 
   return (
-    <aside
-      aria-label="Nu luisteren"
-      className={`sticky-listen-bar hidden md:block ${isVisible ? "is-visible" : ""}`}
-    >
-      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Nu luisteren</p>
-      <p className="mt-1 text-sm font-semibold text-[var(--color-text-primary)]">{trackTitle}</p>
-      <div className="mt-2 flex gap-2">
-        <Link
-          href={trackHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-3 py-1.5 text-xs font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+    <>
+      <aside aria-label="Nu luisteren" className={`sticky-listen-bar hidden md:grid ${showBar ? "is-visible" : ""}`}>
+        <button
+          type="button"
+          aria-label="Sluit luisterbalk"
+          className="sticky-listen-close"
+          onClick={() => {
+            setIsDismissed(true);
+            setIsManuallyOpen(false);
+          }}
         >
-          Open track
-        </Link>
-        <Link
-          href={artistHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-        >
-          Artist
-        </Link>
-      </div>
-    </aside>
+          ×
+        </button>
+        <div className="sticky-listen-left">
+          <div className="sticky-listen-vinyl" aria-hidden="true">
+            <div className="sticky-listen-vinyl-label">B</div>
+          </div>
+          <div className="sticky-listen-content">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#f3d7b0]">Nu luisteren</p>
+            <p className="sticky-listen-title">{trackTitle}</p>
+          </div>
+        </div>
+
+        <div className="sticky-listen-right">
+          <figure className="sticky-listen-cover" aria-label="Single artwork">
+            <Image
+              src="/images/music/vroeger-cover.webp"
+              alt="Cover art van de single Vroeger"
+              width={148}
+              height={148}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </figure>
+          <Link
+            href={trackHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sticky-listen-button inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+          >
+            Speel op Spotify
+          </Link>
+        </div>
+      </aside>
+
+      <button
+        type="button"
+        aria-label="Open luisterbalk"
+        className={`sticky-listen-launcher hidden md:inline-flex ${showLauncher ? "is-visible" : ""}`}
+        onClick={() => {
+          setIsDismissed(false);
+          setIsManuallyOpen(true);
+        }}
+      >
+        <span aria-hidden="true">♫</span>
+      </button>
+    </>
   );
 }

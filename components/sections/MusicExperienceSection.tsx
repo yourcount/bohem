@@ -15,10 +15,10 @@ export function MusicExperienceSection({ musicExperience }: MusicExperienceSecti
       aria-labelledby="muziek-title"
       className="section-ambient section-ambient-experience bg-[linear-gradient(180deg,#26263a_0%,#252238_55%,#232031_100%)] py-16"
     >
-      <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-6 md:grid-cols-[1.15fr_1fr]">
+      <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-4 sm:px-6 md:grid-cols-[1.15fr_1fr]">
         <Reveal>
           <div>
-            <h2 id="muziek-title" className="mb-4 font-display text-4xl leading-tight sm:text-5xl">
+            <h2 id="muziek-title" className="mb-4 font-display text-3xl leading-tight sm:text-4xl lg:text-5xl">
               {musicExperience.title}
             </h2>
             <p>{musicExperience.body}</p>

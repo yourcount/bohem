@@ -14,9 +14,9 @@ export function AboutSection({ about }: AboutSectionProps) {
       aria-labelledby="over-title"
       className="section-ambient section-ambient-bio bg-[linear-gradient(180deg,#1b2d47_0%,#212f44_100%)] py-16"
     >
-      <div className="mx-auto w-full max-w-[1120px] px-6">
+      <div className="mx-auto w-full max-w-[1120px] px-4 sm:px-6">
         <Reveal>
-          <h2 id="over-title" className="mb-4 font-display text-4xl leading-tight sm:text-5xl">
+          <h2 id="over-title" className="mb-4 font-display text-3xl leading-tight sm:text-4xl lg:text-5xl">
             {about.title}
           </h2>
           <p className="mb-6 max-w-[74ch]">{about.intro}</p>
@@ -45,7 +45,7 @@ export function AboutSection({ about }: AboutSectionProps) {
           {about.bios.map((bio, index) => (
             <Reveal key={bio.name} delayMs={index * 120} className="h-full">
               <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
-                <h3 className="mb-3 font-display text-3xl">{bio.name}</h3>
+                <h3 className="mb-3 font-display text-2xl sm:text-3xl">{bio.name}</h3>
                 <p className="mb-0">{bio.text}</p>
               </article>
             </Reveal>
@@ -55,7 +55,7 @@ export function AboutSection({ about }: AboutSectionProps) {
         {about.lineupItems && about.lineupItems.length > 0 ? (
           <Reveal delayMs={220}>
             <article className="mt-6 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.04)] p-6">
-              {about.lineupTitle ? <h3 className="mb-3 font-display text-3xl">{about.lineupTitle}</h3> : null}
+              {about.lineupTitle ? <h3 className="mb-3 font-display text-2xl sm:text-3xl">{about.lineupTitle}</h3> : null}
               <ul className="space-y-2">
                 {about.lineupItems.map((item) => (
                   <li key={item}>{item}</li>

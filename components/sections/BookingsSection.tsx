@@ -16,13 +16,18 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
       aria-labelledby="boekingen-title"
       className="section-ambient section-ambient-bookings bg-[linear-gradient(180deg,#232031_0%,#251a1a_58%,#221816_100%)] py-16"
     >
-      <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-6 md:grid-cols-[1.15fr_1fr]">
+      <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-4 sm:px-6 md:grid-cols-[1.15fr_1fr]">
         {bookings.pressQuotes && bookings.pressQuotes.length > 0 ? (
-          <Reveal className="md:col-span-2">
+          <Reveal className="hidden md:col-span-2 md:block">
             <section aria-label="Persquotes" className="press-marquee-wrap rounded-2xl border border-[var(--color-line-muted)]">
               <div className="press-marquee-track">
-                {[...bookings.pressQuotes, ...bookings.pressQuotes].map((quote, index) => (
-                  <p key={`${quote}-${index}`} className="press-marquee-item">
+                {bookings.pressQuotes.map((quote) => (
+                  <p key={`quote-${quote}`} className="press-marquee-item">
+                    {quote}
+                  </p>
+                ))}
+                {bookings.pressQuotes.map((quote) => (
+                  <p key={`quote-duplicate-${quote}`} className="press-marquee-item press-marquee-item-duplicate">
                     {quote}
                   </p>
                 ))}
@@ -57,7 +62,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
 
         <Reveal>
           <div>
-            <h2 id="boekingen-title" className="mb-4 font-display text-4xl leading-tight sm:text-5xl">
+            <h2 id="boekingen-title" className="mb-4 font-display text-3xl leading-tight sm:text-4xl lg:text-5xl">
               {bookings.title}
             </h2>
             <p>{bookings.body}</p>
@@ -91,7 +96,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
             aria-label="Boekingsinformatie"
             className="rounded-2xl border border-[rgba(36,27,23,0.10)] bg-[var(--color-surface)] p-6 text-[var(--color-text-dark)] shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
           >
-            <h3 className="mb-3 font-display text-3xl">{bookings.infoTitle}</h3>
+            <h3 className="mb-3 font-display text-2xl sm:text-3xl">{bookings.infoTitle}</h3>
             <ul className="space-y-3">
               {bookings.infoItems.map((item) => (
                 <li key={item}>{item}</li>

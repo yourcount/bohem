@@ -97,7 +97,7 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
 
   return (
     <header className="sticky top-0 z-30 border-b border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.82)] backdrop-blur">
-      <div className="mx-auto flex min-h-16 w-full max-w-[1120px] items-center justify-between gap-4 px-6">
+      <div className="mx-auto flex min-h-16 w-full max-w-[1120px] items-center justify-between gap-3 px-4 sm:gap-4 sm:px-6">
         <Link href="#" onClick={handleLogoClick} className="inline-flex items-center">
           <Image
             src="/brand/logos/bohem-logo-white-moon-color.webp"
@@ -146,7 +146,7 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
           aria-label="Mobiel menu"
           className="mobile-menu-panel border-t border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.96)] md:hidden"
         >
-          <ul className="mx-auto flex w-full max-w-[1120px] flex-col gap-2 px-6 py-4">
+          <ul className="mx-auto flex w-full max-w-[1120px] flex-col gap-2 px-4 py-4 sm:px-6">
             {navigation.map((item) => (
               <li key={`mobile-${item.href}`}>
                 <Link

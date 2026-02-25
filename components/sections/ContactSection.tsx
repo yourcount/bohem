@@ -111,9 +111,9 @@ export function ContactSection({ contact }: ContactSectionProps) {
       aria-labelledby="contact-title"
       className="section-ambient section-ambient-contact bg-[linear-gradient(180deg,#221816_0%,#1d1513_55%,#1a1412_100%)] py-16"
     >
-      <div className="mx-auto w-full max-w-[1120px] px-6">
+      <div className="mx-auto w-full max-w-[1120px] px-4 sm:px-6">
         <Reveal>
-          <h2 id="contact-title" className="mb-4 font-display text-4xl leading-tight sm:text-5xl">
+          <h2 id="contact-title" className="mb-4 font-display text-3xl leading-tight sm:text-4xl lg:text-5xl">
             {contact.title}
           </h2>
           <p className="mb-6 max-w-[64ch]">{contact.intro}</p>
@@ -148,17 +148,17 @@ export function ContactSection({ contact }: ContactSectionProps) {
             ) : (
               <>
                 {messageField ? <FormField field={messageField} idPrefix="mobile" subjectOptions={subjectOptions} /> : null}
-                <div className="mt-2 flex items-center gap-2">
+                <div className="mt-2 grid gap-2">
                   <button
                     type="button"
                     onClick={() => setMobileStep(1)}
-                    className="inline-flex w-1/2 items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-3 text-sm font-semibold transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                    className="inline-flex w-full items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-3 text-sm font-semibold transition-colors hover:bg-[rgba(244,233,220,0.08)]"
                   >
                     Terug
                   </button>
                   <button
                     type="submit"
-                    className="inline-flex w-1/2 items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+                    className="inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                   >
                     {contact.ctaLabel}
                   </button>

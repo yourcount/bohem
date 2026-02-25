@@ -30,9 +30,9 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
         style={{ backgroundImage: "url('/brand/elements/bohem-b-monogram-color.webp')", backgroundSize: "contain", backgroundRepeat: "no-repeat" }}
         aria-hidden="true"
       />
-      <div className="relative z-10 mx-auto w-full max-w-[1120px] px-6">
+      <div className="relative z-10 mx-auto w-full max-w-[1120px] px-4 sm:px-6">
         <Reveal>
-          <h2 id="discografie-title" className="mb-4 font-display text-4xl leading-tight sm:text-5xl">
+          <h2 id="discografie-title" className="mb-4 font-display text-3xl leading-tight sm:text-4xl lg:text-5xl">
             {discography.title}
           </h2>
           <p className="mb-7 max-w-[70ch]">{discography.intro}</p>
@@ -42,7 +42,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
           <Reveal className="h-full">
             <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(165deg,rgba(244,233,220,0.12)_0%,rgba(244,233,220,0.04)_100%)] p-6">
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Nieuw uitgelicht</p>
-              <h3 className="mb-2 font-display text-3xl">{discography.featuredSingle.title}</h3>
+              <h3 className="mb-2 font-display text-2xl sm:text-3xl">{discography.featuredSingle.title}</h3>
               <p className="mb-4 text-[#e7d6c1]">{discography.featuredSingle.description}</p>
               <iframe
                 style={{ borderRadius: "12px" }}
@@ -67,7 +67,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
           <Reveal delayMs={120} className="h-full">
             <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Spotify</p>
-              <h3 className="mb-2 font-display text-3xl">{discography.artist.title}</h3>
+              <h3 className="mb-2 font-display text-2xl sm:text-3xl">{discography.artist.title}</h3>
               <p className="mb-4 text-[#e7d6c1]">{discography.artist.description}</p>
               <Link
                 href={discography.artist.href}
@@ -107,7 +107,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
                   <span className="text-sm text-[#d6be9f]">{release.year}</span>
                 </div>
 
-                <h3 className="mb-2 font-display text-3xl">{release.title}</h3>
+                <h3 className="mb-2 font-display text-2xl sm:text-3xl">{release.title}</h3>
                 <p className="mb-5 text-sm text-[#e7d6c1]">{release.note}</p>
 
                 <div className="mt-auto flex flex-wrap gap-2">

@@ -47,7 +47,7 @@ export function StickyListenBar({
   return (
     <aside
       aria-label="Nu luisteren"
-      className={`sticky-listen-bar ${isVisible ? "is-visible" : ""}`}
+      className={`sticky-listen-bar hidden md:block ${isVisible ? "is-visible" : ""}`}
     >
       <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Nu luisteren</p>
       <p className="mt-1 text-sm font-semibold text-[var(--color-text-primary)]">{trackTitle}</p>

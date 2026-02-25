@@ -28,7 +28,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
   }, []);
 
   return (
-    <section aria-labelledby="hero-title" className="relative grid min-h-[85svh] items-end overflow-clip pb-24 pt-12">
+    <section aria-labelledby="hero-title" className="relative grid min-h-[82svh] items-end overflow-clip pb-20 pt-10 sm:min-h-[85svh] sm:pb-24 sm:pt-12">
       <div className="absolute inset-0">
         <Image
           src={hero.image.src}
@@ -59,17 +59,17 @@ export function HeroSection({ hero }: HeroSectionProps) {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-[1120px] px-6">
+      <div className="relative z-10 mx-auto w-full max-w-[1120px] px-4 sm:px-6">
         <Reveal className="hero-intro" delayMs={40}>
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#f3d7b0]">{hero.eyebrow}</p>
         </Reveal>
         <Reveal className="hero-intro" delayMs={120}>
-          <h1 id="hero-title" className="mb-4 max-w-[18ch] font-display text-5xl leading-[1.1] sm:text-6xl">
+          <h1 id="hero-title" className="mb-4 max-w-[18ch] font-display text-4xl leading-[1.1] sm:text-5xl md:text-6xl">
             {hero.headline}
           </h1>
         </Reveal>
         <Reveal className="hero-intro" delayMs={220}>
-          <p className="mb-6 max-w-[56ch] text-[var(--color-text-primary)]">{hero.subhead}</p>
+          <p className="mb-6 max-w-[56ch] text-[0.98rem] text-[var(--color-text-primary)] sm:text-base">{hero.subhead}</p>
         </Reveal>
         <Reveal className="hero-intro" delayMs={320}>
           <div aria-label="Primaire acties" className="flex flex-wrap gap-3">

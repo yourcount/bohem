@@ -11,7 +11,7 @@ export function SiteFooter({ footer }: SiteFooterProps) {
 
   return (
     <footer aria-label="Footer" className="border-t border-[var(--color-line-muted)] bg-[#111d30] py-8 text-[#d6e3ec]">
-      <div className="mx-auto flex w-full max-w-[1120px] flex-col items-start justify-between gap-4 px-6 sm:flex-row sm:items-center">
+      <div className="mx-auto flex w-full max-w-[1120px] flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center sm:px-6">
         <Image
           src="/brand/logos/bohem-logo-white-moon-color.webp"
           alt={footer.copyright}

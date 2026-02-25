@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+  --font-body: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+  --color-bg-deep: #1a1412;
+  --color-bg-soft: #2a211e;
+  --color-surface: #f4e9dc;
+  --color-text-primary: #f7f1ea;
+  --color-text-dark: #241b17;
+  --color-accent-amber: #c8873e;
+  --color-accent-copper: #a65a3a;
+  --color-line-muted: #6e5a52;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  --focus-ring: #f7f1ea;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+section[id] {
+  scroll-margin-top: 6.5rem;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body), "Avenir Next", "Segoe UI", sans-serif;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background: radial-gradient(circle at top, #3b2a22 0%, var(--color-bg-deep) 40%, #140f0d 100%);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 640ms cubic-bezier(0.22, 1, 0.36, 1), transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero-intro.reveal {
+  transform: translateY(16px);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), "Times New Roman", serif;
+}
+
+p {
+  margin-top: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+}
+
+.skip-link:focus-visible {
+  left: var(--space-4);
+  top: var(--space-4);
+  z-index: 1000;
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-dark);
+  padding: var(--space-3) var(--space-4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (min-width: 768px) {
+  section[id] {
+    scroll-margin-top: 7.5rem;
+  }
+}

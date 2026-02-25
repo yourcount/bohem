@@ -1,0 +1,67 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+import type { NavItem } from "@/lib/types";
+
+type SiteHeaderProps = {
+  brandName: string;
+  navigation: NavItem[];
+};
+
+export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleCloseMenu = () => setIsMenuOpen(false);
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+
+  return (
+    <header className="sticky top-0 z-30 border-b border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.82)] backdrop-blur">
+      <div className="mx-auto flex min-h-16 w-full max-w-[1120px] items-center justify-between gap-4 px-6">
+        <p className="font-display text-[2rem] leading-none tracking-[0.02em]">{brandName}</p>
+
+        <button
+          type="button"
+          className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-sm font-semibold md:hidden"
+          aria-expanded={isMenuOpen}
+          aria-controls="mobile-nav"
+          aria-label={isMenuOpen ? "Sluit menu" : "Open menu"}
+          onClick={toggleMenu}
+        >
+          {isMenuOpen ? "Sluiten" : "Menu"}
+        </button>
+
+        <nav aria-label="Snelle navigatie" className="hidden md:block">
+          <ul className="flex min-w-max gap-5 text-sm">
+            {navigation.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="transition-colors hover:text-[#f3d7b0] focus-visible:text-[#f3d7b0]">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+
+      {isMenuOpen ? (
+        <nav id="mobile-nav" aria-label="Mobiel menu" className="border-t border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.96)] md:hidden">
+          <ul className="mx-auto flex w-full max-w-[1120px] flex-col gap-2 px-6 py-4">
+            {navigation.map((item) => (
+              <li key={`mobile-${item.href}`}>
+                <Link
+                  href={item.href}
+                  className="block rounded-xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] px-4 py-3 text-base font-medium transition-colors hover:border-[#c8873e] hover:text-[#f3d7b0]"
+                  onClick={handleCloseMenu}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
+    </header>
+  );
+}

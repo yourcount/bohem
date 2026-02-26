@@ -12,7 +12,7 @@ export function AboutSection({ about }: AboutSectionProps) {
     <section
       id="bio"
       aria-labelledby="over-title"
-      className="section-ambient section-ambient-bio bg-[linear-gradient(180deg,#1a2431_0%,#202837_48%,#282538_100%)] py-16"
+      className="section-ambient section-ambient-bio bg-[linear-gradient(180deg,#1a2431_0%,#1f2938_46%,#242b3a_100%)] py-16"
     >
       <div className="mx-auto w-full max-w-[1120px] px-4 sm:px-6">
         <Reveal>

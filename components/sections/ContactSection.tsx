@@ -109,7 +109,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
     <section
       id="contact"
       aria-labelledby="contact-title"
-      className="section-ambient section-ambient-contact bg-[linear-gradient(180deg,#221816_0%,#1d1513_55%,#1a1412_100%)] py-16"
+      className="section-ambient section-ambient-contact bg-[linear-gradient(180deg,#231816_0%,#201613_54%,#1a1412_100%)] py-16"
     >
       <div className="mx-auto w-full max-w-[1120px] px-4 sm:px-6">
         <Reveal>

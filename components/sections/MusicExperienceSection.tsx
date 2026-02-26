@@ -13,7 +13,7 @@ export function MusicExperienceSection({ musicExperience }: MusicExperienceSecti
     <section
       id="muziek"
       aria-labelledby="muziek-title"
-      className="section-ambient section-ambient-experience bg-[linear-gradient(180deg,#26263a_0%,#252238_55%,#232031_100%)] py-16"
+      className="section-ambient section-ambient-experience bg-[linear-gradient(180deg,#2a2537_0%,#2b2434_56%,#2b2230_100%)] py-16"
     >
       <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-4 sm:px-6 md:grid-cols-[1.15fr_1fr]">
         <Reveal>

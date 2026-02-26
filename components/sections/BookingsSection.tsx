@@ -14,7 +14,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
     <section
       id="boekingen"
       aria-labelledby="boekingen-title"
-      className="section-ambient section-ambient-bookings bg-[linear-gradient(180deg,#232031_0%,#251a1a_58%,#221816_100%)] py-16"
+      className="section-ambient section-ambient-bookings bg-[linear-gradient(180deg,#2a1d1b_0%,#271b19_56%,#231816_100%)] py-16"
     >
       <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-4 sm:px-6 md:grid-cols-[1.15fr_1fr]">
         {bookings.pressQuotes && bookings.pressQuotes.length > 0 ? (

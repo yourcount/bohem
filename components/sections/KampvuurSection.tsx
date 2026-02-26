@@ -12,7 +12,7 @@ export function KampvuurSection({ kampvuur }: KampvuurSectionProps) {
     <section
       id="kampvuurklanken"
       aria-labelledby="kampvuur-title"
-      className="section-ambient kampvuur-section bg-[linear-gradient(180deg,#2a1f1a_0%,#2b1b18_52%,#251a1a_100%)] py-16"
+      className="section-ambient kampvuur-section bg-[linear-gradient(180deg,#2b2230_0%,#2c2225_48%,#2a1d1b_100%)] py-16"
     >
       <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-4 sm:px-6 md:grid-cols-[1.2fr_1fr]">
         <Reveal>

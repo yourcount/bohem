@@ -284,13 +284,29 @@ p {
   position: absolute;
   inset: 0;
   background-repeat: no-repeat;
-  opacity: 0.55;
+  opacity: 0.44;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
 }
 
 .section-ambient-bio::before {
   background-image:
-    radial-gradient(circle at 16% 14%, rgba(242, 139, 14, 0.16) 0%, transparent 42%),
-    radial-gradient(circle at 82% 78%, rgba(67, 135, 133, 0.16) 0%, transparent 46%);
+    radial-gradient(circle at 14% 18%, rgba(255, 172, 92, 0.2) 0%, transparent 34%),
+    radial-gradient(circle at 86% 22%, rgba(76, 160, 174, 0.16) 0%, transparent 36%),
+    radial-gradient(circle at 74% 82%, rgba(181, 47, 29, 0.14) 0%, transparent 40%);
+}
+
+.section-ambient-bio::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 24% 62%, rgba(255, 207, 147, 0.14) 0%, transparent 30%),
+    radial-gradient(circle at 64% 10%, rgba(105, 181, 196, 0.12) 0%, transparent 34%);
+  opacity: 0.9;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 86%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 86%, transparent 100%);
 }
 
 .section-ambient-discography::before {
@@ -318,8 +334,7 @@ p {
   overflow: hidden;
 }
 
-.kampvuur-section::before,
-.kampvuur-section::after {
+.kampvuur-section::before {
   content: "";
   pointer-events: none;
   position: absolute;
@@ -332,16 +347,8 @@ p {
     radial-gradient(circle at 14% 18%, rgba(242, 139, 14, 0.24) 0%, transparent 35%),
     radial-gradient(circle at 82% 22%, rgba(181, 47, 29, 0.2) 0%, transparent 38%),
     radial-gradient(circle at 54% 88%, rgba(242, 139, 14, 0.14) 0%, transparent 44%);
-}
-
-.kampvuur-section::after {
-  width: 440px;
-  height: 440px;
-  right: -120px;
-  bottom: -140px;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(242, 139, 14, 0.3) 0%, rgba(181, 47, 29, 0.14) 36%, transparent 72%);
-  filter: blur(2px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 86%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 86%, transparent 100%);
 }
 
 .kampvuur-section > .mx-auto {

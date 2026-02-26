@@ -12,13 +12,13 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
     <section
       id="discografie"
       aria-labelledby="discografie-title"
-      className="section-ambient section-ambient-discography relative overflow-hidden bg-[linear-gradient(180deg,#212f44_0%,#26263a_100%)] py-16"
+      className="section-ambient section-ambient-discography relative overflow-hidden bg-[linear-gradient(180deg,#242b3a_0%,#28283a_54%,#2a2537_100%)] py-16"
     >
       <div
         className="discography-parallax pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            "linear-gradient(165deg, rgba(13,20,31,0.86) 0%, rgba(24,41,63,0.82) 45%, rgba(77,65,110,0.82) 100%), url('/brand/docs/roest-en-metaal.webp')",
+            "linear-gradient(165deg, rgba(13,20,31,0.0) 0%, rgba(24,41,63,0.56) 20%, rgba(24,41,63,0.82) 50%, rgba(77,65,110,0.82) 100%), url('/brand/docs/roest-en-metaal.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat"

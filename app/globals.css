@@ -147,7 +147,6 @@ p {
   transform: translateY(14px);
   pointer-events: none;
   transition: opacity 240ms ease, transform 240ms ease;
-  display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: 18px;
@@ -472,10 +471,15 @@ p {
 
 @media (max-width: 767px) {
   .sticky-listen-bar {
+    display: none !important;
     right: 12px;
     left: 12px;
     width: auto;
     bottom: 88px;
+  }
+
+  .sticky-listen-launcher {
+    display: none !important;
   }
 
   .press-marquee-wrap {

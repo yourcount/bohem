@@ -46,7 +46,7 @@ export function StickyListenBar({
 
   return (
     <>
-      <aside aria-label="Nu luisteren" className={`sticky-listen-bar hidden md:grid ${showBar ? "is-visible" : ""}`}>
+      <aside aria-label="Nu luisteren" className={`sticky-listen-bar ${showBar ? "is-visible" : ""}`}>
         <button
           type="button"
           aria-label="Sluit luisterbalk"
@@ -93,7 +93,7 @@ export function StickyListenBar({
       <button
         type="button"
         aria-label="Open luisterbalk"
-        className={`sticky-listen-launcher hidden md:inline-flex ${showLauncher ? "is-visible" : ""}`}
+        className={`sticky-listen-launcher ${showLauncher ? "is-visible" : ""}`}
         onClick={() => {
           setIsDismissed(false);
           setIsManuallyOpen(true);

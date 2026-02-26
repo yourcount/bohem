@@ -130,6 +130,7 @@ p {
 }
 
 .sticky-listen-bar {
+  display: none;
   position: fixed;
   right: 20px;
   bottom: 20px;
@@ -244,6 +245,7 @@ p {
 }
 
 .sticky-listen-launcher {
+  display: none;
   position: fixed;
   right: 20px;
   bottom: 20px;
@@ -553,6 +555,14 @@ p {
 @media (min-width: 768px) {
   section[id] {
     scroll-margin-top: 7.5rem;
+  }
+
+  .sticky-listen-bar {
+    display: grid;
+  }
+
+  .sticky-listen-launcher {
+    display: inline-flex;
   }
 
   .discography-parallax {

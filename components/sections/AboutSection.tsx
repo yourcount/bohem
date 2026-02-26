@@ -23,10 +23,10 @@ export function AboutSection({ about }: AboutSectionProps) {
         </Reveal>
 
         {about.photoMoments && about.photoMoments.length > 0 ? (
-          <div className="mb-6 grid gap-4 md:grid-cols-2" aria-label="Fotomomenten">
+          <div className="bio-photo-slider mb-6 md:grid md:grid-cols-2" aria-label="Fotomomenten">
             {about.photoMoments.map((photo, index) => (
-              <Reveal key={photo.src} delayMs={index * 120}>
-                <figure className="aspect-[4/3] overflow-hidden rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.24)]">
+              <Reveal key={photo.src} delayMs={index * 120} className="bio-photo-item">
+                <figure className="bio-photo-slide overflow-hidden border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.24)]">
                   <Image
                     src={photo.src}
                     alt={photo.alt}

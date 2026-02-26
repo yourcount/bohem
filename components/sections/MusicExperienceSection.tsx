@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 
 import type { SiteContent } from "@/lib/types";
 import { Reveal } from "@/components/ui/Reveal";
@@ -22,12 +21,12 @@ export function MusicExperienceSection({ musicExperience }: MusicExperienceSecti
               {musicExperience.title}
             </h2>
             <p>{musicExperience.body}</p>
-            <Link
+            <a
               href={musicExperience.cta.href}
               className="inline-block font-bold text-[#f3d7b0] underline decoration-2 underline-offset-[3px]"
             >
               {musicExperience.cta.label}
-            </Link>
+            </a>
           </div>
         </Reveal>
         <Reveal delayMs={140}>

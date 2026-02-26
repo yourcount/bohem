@@ -330,6 +330,22 @@ p {
   background-image: radial-gradient(circle at 16% 18%, rgba(242, 139, 14, 0.16) 0%, transparent 42%);
 }
 
+.bio-photo-slider {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 2px 2px 4px;
+}
+
+.bio-photo-item {
+  min-width: 0;
+}
+
+.bio-photo-slide {
+  aspect-ratio: 1 / 1;
+  border-radius: 999px;
+}
+
 .kampvuur-section {
   position: relative;
   overflow: hidden;
@@ -559,6 +575,21 @@ p {
 @media (min-width: 768px) {
   section[id] {
     scroll-margin-top: 7.5rem;
+  }
+
+  .bio-photo-slider {
+    display: grid;
+    gap: 16px;
+    padding: 0;
+  }
+
+  .bio-photo-item {
+    min-width: 0;
+  }
+
+  .bio-photo-slide {
+    aspect-ratio: 4 / 3;
+    border-radius: 1rem;
   }
 
   .sticky-listen-bar {

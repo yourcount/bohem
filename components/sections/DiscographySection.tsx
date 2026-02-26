@@ -57,6 +57,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
                 href={discography.featuredSingle.href}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-cta="discography_featured_single"
                 className="mt-4 inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
               >
                 Luister op Spotify
@@ -73,6 +74,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
                 href={discography.artist.href}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-cta="discography_artist_profile"
                 className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-bold transition-colors hover:border-[#c8873e] hover:bg-[rgba(200,135,62,0.16)]"
               >
                 Open Spotify-profiel
@@ -117,6 +119,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
+                      data-cta={`release_${release.title.toLowerCase().replace(/\s+/g, "_")}`}
                       className="rounded-full border border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.4)] px-3 py-2 text-xs font-semibold transition-colors hover:border-[#c8873e] hover:bg-[rgba(200,135,62,0.18)] focus-visible:border-[#c8873e]"
                     >
                       {link.label}

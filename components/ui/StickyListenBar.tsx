@@ -50,6 +50,7 @@ export function StickyListenBar({
         <button
           type="button"
           aria-label="Sluit luisterbalk"
+          data-cta="listenbar_close"
           className="sticky-listen-close"
           onClick={() => {
             setIsDismissed(true);
@@ -83,6 +84,7 @@ export function StickyListenBar({
             href={trackHref}
             target="_blank"
             rel="noopener noreferrer"
+            data-cta="listenbar_spotify_play"
             className="sticky-listen-button inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
           >
             Speel op Spotify
@@ -93,6 +95,7 @@ export function StickyListenBar({
       <button
         type="button"
         aria-label="Open luisterbalk"
+        data-cta="listenbar_open"
         className={`sticky-listen-launcher ${showLauncher ? "is-visible" : ""}`}
         onClick={() => {
           setIsDismissed(false);

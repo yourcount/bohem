@@ -138,6 +138,25 @@
       "Verfrissend alternatief voor traditionele teambuilding"
     ],
     "quote": "Een bijeenkomst die blijft hangen, een team dat lichter naar huis gaat.",
+    "packagesTitle": "Formatkeuze",
+    "packages": [
+      {
+        "name": "Compact",
+        "duration": "60 min",
+        "description": "Korte krachtige sessie met songs en verhalen rond verbinding en reflectie."
+      },
+      {
+        "name": "Verdieping",
+        "duration": "90 min",
+        "description": "Meer ruimte voor interactie, humor en gezamenlijke herkenning."
+      },
+      {
+        "name": "Volledige avond",
+        "duration": "120 min",
+        "description": "Een complete Kampvuurklanken-avond met opbouw, rust en energie."
+      }
+    ],
+    "packageCta": { "label": "Plan 15-min verkenning", "href": "#contact", "variant": "primary" },
     "contactPrompt": "Neem gerust contact op, we denken graag mee.",
     "contactEmail": "info@musicbybohem.nl",
     "contactPhone": "+31 6 36313948",
@@ -193,6 +212,26 @@
       {
         "quote": "Professioneel in voorbereiding en warm op het podium.",
         "source": "Podiumcoördinator (Eindhoven, 2024)"
+      }
+    ],
+    "miniCases": [
+      {
+        "title": "Theateravond",
+        "context": "Kleinschalig theaterprogramma met gemengd publiek.",
+        "approach": "Set opgebouwd van verstilling naar energie met interactiemomenten.",
+        "result": "Hoge betrokkenheid en verlengde publieksnabespreking in foyer."
+      },
+      {
+        "title": "Cultureel event",
+        "context": "Seizoensopening met brede leeftijdsgroep.",
+        "approach": "Repertoire afgestemd op verhalende lijn van de avond.",
+        "result": "Sterke sfeeropbouw en meer doorloop naar vervolgprogramma."
+      },
+      {
+        "title": "Teamavond",
+        "context": "Kampvuurklanken voor organisatie in drukke periode.",
+        "approach": "Afwisselend lied, verhaal en lichte interactie rondom herkenbare thema's.",
+        "result": "Meetbaar meer open gesprek en positief slotgevoel in teamfeedback."
       }
     ],
     "upcomingShows": [
@@ -270,7 +309,7 @@
     "email": "boekingen@bohem.nl",
     "responseTimeText": "We reageren meestal binnen 2 werkdagen.",
     "intakeHint": "Vermeld bij voorkeur datum, locatie en type avond, dan kunnen we direct gericht reageren.",
-    "subjectOptions": ["Boeking", "Pers", "Algemene vraag"],
+    "subjectOptions": ["Theaterboeking", "Kampvuurklanken", "Pers", "Algemene vraag"],
     "fields": [
       {
         "id": "subject",
@@ -283,6 +322,7 @@
         "label": "Naam",
         "type": "text",
         "autoComplete": "name",
+        "placeholder": "Voor- en achternaam",
         "required": true
       },
       {
@@ -290,6 +330,7 @@
         "label": "E-mail",
         "type": "email",
         "autoComplete": "email",
+        "placeholder": "naam@organisatie.nl",
         "required": true
       },
       {
@@ -297,12 +338,14 @@
         "label": "Telefoonnummer",
         "type": "tel",
         "autoComplete": "tel",
+        "placeholder": "+31 6 ...",
         "required": true
       },
       {
         "id": "message",
         "label": "Bericht",
         "type": "textarea",
+        "placeholder": "Vermeld datum, locatie, type avond en gewenste setduur.",
         "required": true
       }
     ]

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 import { Reveal } from "@/components/ui/Reveal";
 import type { SiteContent } from "@/lib/types";
@@ -82,6 +81,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                     <p className="text-sm text-[#d9c4a8]">{show.city}</p>
                     <Link
                       href={show.ctaHref}
+                      data-cta={`show_${show.venue.toLowerCase().replace(/\s+/g, "_")}`}
                       className="mt-3 inline-flex w-fit items-center justify-center rounded-full border border-[rgba(242,139,14,0.45)] px-4 py-2 text-xs font-semibold text-[#f2e7d8] transition-colors hover:border-[var(--color-accent-copper)] hover:bg-[rgba(181,47,29,0.18)]"
                     >
                       {show.ctaLabel}
@@ -99,6 +99,16 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
               {bookings.title}
             </h2>
             <p>{bookings.body}</p>
+            {bookings.bookabilityItems && bookings.bookabilityItems.length > 0 ? (
+              <article className="mt-5 rounded-2xl border border-[rgba(242,139,14,0.42)] bg-[rgba(242,139,14,0.08)] p-5">
+                <h3 className="mb-3 font-display text-2xl text-[var(--color-text-primary)]">In 20 sec geregeld</h3>
+                <ul className="space-y-2 text-sm text-[#f1deca]">
+                  {bookings.bookabilityItems.slice(0, 4).map((item) => (
+                    <li key={item}>• {item}</li>
+                  ))}
+                </ul>
+              </article>
+            ) : null}
             {bookings.fitItems && bookings.fitItems.length > 0 ? (
               <article className="mt-5 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] p-5">
                 {bookings.fitTitle ? <h3 className="mb-3 font-display text-2xl text-[var(--color-text-primary)]">{bookings.fitTitle}</h3> : null}
@@ -118,6 +128,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                     <Link
                       key={item.label}
                       href={item.href}
+                      data-cta={`route_${item.label.toLowerCase().replace(/\s+/g, "_")}`}
                       className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] p-4 transition-colors hover:border-[#f28b0e]"
                     >
                       <p className="mb-1 font-semibold text-[var(--color-text-primary)]">{item.label}</p>
@@ -126,23 +137,6 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                   ))}
                 </div>
               </article>
-            ) : null}
-            {bookings.highlightImage ? (
-              <figure className="mt-5 overflow-hidden rounded-2xl border border-[var(--color-line-muted)]">
-                <Image
-                  src={bookings.highlightImage.src}
-                  alt={bookings.highlightImage.alt}
-                  width={bookings.highlightImage.width}
-                  height={bookings.highlightImage.height}
-                  className="h-full w-full object-cover object-center"
-                  loading="lazy"
-                />
-                {bookings.highlightImage.caption ? (
-                  <figcaption className="border-t border-[var(--color-line-muted)] bg-[rgba(15,24,37,0.45)] px-4 py-2 text-xs uppercase tracking-[0.08em] text-[#d6be9f]">
-                    {bookings.highlightImage.caption}
-                  </figcaption>
-                ) : null}
-              </figure>
             ) : null}
           </div>
         </Reveal>
@@ -206,18 +200,21 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
               <div className="flex flex-wrap items-center gap-3">
                 <Link
                   href={bookings.press.kitHref}
+                  data-cta="epk_download"
                   className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                 >
                   {bookings.press.kitLabel}
                 </Link>
                 <a
                   href={`mailto:${bookings.press.contactEmail}`}
+                  data-cta="press_contact_email"
                   className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
                 >
                   {bookings.press.contactEmail}
                 </a>
                 <a
                   href={`tel:${bookings.press.contactPhone.replace(/\s+/g, "")}`}
+                  data-cta="press_contact_phone"
                   className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
                 >
                   {bookings.press.contactPhone}

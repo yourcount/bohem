@@ -50,7 +50,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
         width={420}
         height={420}
         className="pointer-events-none absolute -right-20 top-20 hidden opacity-20 md:block"
-        style={{ transform: `translateY(${parallaxY * 0.08}px)` }}
+        style={{ transform: `translateY(${parallaxY * 0.08}px)`, width: "auto", height: "auto" }}
         aria-hidden="true"
       />
       <Image
@@ -78,7 +78,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
         <Reveal className="hero-intro" delayMs={320}>
           <div aria-label="Primaire acties" className="flex flex-wrap gap-3">
             {hero.ctas.map((cta) => (
-              <ButtonLink key={cta.label} href={cta.href} variant={cta.variant ?? "primary"}>
+              <ButtonLink key={cta.label} href={cta.href} variant={cta.variant ?? "primary"} dataCta="hero_book_primary">
                 {cta.label}
               </ButtonLink>
             ))}

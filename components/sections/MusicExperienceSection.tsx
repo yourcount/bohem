@@ -23,6 +23,7 @@ export function MusicExperienceSection({ musicExperience }: MusicExperienceSecti
             <p>{musicExperience.body}</p>
             <a
               href={musicExperience.cta.href}
+              data-cta="music_experience_bookings"
               className="inline-block font-bold text-[#f3d7b0] underline decoration-2 underline-offset-[3px]"
             >
               {musicExperience.cta.label}

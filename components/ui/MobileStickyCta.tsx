@@ -45,6 +45,7 @@ export function MobileStickyCta({ href, label, visibleSectionIds }: MobileSticky
     >
       <Link
         href={href}
+        data-cta="mobile_bookings_primary"
         className="pointer-events-auto inline-flex min-h-11 w-full max-w-[22rem] items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-6 py-3 text-sm font-bold text-[var(--color-bg-deep)] shadow-[0_10px_28px_rgba(0,0,0,0.35)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
       >
         {label}

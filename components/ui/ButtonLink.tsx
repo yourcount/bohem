@@ -4,6 +4,7 @@ type ButtonLinkProps = {
   href: string;
   children: string;
   variant?: "primary" | "secondary";
+  dataCta?: string;
 };
 
 const variants: Record<NonNullable<ButtonLinkProps["variant"]>, string> = {
@@ -13,10 +14,11 @@ const variants: Record<NonNullable<ButtonLinkProps["variant"]>, string> = {
     "border border-[var(--color-line-muted)] bg-transparent text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] focus-visible:bg-[rgba(244,233,220,0.08)]"
 };
 
-export function ButtonLink({ href, children, variant = "primary" }: ButtonLinkProps) {
+export function ButtonLink({ href, children, variant = "primary", dataCta }: ButtonLinkProps) {
   return (
     <Link
       href={href}
+      data-cta={dataCta}
       className={`inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-bold transition-colors ${variants[variant]}`}
     >
       {children}

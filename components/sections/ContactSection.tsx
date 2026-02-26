@@ -33,6 +33,7 @@ function FormField({
           name={field.id}
           required={field.required}
           rows={5}
+          placeholder={field.placeholder}
           className="w-full rounded-[10px] border border-[rgba(36,27,23,0.2)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text-dark)]"
         />
       ) : field.type === "select" ? (
@@ -66,6 +67,7 @@ function FormField({
           name={field.id}
           type={field.type}
           autoComplete={field.autoComplete}
+          placeholder={field.placeholder}
           required={field.required}
           className="w-full rounded-[10px] border border-[rgba(36,27,23,0.2)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text-dark)]"
         />
@@ -141,6 +143,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                 <button
                   type="button"
                   onClick={handleNextStep}
+                  data-cta="contact_mobile_next"
                   className="mt-2 inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-6 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                 >
                   Volgende stap
@@ -159,6 +162,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                   </button>
                   <button
                     type="submit"
+                    data-cta="contact_mobile_submit"
                     className="inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                   >
                     {contact.ctaLabel}
@@ -176,6 +180,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
             ))}
             <button
               type="submit"
+              data-cta="contact_desktop_submit"
               className="mt-4 inline-flex w-fit items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-6 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)] focus-visible:bg-[var(--color-accent-copper)] focus-visible:text-[var(--color-text-primary)] md:col-span-2"
             >
               {contact.ctaLabel}

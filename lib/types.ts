@@ -28,6 +28,15 @@ export type SiteContent = {
       alt: string;
     };
     ctas: Cta[];
+    listenNow?: {
+      label: string;
+      context: string;
+      href: string;
+    };
+    intentLinks?: Array<{
+      label: string;
+      href: string;
+    }>;
   };
   about: {
     title: string;
@@ -100,6 +109,13 @@ export type SiteContent = {
       width: number;
       height: number;
     };
+    packagesTitle?: string;
+    packages?: Array<{
+      name: string;
+      duration: string;
+      description: string;
+    }>;
+    packageCta?: Cta;
   };
   bookings: {
     title: string;
@@ -116,6 +132,12 @@ export type SiteContent = {
     socialProof?: Array<{
       quote: string;
       source: string;
+    }>;
+    miniCases?: Array<{
+      title: string;
+      context: string;
+      approach: string;
+      result: string;
     }>;
     pressQuotes?: string[];
     upcomingShows?: Array<{
@@ -163,6 +185,7 @@ export type SiteContent = {
       label: string;
       type: "text" | "email" | "tel" | "textarea" | "select";
       autoComplete?: string;
+      placeholder?: string;
       required: boolean;
     }>;
   };

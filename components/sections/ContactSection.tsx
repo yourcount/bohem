@@ -117,6 +117,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
             {contact.title}
           </h2>
           <p className="mb-6 max-w-[64ch]">{contact.intro}</p>
+          {contact.intakeHint ? <p className="mb-6 max-w-[64ch] text-sm text-[#d6be9f]">{contact.intakeHint}</p> : null}
         </Reveal>
 
         <Reveal delayMs={120}>

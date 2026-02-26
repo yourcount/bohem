@@ -12,6 +12,7 @@
     { "label": "Discografie", "href": "#discografie" },
     { "label": "Kampvuurklanken", "href": "#kampvuurklanken" },
     { "label": "Boekingen", "href": "#boekingen" },
+    { "label": "Pers", "href": "#pers" },
     { "label": "Contact", "href": "#contact" }
   ],
   "hero": {
@@ -68,7 +69,7 @@
       "embedUrl": "https://open.spotify.com/embed/track/2TaHQl5PVOSHIs1xCjbD1W?utm_source=generator"
     },
     "artist": {
-      "title": "Spotify Artist",
+      "title": "Artiestprofiel",
       "description": "Volg Bohèm op Spotify voor nieuwe releases, updates en live materiaal.",
       "href": "https://open.spotify.com/artist/7MZs9HjZfvICRqVXENFcoa?si=OykX8uRmQcawyF4woCaciQ"
     },
@@ -150,6 +151,30 @@
   "bookings": {
     "title": "Live & Boekingen",
     "body": "Bohèm speelt als Reizigers op theaters, kleinschalige culturele podia en intieme concertavonden. Voor aanvragen en beschikbaarheid reageren we persoonlijk en snel.",
+    "fitTitle": "Past goed bij",
+    "fitItems": [
+      "Theateravonden en vlakkevloerprogramma's",
+      "Culturele seizoensopeningen en community-events",
+      "Intieme concerten en storytelling-sets"
+    ],
+    "routeTitle": "Kies je route",
+    "routeItems": [
+      {
+        "label": "Theater",
+        "description": "Voor programmeurs die snel speelbaar format en technische basis willen.",
+        "href": "#contact"
+      },
+      {
+        "label": "Cultureel event",
+        "description": "Voor organisatoren die sfeer, publiek en context willen laten aansluiten.",
+        "href": "#contact"
+      },
+      {
+        "label": "Kampvuurklanken",
+        "description": "Voor teams en groepen die verbinding, vertraging en menselijkheid zoeken.",
+        "href": "#kampvuurklanken"
+      }
+    ],
     "pressQuotes": [
       "“Een warm, volwassen geluid met een theatrale ziel.”",
       "“Verhalende songs die direct binnenkomen.”",
@@ -159,15 +184,15 @@
     "socialProof": [
       {
         "quote": "Intiem, stijlvol en muzikaal sterk. Het publiek bleef nog lang napraten.",
-        "source": "Programmeur, kleinschalig theater"
+        "source": "Programmeur, kleinschalig theater (Nijmegen, 2025)"
       },
       {
         "quote": "De combinatie van storytelling, humor en muzikaliteit werkte direct in de zaal.",
-        "source": "Organisator culturele avond"
+        "source": "Organisator culturele avond (Utrecht, 2025)"
       },
       {
         "quote": "Professioneel in voorbereiding en warm op het podium.",
-        "source": "Podiumcoördinator"
+        "source": "Podiumcoördinator (Eindhoven, 2024)"
       }
     ],
     "upcomingShows": [
@@ -206,7 +231,37 @@
       "Format: duo-set met zang, mondharmonica, backingvocals en percussie.",
       "Live-concept: Reizigers - muzikale mini-trip met interactie.",
       "Reactietijd: meestal binnen 2 werkdagen."
-    ]
+    ],
+    "bookabilityTitle": "Speelbaar in de praktijk",
+    "bookabilityItems": [
+      "Speelduur: 45 minuten (festival) of 2 x 35 minuten (theateravond).",
+      "Opbouw: circa 45 minuten, afbouw circa 30 minuten.",
+      "Techniek basis: 2 vocal mics, DI's voor instrumenten, monitor per persoon.",
+      "Bezetting: leadvocal/mondharmonica, backingvocals/percussie, gitaar/bas/piano."
+    ],
+    "requestStepsTitle": "Beschikbaarheid aanvragen in 3 stappen",
+    "requestSteps": [
+      "1. Stuur datum, locatie en type avond.",
+      "2. Vermeld zaalcapaciteit en gewenste setduur.",
+      "3. Ontvang binnen 2 werkdagen een concreet voorstel."
+    ],
+    "availabilityText": "Beschikbaar voor theaterzaal, vlakkevloer en intieme podiumsetting.",
+    "press": {
+      "title": "Pers in 30 seconden",
+      "facts": [
+        "BOHÈM: Arthur Bont + Bettina Kraaieveld",
+        "Genre: melodische NL/EN songs met verhalende inslag",
+        "EP: Wolkentranen (2026)",
+        "Single: Vroeger",
+        "Live-concept: Reizigers",
+        "Standplaats: Nederland"
+      ],
+      "boilerplate": "BOHÈM maakt melodische, verhalende songs in het Nederlands en Engels over het leven in al zijn facetten. In hun live-concept Reizigers combineren Arthur Bont en Bettina Kraaieveld theatrale zeggingskracht met persoonlijke liedjes die raken en verbinden.",
+      "kitLabel": "Download perskit",
+      "kitHref": "/brand/docs/bohem-press-kit.pdf",
+      "contactEmail": "info@musicbybohem.nl",
+      "contactPhone": "+31 6 36313948"
+    }
   },
   "contact": {
     "title": "Contact",
@@ -214,6 +269,7 @@
     "ctaLabel": "Stuur een bericht",
     "email": "boekingen@bohem.nl",
     "responseTimeText": "We reageren meestal binnen 2 werkdagen.",
+    "intakeHint": "Vermeld bij voorkeur datum, locatie en type avond, dan kunnen we direct gericht reageren.",
     "subjectOptions": ["Boeking", "Pers", "Algemene vraag"],
     "fields": [
       {

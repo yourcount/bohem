@@ -104,6 +104,14 @@ export type SiteContent = {
   bookings: {
     title: string;
     body: string;
+    fitTitle?: string;
+    fitItems?: string[];
+    routeTitle?: string;
+    routeItems?: Array<{
+      label: string;
+      description: string;
+      href: string;
+    }>;
     socialProofTitle?: string;
     socialProof?: Array<{
       quote: string;
@@ -127,6 +135,20 @@ export type SiteContent = {
     cta: Cta;
     infoTitle: string;
     infoItems: string[];
+    bookabilityTitle?: string;
+    bookabilityItems?: string[];
+    requestStepsTitle?: string;
+    requestSteps?: string[];
+    availabilityText?: string;
+    press?: {
+      title: string;
+      facts: string[];
+      boilerplate: string;
+      kitLabel: string;
+      kitHref: string;
+      contactEmail: string;
+      contactPhone: string;
+    };
   };
   contact: {
     title: string;
@@ -134,6 +156,7 @@ export type SiteContent = {
     ctaLabel: string;
     email: string;
     responseTimeText?: string;
+    intakeHint?: string;
     subjectOptions?: string[];
     fields: Array<{
       id: "name" | "email" | "phone" | "message" | "subject";

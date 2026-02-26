@@ -66,7 +66,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
 
           <Reveal delayMs={120} className="h-full">
             <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Spotify</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Streaming</p>
               <h3 className="mb-2 font-display text-2xl sm:text-3xl">{discography.artist.title}</h3>
               <p className="mb-4 text-[#e7d6c1]">{discography.artist.description}</p>
               <Link
@@ -75,7 +75,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-bold transition-colors hover:border-[#c8873e] hover:bg-[rgba(200,135,62,0.16)]"
               >
-                Open artist profiel
+                Open Spotify-profiel
               </Link>
 
               {discography.productionItems && discography.productionItems.length > 0 ? (

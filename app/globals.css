@@ -457,6 +457,15 @@ p {
   color: rgba(31, 37, 48, 0.82);
 }
 
+.booking-timeline-card {
+  border-color: rgba(242, 139, 14, 0.25);
+  background: linear-gradient(145deg, rgba(42, 28, 24, 0.72) 0%, rgba(31, 22, 28, 0.64) 100%);
+}
+
+.booking-info-panel .timeline-date {
+  color: #f3d7b0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .mobile-menu-panel,
   .mobile-menu-link,

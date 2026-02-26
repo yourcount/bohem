@@ -39,7 +39,8 @@ export function HeroSection({ hero }: HeroSectionProps) {
           fill
           className="hero-mobile-zoom object-cover object-top"
           priority
-          sizes="100vw"
+          quality={92}
+          sizes="(max-width: 767px) 100vw, 100vw"
         />
       </div>
       <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(14,22,34,0.58)_0%,rgba(14,22,34,0.2)_42%,rgba(14,22,34,0.68)_100%)]" />

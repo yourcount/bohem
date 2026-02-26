@@ -584,7 +584,7 @@ p {
 
 @keyframes heroMobileZoomIn {
   from {
-    transform: scale(1.05);
+    transform: scale(1.015);
   }
   to {
     transform: scale(1);

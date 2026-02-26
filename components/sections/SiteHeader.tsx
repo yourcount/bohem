@@ -34,10 +34,30 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
     setIsMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith("#")) {
+      event.preventDefault();
+    }
+
     pendingHrefRef.current = href;
     setActiveHref(href);
     handleCloseMenu();
+
+    if (!href.startsWith("#")) return;
+
+    const targetId = href.slice(1);
+    const targetSection = document.getElementById(targetId);
+
+    if (targetSection) {
+      targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      if (window.location.hash !== href) {
+        history.pushState(null, "", href);
+      }
+      return;
+    }
+
+    history.pushState(null, "", href);
   };
 
   useEffect(() => {
@@ -127,7 +147,7 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
                 <Link
                   href={item.href}
                   aria-current={activeHref === item.href ? "page" : undefined}
-                  onClick={() => handleNavClick(item.href)}
+                  onClick={(event) => handleNavClick(event, item.href)}
                   className={`transition-colors hover:text-[#f3d7b0] focus-visible:text-[#f3d7b0] ${
                     activeHref === item.href ? "text-[#f3d7b0] underline decoration-[1.5px] underline-offset-[6px]" : ""
                   }`}
@@ -155,7 +175,7 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
                   className={`mobile-menu-link block rounded-xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] px-4 py-3 text-base font-medium transition-colors hover:border-[#c8873e] hover:text-[#f3d7b0] active:scale-[0.99] ${
                     activeHref === item.href ? "border-[#c8873e] text-[#f3d7b0]" : ""
                   }`}
-                  onClick={() => handleNavClick(item.href)}
+                  onClick={(event) => handleNavClick(event, item.href)}
                 >
                   {item.label}
                 </Link>

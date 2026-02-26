@@ -51,11 +51,13 @@
     "bios": [
       {
         "name": "Arthur",
-        "text": "Arthur Bont is drummer, percussionist en songwriter. Hij werkte samen met onder anderen Sjors van der Panne, Jack Poels, Mick Taylor en Smokey Wilson. Binnen Bohèm geeft hij ritmische gelaagdheid, backingvocals en percussie vorm, met een sterke focus op dynamiek en songverhaal."
+        "text": "Arthur Bont is drummer, percussionist en songwriter. Hij werkte samen met onder anderen Sjors van der Panne, Jack Poels, Mick Taylor en Smokey Wilson. Binnen Bohèm geeft hij ritmische gelaagdheid, backingvocals en percussie vorm, met een sterke focus op dynamiek en songverhaal.",
+        "website": "https://www.arthurbont.nl"
       },
       {
         "name": "Bettina",
-        "text": "Bettina Kraaieveld is zangeres, theatermaker en songwriter met een sterke podiumaanwezigheid en een liefde voor verhalen die raken. Als leadvocalist en mondharmonicaspeler geeft zij de songs van Bohèm een direct, persoonlijk en theatraal karakter."
+        "text": "Bettina Kraaieveld is zangeres, theatermaker en songwriter met een sterke podiumaanwezigheid en een liefde voor verhalen die raken. Als leadvocalist en mondharmonicaspeler geeft zij de songs van Bohèm een direct, persoonlijk en theatraal karakter.",
+        "website": "https://www.bettinakraaieveld.nl"
       }
     ]
   },

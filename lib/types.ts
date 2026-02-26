@@ -52,6 +52,7 @@ export type SiteContent = {
     bios: Array<{
       name: string;
       text: string;
+      website?: string;
     }>;
   };
   discography: {

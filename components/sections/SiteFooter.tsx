@@ -7,8 +7,6 @@ type SiteFooterProps = {
 };
 
 export function SiteFooter({ footer }: SiteFooterProps) {
-  const year = new Date().getFullYear();
-
   return (
     <footer aria-label="Footer" className="border-t border-[var(--color-line-muted)] bg-[#111d30] py-8 text-[#d6e3ec]">
       <div className="mx-auto flex w-full max-w-[1120px] flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center sm:px-6">
@@ -19,7 +17,19 @@ export function SiteFooter({ footer }: SiteFooterProps) {
           height={68}
           className="h-8 w-auto"
         />
-        <p>&copy; {year} {footer.copyright}</p>
+        <span className="block mt-3 text-sm text-[#cfd9e2] sm:mt-0">
+          Designed &amp; Developed by{" "}
+          <a
+            id="footer-designer-link"
+            href="https://www.instagram.com/yourcounter/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline transition-colors hover:text-white"
+          >
+            Tijmen de Graaf
+          </a>
+          .
+        </span>
       </div>
     </footer>
   );

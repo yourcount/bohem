@@ -47,6 +47,18 @@ export function AboutSection({ about }: AboutSectionProps) {
               <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
                 <h3 className="mb-3 font-display text-2xl sm:text-3xl">{bio.name}</h3>
                 <p className="mb-0">{bio.text}</p>
+                {bio.website ? (
+                  <div className="mt-auto pt-5">
+                    <a
+                      href={bio.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex w-fit items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-xs font-semibold text-[var(--color-text-primary)] transition-colors hover:border-[#c8873e] hover:bg-[rgba(200,135,62,0.14)]"
+                    >
+                      Persoonlijke website
+                    </a>
+                  </div>
+                ) : null}
               </article>
             </Reveal>
           ))}

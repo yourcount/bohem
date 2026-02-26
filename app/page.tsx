@@ -10,10 +10,15 @@ import { SiteHeader } from "@/components/sections/SiteHeader";
 import { MobileStickyCta } from "@/components/ui/MobileStickyCta";
 import { StickyListenBar } from "@/components/ui/StickyListenBar";
 import { siteContent } from "@/lib/content";
+import { buildHomeJsonLd } from "@/lib/seo";
 
 export default function HomePage() {
+  const jsonLd = buildHomeJsonLd(siteContent);
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
       <a href="#main-content" className="skip-link">
         Ga direct naar inhoud
       </a>

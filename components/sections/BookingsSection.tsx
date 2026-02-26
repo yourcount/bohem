@@ -186,9 +186,9 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
               aria-labelledby="pers-title"
               className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6"
             >
-              <h3 id="pers-title" className="mb-3 font-display text-3xl text-[var(--color-text-primary)]">
+              <h2 id="pers-title" className="mb-3 font-display text-3xl text-[var(--color-text-primary)]">
                 {bookings.press.title}
-              </h3>
+              </h2>
               <ul className="mb-4 grid gap-2 md:grid-cols-2">
                 {bookings.press.facts.map((fact) => (
                   <li key={fact} className="text-sm text-[#ead7bc]">
@@ -200,6 +200,8 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
               <div className="flex flex-wrap items-center gap-3">
                 <Link
                   href={bookings.press.kitHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   data-cta="epk_download"
                   className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                 >

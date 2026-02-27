@@ -10,11 +10,20 @@ import { SiteHeader } from "@/components/sections/SiteHeader";
 import { MobileStickyCta } from "@/components/ui/MobileStickyCta";
 import { ScrollExperience } from "@/components/ui/ScrollExperience";
 import { StickyListenBar } from "@/components/ui/StickyListenBar";
-import { siteContent } from "@/lib/content";
-import { buildHomeJsonLd } from "@/lib/seo";
+import { getLiveSiteContent } from "@/lib/content/live-content";
+import { getSeoSettingsSafe, resolveHomeJsonLd } from "@/lib/seo-settings";
+import { getFeatureFlagsSafe } from "@/lib/system/feature-flags";
 
 export default function HomePage() {
-  const jsonLd = buildHomeJsonLd(siteContent);
+  const siteContent = getLiveSiteContent();
+  const flags = getFeatureFlagsSafe();
+  const seoSettings = getSeoSettingsSafe();
+  const jsonLd = resolveHomeJsonLd(siteContent, seoSettings);
+  const navigation = siteContent.navigation.filter((item) => {
+    if (item.href === "#discografie") return flags.enable_discography_section;
+    if (item.href === "#kampvuurklanken") return flags.enable_kampvuur_section;
+    return true;
+  });
 
   return (
     <>
@@ -25,23 +34,31 @@ export default function HomePage() {
         Ga direct naar inhoud
       </a>
 
-      <SiteHeader brandName={siteContent.brand.name} navigation={siteContent.navigation} />
+      <SiteHeader brandName={siteContent.brand.name} navigation={navigation} />
 
       <main id="main-content">
         <HeroSection hero={siteContent.hero} />
         <AboutSection about={siteContent.about} />
-        <DiscographySection discography={siteContent.discography} />
+        {flags.enable_discography_section ? <DiscographySection discography={siteContent.discography} /> : null}
         <MusicExperienceSection musicExperience={siteContent.musicExperience} />
-        <KampvuurSection kampvuur={siteContent.kampvuur} />
+        {flags.enable_kampvuur_section ? <KampvuurSection kampvuur={siteContent.kampvuur} /> : null}
         <BookingsSection bookings={siteContent.bookings} />
         <ContactSection contact={siteContent.contact} />
       </main>
-      <StickyListenBar
-        visibleSectionIds={["bio", "discografie"]}
-        trackTitle={siteContent.discography.featuredSingle.title}
-        trackHref={siteContent.discography.featuredSingle.href}
-      />
-      <MobileStickyCta href="#boekingen" label="Boek Bohèm" visibleSectionIds={["bio", "discografie"]} />
+      {flags.enable_sticky_listen_bar ? (
+        <StickyListenBar
+          visibleSectionIds={["bio", "discografie"]}
+          trackTitle={siteContent.discography.featuredSingle.title}
+          trackHref={siteContent.discography.featuredSingle.href}
+        />
+      ) : null}
+      {flags.enable_mobile_sticky_cta ? (
+        <MobileStickyCta
+          href={siteContent.bookings.cta.href}
+          label={siteContent.bookings.cta.label}
+          visibleSectionIds={["bio", "discografie"]}
+        />
+      ) : null}
 
       <SiteFooter footer={siteContent.footer} />
     </>

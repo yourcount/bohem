@@ -18,3 +18,10 @@ yarn-error.log*
 
 # misc
 coverage/
+
+# local database
+data/*.db
+data/admin-user.json
+
+# local tooling artifacts
+.playwright-cli/

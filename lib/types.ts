@@ -14,6 +14,9 @@ export type SiteContent = {
     title: string;
     description: string;
     locale: string;
+    canonical: string;
+    ogTitle: string;
+    ogDescription: string;
   };
   brand: {
     name: string;

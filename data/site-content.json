@@ -2,7 +2,10 @@
   "meta": {
     "title": "Bohèm boeken | Live muziekduo voor theater en events",
     "description": "Bohèm (Arthur Bont & Bettina Kraaieveld) brengt melodische NL/EN songs voor theaters, culturele events en Kampvuurklanken-avonden. Bekijk muziek, persinfo en boek direct.",
-    "locale": "nl-NL"
+    "locale": "nl-NL",
+    "canonical": "/",
+    "ogTitle": "Bohèm boeken | Live muziekduo voor theater en events",
+    "ogDescription": "Bohèm (Arthur Bont & Bettina Kraaieveld) brengt melodische NL/EN songs voor theaters, culturele events en Kampvuurklanken-avonden. Bekijk muziek, persinfo en boek direct."
   },
   "brand": {
     "name": "Bohèm"

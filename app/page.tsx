@@ -8,6 +8,7 @@ import { MusicExperienceSection } from "@/components/sections/MusicExperienceSec
 import { SiteFooter } from "@/components/sections/SiteFooter";
 import { SiteHeader } from "@/components/sections/SiteHeader";
 import { MobileStickyCta } from "@/components/ui/MobileStickyCta";
+import { ScrollExperience } from "@/components/ui/ScrollExperience";
 import { StickyListenBar } from "@/components/ui/StickyListenBar";
 import { siteContent } from "@/lib/content";
 import { buildHomeJsonLd } from "@/lib/seo";
@@ -18,6 +19,7 @@ export default function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <ScrollExperience />
 
       <a href="#main-content" className="skip-link">
         Ga direct naar inhoud

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Reveal } from "@/components/ui/Reveal";
@@ -13,9 +13,13 @@ type HeroSectionProps = {
 
 export function HeroSection({ hero }: HeroSectionProps) {
   const [parallaxY, setParallaxY] = useState(0);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const allowInteractiveLightRef = useRef(false);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const desktop = window.matchMedia("(min-width: 768px)").matches;
+    allowInteractiveLightRef.current = !reduceMotion && desktop;
     if (reduceMotion) return;
 
     const updateParallax = () => {
@@ -27,10 +31,28 @@ export function HeroSection({ hero }: HeroSectionProps) {
     return () => window.removeEventListener("scroll", updateParallax);
   }, []);
 
+  const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
+    if (!allowInteractiveLightRef.current || !sectionRef.current) return;
+    const rect = sectionRef.current.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    sectionRef.current.style.setProperty("--hero-spot-x", `${Math.min(Math.max(x, 0), 100)}%`);
+    sectionRef.current.style.setProperty("--hero-spot-y", `${Math.min(Math.max(y, 0), 100)}%`);
+  };
+
+  const handlePointerLeave = () => {
+    if (!sectionRef.current) return;
+    sectionRef.current.style.setProperty("--hero-spot-x", "86%");
+    sectionRef.current.style.setProperty("--hero-spot-y", "42%");
+  };
+
   return (
     <section
+      ref={sectionRef}
       aria-labelledby="hero-title"
-      className="relative grid min-h-[82svh] items-end overflow-clip pb-20 pt-10 sm:min-h-[85svh] sm:pb-24 sm:pt-12 md:min-h-[calc(100svh-4rem)]"
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
+      className="hero-spotlight-shell relative grid min-h-[82svh] items-end overflow-clip pb-20 pt-10 sm:min-h-[85svh] sm:pb-24 sm:pt-12 md:min-h-[calc(100svh-4rem)]"
     >
       <div className="absolute inset-0">
         <Image
@@ -44,6 +66,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
         />
       </div>
       <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(14,22,34,0.58)_0%,rgba(14,22,34,0.2)_42%,rgba(14,22,34,0.68)_100%)]" />
+      <div className="hero-spotlight pointer-events-none absolute inset-0 hidden md:block" />
       <Image
         src="/brand/elements/bohem-moon-element.webp"
         alt=""

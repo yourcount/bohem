@@ -33,6 +33,7 @@
   --space-9: 96px;
 
   --focus-ring: #28a7c1;
+  --page-scroll-progress: 0;
 }
 
 * {
@@ -57,6 +58,18 @@ body {
     radial-gradient(circle at 12% 8%, rgba(40, 167, 193, 0.24) 0%, transparent 38%),
     radial-gradient(circle at 86% 10%, rgba(242, 139, 14, 0.3) 0%, transparent 36%),
     linear-gradient(165deg, #101a2a 0%, #1b2d47 45%, #4d416e 100%);
+}
+
+.scroll-tint-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  opacity: calc(0.08 + (var(--page-scroll-progress) * 0.26));
+  transition: opacity 180ms linear;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(252, 174, 92, 0.2) 0%, transparent 40%),
+    linear-gradient(180deg, rgba(47, 66, 98, 0.04) 0%, rgba(24, 37, 61, 0.34) 58%, rgba(10, 17, 30, 0.5) 100%);
 }
 
 .reveal {
@@ -152,10 +165,21 @@ p {
   gap: 18px;
 }
 
+.sticky-listen-bar::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: radial-gradient(circle at 22% 18%, rgba(255, 173, 91, 0.22) 0%, transparent 38%);
+  opacity: 0.4;
+}
+
 .sticky-listen-bar.is-visible {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+  animation: listenBarBreath 5.2s ease-in-out infinite;
 }
 
 .sticky-listen-left {
@@ -220,6 +244,8 @@ p {
   width: 100%;
   min-height: 40px;
   margin-top: 10px;
+  box-shadow: 0 0 0 rgba(242, 139, 14, 0);
+  animation: listenButtonPulse 2.8s ease-in-out infinite;
 }
 
 .sticky-listen-close {
@@ -328,6 +354,18 @@ p {
 
 .section-ambient-contact::before {
   background-image: radial-gradient(circle at 16% 18%, rgba(242, 139, 14, 0.16) 0%, transparent 42%);
+}
+
+.hero-spotlight-shell {
+  --hero-spot-x: 86%;
+  --hero-spot-y: 42%;
+}
+
+.hero-spotlight {
+  opacity: 0.52;
+  background:
+    radial-gradient(circle at var(--hero-spot-x) var(--hero-spot-y), rgba(249, 196, 130, 0.24) 0%, rgba(249, 196, 130, 0.1) 14%, transparent 30%),
+    radial-gradient(circle at calc(var(--hero-spot-x) - 8%) calc(var(--hero-spot-y) + 14%), rgba(52, 96, 128, 0.12) 0%, transparent 34%);
 }
 
 .bio-photo-slider {
@@ -481,7 +519,9 @@ p {
     transition: none !important;
   }
 
-  .sticky-listen-vinyl {
+  .sticky-listen-vinyl,
+  .sticky-listen-bar.is-visible,
+  .sticky-listen-button {
     animation: none !important;
   }
 
@@ -544,6 +584,10 @@ p {
 
   .hero-mobile-zoom {
     animation: heroMobileZoomIn 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .hero-spotlight {
+    display: none;
   }
 
   .mobile-menu-panel {
@@ -660,5 +704,25 @@ p {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes listenButtonPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(242, 139, 14, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(242, 139, 14, 0.14);
+  }
+}
+
+@keyframes listenBarBreath {
+  0%,
+  100% {
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
+  }
+  50% {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(242, 139, 14, 0.2);
   }
 }

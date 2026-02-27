@@ -49,8 +49,8 @@ export function HeroSection({ hero }: HeroSectionProps) {
         alt=""
         width={420}
         height={420}
-        className="pointer-events-none absolute -right-20 top-20 hidden opacity-20 md:block"
-        style={{ transform: `translateY(${parallaxY * 0.08}px)`, width: "auto", height: "auto" }}
+        className="pointer-events-none absolute hidden 2xl:block 2xl:bottom-8 2xl:right-10 2xl:h-auto 2xl:w-[320px] 2xl:opacity-[0.22]"
+        style={{ transform: `translateY(${parallaxY * 0.08}px)` }}
         aria-hidden="true"
       />
       <Image
@@ -63,17 +63,19 @@ export function HeroSection({ hero }: HeroSectionProps) {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-[1120px] px-4 sm:px-6">
+      <div className="relative z-10 mx-auto w-full max-w-[1120px] px-4 sm:px-6 2xl:max-w-[1440px] 2xl:px-12">
         <Reveal className="hero-intro" delayMs={40}>
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#f3d7b0]">{hero.eyebrow}</p>
         </Reveal>
         <Reveal className="hero-intro" delayMs={120}>
-          <h1 id="hero-title" className="mb-4 max-w-[18ch] font-display text-4xl leading-[1.1] sm:text-5xl md:text-6xl">
+          <h1 id="hero-title" className="mb-4 max-w-[18ch] font-display text-4xl leading-[1.1] sm:text-5xl md:text-6xl 2xl:max-w-[22ch] 2xl:text-7xl">
             {hero.headline}
           </h1>
         </Reveal>
         <Reveal className="hero-intro" delayMs={220}>
-          <p className="mb-6 max-w-[56ch] text-[0.98rem] text-[var(--color-text-primary)] sm:text-base">{hero.subhead}</p>
+          <p className="mb-6 max-w-[56ch] text-[0.98rem] text-[var(--color-text-primary)] sm:text-base 2xl:max-w-[64ch] 2xl:text-xl">
+            {hero.subhead}
+          </p>
         </Reveal>
         <Reveal className="hero-intro" delayMs={320}>
           <div aria-label="Primaire acties" className="flex flex-wrap gap-3">

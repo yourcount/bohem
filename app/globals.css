@@ -396,6 +396,219 @@ p {
   z-index: 0;
 }
 
+.kampvuur-section::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 16% 84%, rgba(255, 187, 102, 0.22) 0%, transparent 26%),
+    radial-gradient(circle at 38% 72%, rgba(255, 139, 64, 0.16) 0%, transparent 22%),
+    radial-gradient(circle at 62% 80%, rgba(255, 176, 92, 0.18) 0%, transparent 24%),
+    radial-gradient(circle at 82% 70%, rgba(255, 129, 58, 0.14) 0%, transparent 20%);
+  opacity: 0.36;
+  animation: emberDrift 12s ease-in-out infinite alternate;
+}
+
+.kampvuur-embers {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.kampvuur-embers span {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  --float-x: 13px;
+  --float-y: 44px;
+  --ember-duration: 5.4s;
+  --ember-delay: 0s;
+  --ember-peak: 0.86;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 236, 206, 0.98) 0%, rgba(255, 181, 92, 0.9) 42%, rgba(191, 57, 33, 0.62) 100%);
+  box-shadow: 0 0 16px rgba(255, 156, 66, 0.72), 0 0 30px rgba(242, 139, 14, 0.34);
+  opacity: 0;
+  animation: emberFloat var(--ember-duration) cubic-bezier(0.22, 0.61, 0.36, 1) var(--ember-delay) infinite;
+}
+
+.kampvuur-embers span:nth-child(1) {
+  left: 12%;
+  top: 18%;
+  --float-x: 9px;
+  --float-y: 20px;
+  --ember-duration: 4.8s;
+  --ember-delay: -0.9s;
+}
+.kampvuur-embers span:nth-child(2) {
+  left: 25%;
+  top: 24%;
+  width: 5px;
+  height: 5px;
+  --float-x: 15px;
+  --float-y: 24px;
+  --ember-duration: 6.3s;
+  --ember-delay: -2.4s;
+  --ember-peak: 0.72;
+}
+.kampvuur-embers span:nth-child(3) {
+  left: 40%;
+  top: 20%;
+  --float-x: 8px;
+  --float-y: 18px;
+  --ember-duration: 5.7s;
+  --ember-delay: -1.6s;
+}
+.kampvuur-embers span:nth-child(4) {
+  left: 56%;
+  top: 29%;
+  width: 4px;
+  height: 4px;
+  --float-x: 17px;
+  --float-y: 26px;
+  --ember-duration: 4.9s;
+  --ember-delay: -3.1s;
+  --ember-peak: 0.68;
+}
+.kampvuur-embers span:nth-child(5) {
+  left: 72%;
+  top: 22%;
+  --float-x: 14px;
+  --float-y: 24px;
+  --ember-duration: 6.1s;
+  --ember-delay: -0.4s;
+}
+.kampvuur-embers span:nth-child(6) {
+  left: 86%;
+  top: 26%;
+  width: 5px;
+  height: 5px;
+  --float-x: 6px;
+  --float-y: 20px;
+  --ember-duration: 5.2s;
+  --ember-delay: -2.2s;
+  --ember-peak: 0.7;
+}
+.kampvuur-embers span:nth-child(7) {
+  left: 9%;
+  bottom: 13%;
+  --float-x: 18px;
+  --float-y: 58px;
+  --ember-duration: 6.6s;
+  --ember-delay: -1.8s;
+}
+.kampvuur-embers span:nth-child(8) {
+  left: 21%;
+  bottom: 15%;
+  width: 4px;
+  height: 4px;
+  --float-x: 11px;
+  --float-y: 48px;
+  --ember-duration: 5s;
+  --ember-delay: -3.4s;
+  --ember-peak: 0.66;
+}
+.kampvuur-embers span:nth-child(9) {
+  left: 34%;
+  bottom: 11%;
+  --float-x: 20px;
+  --float-y: 62px;
+  --ember-duration: 7.1s;
+  --ember-delay: -1.2s;
+}
+.kampvuur-embers span:nth-child(10) {
+  left: 50%;
+  bottom: 14%;
+  width: 5px;
+  height: 5px;
+  --float-x: 13px;
+  --float-y: 54px;
+  --ember-duration: 5.5s;
+  --ember-delay: -2.7s;
+}
+.kampvuur-embers span:nth-child(11) {
+  left: 66%;
+  bottom: 10%;
+  --float-x: 16px;
+  --float-y: 57px;
+  --ember-duration: 6.4s;
+  --ember-delay: -0.6s;
+}
+.kampvuur-embers span:nth-child(12) {
+  left: 82%;
+  bottom: 16%;
+  width: 4px;
+  height: 4px;
+  --float-x: 10px;
+  --float-y: 44px;
+  --ember-duration: 4.7s;
+  --ember-delay: -3.9s;
+  --ember-peak: 0.64;
+}
+.kampvuur-embers span:nth-child(13) {
+  left: 16%;
+  top: 35%;
+  width: 4px;
+  height: 4px;
+  --float-x: 12px;
+  --float-y: 22px;
+  --ember-duration: 5.9s;
+  --ember-delay: -4.1s;
+  --ember-peak: 0.62;
+}
+.kampvuur-embers span:nth-child(14) {
+  left: 47%;
+  top: 40%;
+  width: 5px;
+  height: 5px;
+  --float-x: 19px;
+  --float-y: 30px;
+  --ember-duration: 6.8s;
+  --ember-delay: -2.9s;
+}
+.kampvuur-embers span:nth-child(15) {
+  left: 78%;
+  top: 38%;
+  --float-x: 8px;
+  --float-y: 22px;
+  --ember-duration: 5.1s;
+  --ember-delay: -5s;
+}
+.kampvuur-embers span:nth-child(16) {
+  left: 28%;
+  bottom: 20%;
+  width: 4px;
+  height: 4px;
+  --float-x: 14px;
+  --float-y: 46px;
+  --ember-duration: 4.6s;
+  --ember-delay: -2.05s;
+  --ember-peak: 0.63;
+}
+.kampvuur-embers span:nth-child(17) {
+  left: 59%;
+  bottom: 22%;
+  width: 5px;
+  height: 5px;
+  --float-x: 22px;
+  --float-y: 64px;
+  --ember-duration: 7.4s;
+  --ember-delay: -0.95s;
+}
+.kampvuur-embers span:nth-child(18) {
+  left: 91%;
+  bottom: 18%;
+  width: 4px;
+  height: 4px;
+  --float-x: 9px;
+  --float-y: 42px;
+  --ember-duration: 5.3s;
+  --ember-delay: -4.7s;
+  --ember-peak: 0.62;
+}
+
 .kampvuur-section::before {
   inset: 0;
   background:
@@ -411,15 +624,61 @@ p {
   z-index: 1;
 }
 
+.kampvuur-ember-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, #ffd6a8 0%, #f28b0e 60%, #b52f1d 100%);
+  box-shadow: 0 0 14px rgba(242, 139, 14, 0.75);
+}
+
+.kampvuur-flame-divider {
+  width: 140px;
+  height: 5px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(255, 169, 79, 0.08) 0%, rgba(255, 196, 123, 0.95) 48%, rgba(181, 47, 29, 0.82) 100%);
+  box-shadow: 0 0 14px rgba(242, 139, 14, 0.45), 0 0 36px rgba(181, 47, 29, 0.28);
+}
+
 .kampvuur-benefits {
   border-color: rgba(242, 139, 14, 0.44);
-  background: linear-gradient(145deg, rgba(242, 139, 14, 0.16) 0%, rgba(64, 29, 20, 0.35) 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 193, 122, 0.14);
+  background: linear-gradient(145deg, rgba(242, 139, 14, 0.18) 0%, rgba(64, 29, 20, 0.4) 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 193, 122, 0.14), 0 18px 34px rgba(22, 8, 6, 0.28);
 }
 
 .kampvuur-quote {
   border-left-color: rgba(242, 139, 14, 0.92);
   color: #ffd7a7;
+}
+
+.kampvuur-package-card {
+  transition: transform 240ms ease, border-color 240ms ease, box-shadow 240ms ease;
+}
+
+.kampvuur-package-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 184, 106, 0.72);
+  box-shadow: 0 10px 20px rgba(16, 8, 7, 0.34), 0 0 0 1px rgba(255, 177, 96, 0.22) inset;
+}
+
+.kampvuur-fire-cta {
+  position: relative;
+  overflow: hidden;
+}
+
+.kampvuur-fire-cta::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(112deg, transparent 0%, rgba(255, 220, 162, 0.42) 46%, transparent 100%);
+  transform: translateX(-120%);
+}
+
+.kampvuur-fire-cta:hover::after {
+  transform: translateX(120%);
+  transition: transform 520ms ease;
 }
 
 .kampvuur-media {
@@ -523,6 +782,15 @@ p {
   .sticky-listen-bar.is-visible,
   .sticky-listen-button {
     animation: none !important;
+  }
+
+  .kampvuur-section::after {
+    animation: none !important;
+  }
+
+  .kampvuur-embers span {
+    animation: none !important;
+    opacity: 0.2;
   }
 
   *,
@@ -724,5 +992,36 @@ p {
   }
   50% {
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(242, 139, 14, 0.2);
+  }
+}
+
+@keyframes emberDrift {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-8px) translateX(3px);
+    opacity: 0.42;
+  }
+}
+
+@keyframes emberFloat {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.9);
+    opacity: 0;
+  }
+  16% {
+    opacity: var(--ember-peak);
+  }
+  34% {
+    opacity: calc(var(--ember-peak) * 0.76);
+  }
+  52% {
+    opacity: calc(var(--ember-peak) * 0.88);
+  }
+  100% {
+    transform: translateY(calc(var(--float-y) * -1)) translateX(var(--float-x)) scale(1.04);
+    opacity: 0;
   }
 }

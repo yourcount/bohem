@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import Image from "next/image";
 
 import type { SiteContent } from "@/lib/types";
+
+type EditorManagedContent = Pick<
+  SiteContent,
+  "brand" | "navigation" | "hero" | "about" | "discography" | "musicExperience" | "kampvuur" | "bookings" | "contact" | "footer"
+>;
 
 type ApiError = {
   error?: string;
@@ -10,8 +16,8 @@ type ApiError = {
   fieldErrors?: Record<string, string[]>;
 };
 
-type AdminFullContentResponse = {
-  content: SiteContent;
+type AdminEditorContentResponse = {
+  content: EditorManagedContent;
   updated_at: string;
   updated_by: string;
 };
@@ -25,10 +31,20 @@ type EditableField = {
   value: string;
 };
 
+type MediaFile = {
+  src: string;
+  name: string;
+};
+
 type StatusTone = "neutral" | "success" | "error";
+const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][number]["format"]> = [
+  "Single",
+  "EP",
+  "Live Session",
+  "Album"
+];
 
 const sectionLabels: Record<string, string> = {
-  meta: "SEO en pagina-info",
   brand: "Merk",
   navigation: "Navigatie",
   hero: "Hero",
@@ -42,12 +58,6 @@ const sectionLabels: Record<string, string> = {
 };
 
 const keyLabels: Record<string, string> = {
-  title: "Titel",
-  description: "Beschrijving",
-  locale: "Taal",
-  canonical: "Canonieke link",
-  ogTitle: "OG titel",
-  ogDescription: "OG beschrijving",
   name: "Naam",
   label: "Label",
   href: "Link",
@@ -80,13 +90,12 @@ const keyLabels: Record<string, string> = {
 
 const helperByKey: Record<string, string> = {
   href: "Gebruik een volledige link (https://...) of een pagina-anker (#contact).",
-  canonical: "Bijv. / of https://musicbybohem.nl/",
   email: "Gebruik een geldig e-mailadres.",
   contactEmail: "Gebruik een geldig e-mailadres.",
-  contactPhone: "Gebruik internationaal formaat, bijv. +31 6...",
+  contactPhone: "Gebruik internationaal formaat, bijvoorbeeld +31 6...",
   alt: "Beschrijf kort wat er op de foto te zien is (toegankelijkheid).",
-  embedUrl: "Spotify embed URL, bijv. https://open.spotify.com/embed/...",
-  src: "Pad of URL van de afbeelding, bijv. /uploads/hero/....jpg"
+  embedUrl: "Spotify embed URL, bijvoorbeeld https://open.spotify.com/embed/...",
+  src: "Kies via de fotobibliotheek of vul een afbeeldingspad in, bijvoorbeeld /uploads/library/....webp"
 };
 
 function pathParts(path: string) {
@@ -130,7 +139,9 @@ function flattenEditableFields(value: unknown, path = "", section = ""): Editabl
         section,
         label: labelForPath(path),
         helper: helperForPath(path),
-        multiline: value.length > 80 || ["description", "text", "body", "intro", "boilerplate", "note", "quote", "subhead"].includes(leaf),
+        multiline:
+          value.length > 80 ||
+          ["description", "text", "body", "intro", "boilerplate", "note", "quote", "subhead"].includes(leaf),
         value
       }
     ];
@@ -150,26 +161,6 @@ function flattenEditableFields(value: unknown, path = "", section = ""): Editabl
   }
 
   return [];
-}
-
-function getValueAtPath(input: unknown, path: string): unknown {
-  const parts = pathParts(path);
-  let current: unknown = input;
-
-  for (const part of parts) {
-    if (Array.isArray(current)) {
-      current = current[Number(part)];
-      continue;
-    }
-
-    if (!current || typeof current !== "object") {
-      return undefined;
-    }
-
-    current = (current as Record<string, unknown>)[part];
-  }
-
-  return current;
 }
 
 function setValueAtPath<T>(input: T, path: string, value: string): T {
@@ -208,18 +199,37 @@ function normalizeApiFieldErrors(fieldErrors?: Record<string, string[]>) {
   return normalized;
 }
 
+function isImageSourcePath(path: string) {
+  return path.endsWith(".src");
+}
+
+function sectionToId(sectionTitle: string) {
+  return `editor-section-${sectionTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+}
+
 export function ContentEditorForm() {
-  const [content, setContent] = useState<SiteContent | null>(null);
-  const [initialContent, setInitialContent] = useState<SiteContent | null>(null);
+  const [content, setContent] = useState<EditorManagedContent | null>(null);
+  const [initialContent, setInitialContent] = useState<EditorManagedContent | null>(null);
   const [lastSavedAt, setLastSavedAt] = useState("");
   const [lastSavedBy, setLastSavedBy] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [statusTone, setStatusTone] = useState<StatusTone>("neutral");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
+  const [mediaTargetPath, setMediaTargetPath] = useState<string | null>(null);
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+  const [isMediaLoading, setIsMediaLoading] = useState(false);
+  const [mediaError, setMediaError] = useState("");
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  const [jumpTarget, setJumpTarget] = useState("");
+
   const fieldRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
+  const mediaUploadInputRef = useRef<HTMLInputElement | null>(null);
+  const sectionRefs = useRef<Record<string, HTMLDetailsElement | null>>({});
 
   useEffect(() => {
     const load = async () => {
@@ -228,8 +238,8 @@ export function ContentEditorForm() {
       setStatusTone("neutral");
 
       try {
-        const response = await fetch("/api/content/admin/full", { method: "GET" });
-        const payload = (await response.json()) as AdminFullContentResponse & ApiError;
+        const response = await fetch("/api/content/admin/editor-full", { method: "GET" });
+        const payload = (await response.json()) as AdminEditorContentResponse & ApiError;
 
         if (!response.ok || !("content" in payload)) {
           setStatusMessage(payload.error ?? "Kon content niet laden.");
@@ -254,7 +264,7 @@ export function ContentEditorForm() {
 
   const editableFields = useMemo(() => {
     if (!content) return [];
-    return flattenEditableFields(content);
+    return flattenEditableFields(content).filter((field) => !field.path.startsWith("discography.releases."));
   }, [content]);
 
   const groupedFields = useMemo(() => {
@@ -271,19 +281,34 @@ export function ContentEditorForm() {
     return Array.from(groups.entries());
   }, [editableFields]);
 
+  useEffect(() => {
+    setOpenSections((previous) => {
+      const next: Record<string, boolean> = {};
+      for (const [sectionTitle] of groupedFields) {
+        next[sectionTitle] = previous[sectionTitle] ?? true;
+      }
+      return next;
+    });
+  }, [groupedFields]);
+
   const isPristine = useMemo(() => {
     if (!content || !initialContent) return true;
     return JSON.stringify(content) === JSON.stringify(initialContent);
   }, [content, initialContent]);
 
-  const onChangeField = (path: string, value: string) => {
-    setContent((prev) => (prev ? setValueAtPath(prev, path, value) : prev));
-    setFieldErrors((prev) => ({ ...prev, [path]: [] }));
+  const releases = content?.discography.releases ?? [];
 
+  const setDirty = () => {
     if (statusTone !== "error") {
       setStatusMessage("Niet-opgeslagen wijzigingen.");
       setStatusTone("neutral");
     }
+  };
+
+  const onChangeField = (path: string, value: string) => {
+    setContent((prev) => (prev ? setValueAtPath(prev, path, value) : prev));
+    setFieldErrors((prev) => ({ ...prev, [path]: [] }));
+    setDirty();
   };
 
   const onReset = () => {
@@ -304,14 +329,14 @@ export function ContentEditorForm() {
     setFieldErrors({});
 
     try {
-      const response = await fetch("/api/content/admin/full", {
+      const response = await fetch("/api/content/admin/editor-full", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content })
       });
 
       const payload = (await response.json()) as
-        | { ok: true; content: SiteContent; updated_at: string; updated_by: string }
+        | { ok: true; content: EditorManagedContent; updated_at: string; updated_by: string }
         | ApiError;
 
       if (!response.ok) {
@@ -337,7 +362,7 @@ export function ContentEditorForm() {
         setLastSavedBy(payload.updated_by);
       }
 
-      setStatusMessage("Wijzigingen opgeslagen.");
+      setStatusMessage("Wijzigingen opgeslagen en live.");
       setStatusTone("success");
     } catch {
       setStatusMessage("Er ging iets mis bij opslaan. Probeer opnieuw.");
@@ -347,47 +372,194 @@ export function ContentEditorForm() {
     }
   };
 
-  const onUploadHeroImage = async (event: ChangeEvent<HTMLInputElement>) => {
+  const loadMediaLibrary = async () => {
+    setIsMediaLoading(true);
+    setMediaError("");
+
+    try {
+      const response = await fetch("/api/content/admin/media", { method: "GET" });
+      const payload = (await response.json()) as { ok?: boolean; files?: MediaFile[]; error?: string };
+
+      if (!response.ok || !payload.ok) {
+        setMediaError(payload.error ?? "Mediabibliotheek kon niet geladen worden.");
+        return;
+      }
+
+      setMediaFiles(payload.files ?? []);
+    } catch {
+      setMediaError("Mediabibliotheek kon niet geladen worden.");
+    } finally {
+      setIsMediaLoading(false);
+    }
+  };
+
+  const openMediaModal = (path: string) => {
+    setMediaTargetPath(path);
+    setIsMediaModalOpen(true);
+    void loadMediaLibrary();
+  };
+
+  const closeMediaModal = () => {
+    setIsMediaModalOpen(false);
+    setMediaTargetPath(null);
+    setMediaError("");
+  };
+
+  const onSelectMedia = (src: string) => {
+    if (!mediaTargetPath) return;
+    onChangeField(mediaTargetPath, src);
+    closeMediaModal();
+  };
+
+  const onUploadMedia = async (event: ChangeEvent<HTMLInputElement>) => {
     const selected = event.target.files?.[0];
     if (!selected) return;
 
-    setIsUploadingImage(true);
-    setStatusMessage("Afbeelding uploaden...");
-    setStatusTone("neutral");
+    setIsUploadingMedia(true);
+    setMediaError("");
 
     try {
       const body = new FormData();
       body.append("file", selected);
 
-      const response = await fetch("/api/content/admin/hero-image", {
+      const response = await fetch("/api/content/admin/media", {
         method: "POST",
         body
       });
 
       const payload = (await response.json()) as
-        | { ok: true; hero_image_url: string; updated_at: string; updated_by: string }
-        | ApiError;
+        | { ok: true; file: { src: string; name: string } }
+        | { error?: string };
 
-      if (!response.ok || !("hero_image_url" in payload)) {
-        const errorPayload = payload as ApiError;
-        setStatusMessage(errorPayload.error ?? "Uploaden is niet gelukt.");
-        setStatusTone("error");
+      if (!response.ok || !("ok" in payload)) {
+        const errorPayload = payload as { error?: string };
+        setMediaError(errorPayload.error ?? "Uploaden is mislukt.");
         return;
       }
 
-      setContent((prev) => (prev ? setValueAtPath(prev, "hero.image.src", payload.hero_image_url) : prev));
-      setInitialContent((prev) => (prev ? setValueAtPath(prev, "hero.image.src", payload.hero_image_url) : prev));
-      setLastSavedAt(payload.updated_at);
-      setLastSavedBy(payload.updated_by);
-      setStatusMessage("Hero-afbeelding vervangen en opgeslagen.");
-      setStatusTone("success");
+      if (mediaTargetPath) {
+        onChangeField(mediaTargetPath, payload.file.src);
+      }
+
+      await loadMediaLibrary();
     } catch {
-      setStatusMessage("Er ging iets mis bij uploaden. Probeer opnieuw.");
-      setStatusTone("error");
+      setMediaError("Uploaden is mislukt.");
     } finally {
-      setIsUploadingImage(false);
+      setIsUploadingMedia(false);
       event.target.value = "";
     }
+  };
+
+  const addRelease = () => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const next = structuredClone(prev);
+      next.discography.releases.push({
+        title: "Nieuwe release",
+        year: String(new Date().getFullYear()),
+        format: "Single",
+        note: "",
+        links: [{ label: "Luister op Spotify", href: "https://" }]
+      });
+      return next;
+    });
+    setDirty();
+  };
+
+  const removeRelease = (index: number) => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      if (prev.discography.releases.length <= 1) return prev;
+      const next = structuredClone(prev);
+      next.discography.releases.splice(index, 1);
+      return next;
+    });
+    setDirty();
+  };
+
+  const addReleaseLink = (releaseIndex: number) => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const next = structuredClone(prev);
+      next.discography.releases[releaseIndex]?.links.push({ label: "Nieuwe link", href: "https://" });
+      return next;
+    });
+    setDirty();
+  };
+
+  const removeReleaseLink = (releaseIndex: number, linkIndex: number) => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const next = structuredClone(prev);
+      const links = next.discography.releases[releaseIndex]?.links;
+      if (!links || links.length <= 1) return prev;
+      links.splice(linkIndex, 1);
+      return next;
+    });
+    setDirty();
+  };
+
+  const updateReleaseField = (
+    releaseIndex: number,
+    key: keyof SiteContent["discography"]["releases"][number],
+    value: string
+  ) => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const next = structuredClone(prev);
+      const release = next.discography.releases[releaseIndex];
+      if (!release) return prev;
+
+      if (key === "format") {
+        release.format = value as SiteContent["discography"]["releases"][number]["format"];
+      } else if (key !== "links") {
+        release[key] = value as never;
+      }
+
+      return next;
+    });
+    setFieldErrors((prev) => ({
+      ...prev,
+      [`discography.releases.${releaseIndex}.${key}`]: []
+    }));
+    setDirty();
+  };
+
+  const updateReleaseLinkField = (releaseIndex: number, linkIndex: number, key: "label" | "href", value: string) => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const next = structuredClone(prev);
+      const link = next.discography.releases[releaseIndex]?.links[linkIndex];
+      if (!link) return prev;
+      link[key] = value;
+      return next;
+    });
+    setFieldErrors((prev) => ({
+      ...prev,
+      [`discography.releases.${releaseIndex}.links.${linkIndex}.${key}`]: []
+    }));
+    setDirty();
+  };
+
+  const setAllSectionsOpen = (isOpen: boolean) => {
+    setOpenSections(() => {
+      const next: Record<string, boolean> = {};
+      for (const [sectionTitle] of groupedFields) {
+        next[sectionTitle] = isOpen;
+      }
+      return next;
+    });
+  };
+
+  const onToggleSection = (sectionTitle: string, isOpen: boolean) => {
+    setOpenSections((previous) => ({ ...previous, [sectionTitle]: isOpen }));
+  };
+
+  const onJumpToSection = (sectionTitle: string) => {
+    setOpenSections((previous) => ({ ...previous, [sectionTitle]: true }));
+    const sectionId = sectionToId(sectionTitle);
+    const node = sectionRefs.current[sectionId] ?? document.getElementById(sectionId);
+    node?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   if (isLoading) {
@@ -400,8 +572,8 @@ export function ContentEditorForm() {
 
   const statusColorClass =
     statusTone === "success" ? "text-[#b6efb9]" : statusTone === "error" ? "text-[#ffb4a8]" : "text-[#d9c6ac]";
-
-  const heroImage = String(getValueAtPath(content, "hero.image.src") ?? "");
+  const editorInputClass =
+    "mt-1 w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-sm text-[var(--color-text-primary)]";
 
   return (
     <section
@@ -412,34 +584,219 @@ export function ContentEditorForm() {
         Website-inhoud
       </h2>
       <p className="mb-4 text-sm text-[#d9c6ac]">
-        Alles wat bezoekers op de website zien kun je hieronder aanpassen. Wijziging klaar? Klik op Opslaan.
+        Pas hier alle zichtbare website-inhoud aan. Technische instellingen staan bewust in de Admin Backend.
       </p>
 
-      <div className="mb-6 rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.52)] p-4">
-        <p className="mb-2 text-sm font-semibold text-[#f8f5f1]">Hero afbeelding vervangen</p>
-        <p className="mb-3 text-xs text-[#d9c6ac]">Kies JPG, PNG of WEBP (maximaal 8 MB).</p>
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]">
-            {isUploadingImage ? "Uploaden..." : "Kies afbeelding"}
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="sr-only"
-              onChange={onUploadHeroImage}
-              disabled={isUploadingImage}
-            />
-          </label>
-          <a href={heroImage} target="_blank" rel="noopener noreferrer" className="text-sm underline underline-offset-2">
-            Huidige afbeelding bekijken
-          </a>
+      <div className="sticky top-0 z-30 mb-6 rounded-xl border border-[var(--color-accent-copper)] bg-[linear-gradient(135deg,rgba(16,22,33,0.96),rgba(35,27,22,0.94))] p-4 shadow-[0_10px_28px_rgba(0,0,0,0.35)] backdrop-blur">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.08em] text-[var(--color-accent-amber)]">Sectiemenu</p>
+            <p className="text-xs text-[#d9c6ac]">Spring direct naar een onderdeel of klap alle secties in één keer open/dicht.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setAllSectionsOpen(true)}
+              className="rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.12)]"
+            >
+              Alles openklappen
+            </button>
+            <button
+              type="button"
+              onClick={() => setAllSectionsOpen(false)}
+              className="rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.12)]"
+            >
+              Alles dichtklappen
+            </button>
+          </div>
         </div>
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <label className="text-xs font-semibold text-[#d9c6ac]" htmlFor="editor-section-jump">
+            Ga naar sectie
+          </label>
+          <select
+            id="editor-section-jump"
+            value={jumpTarget}
+            onChange={(event) => {
+              const value = event.target.value;
+              setJumpTarget(value);
+              if (value) {
+                onJumpToSection(value);
+              }
+            }}
+            className="w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-sm text-[var(--color-text-primary)] sm:max-w-sm"
+          >
+            <option value="">Kies een sectie...</option>
+            {groupedFields.map(([sectionTitle]) => (
+              <option key={sectionTitle} value={sectionTitle}>
+                {sectionTitle}
+              </option>
+            ))}
+          </select>
+          <div className="flex flex-wrap gap-2">
+            {groupedFields.map(([sectionTitle]) => (
+              <button
+                key={`jump-${sectionTitle}`}
+                type="button"
+                onClick={() => onJumpToSection(sectionTitle)}
+                className="rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.14)]"
+              >
+                {sectionTitle}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-6 rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.52)] p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-[#f8f5f1]">Discografie beheren</p>
+            <p className="text-xs text-[#d9c6ac]">Voeg hier nieuwe liedjes/releases toe of verwijder ze.</p>
+          </div>
+          <button
+            type="button"
+            onClick={addRelease}
+            className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2 text-sm font-semibold text-[var(--color-bg-deep)] hover:bg-[var(--color-accent-copper)]"
+          >
+            Nieuw liedje toevoegen
+          </button>
+        </div>
+        <ul className="mt-3 space-y-3">
+          {releases.map((release, index) => (
+            <li key={`${release.title}-${index}`} className="rounded-lg border border-[var(--color-line-muted)] px-3 py-3 text-sm">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-semibold text-[#f8f5f1]">
+                  {index + 1}. {release.title || "Nieuwe release"}
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => addReleaseLink(index)}
+                    className="rounded-full border border-[var(--color-line-muted)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
+                  >
+                    Link toevoegen
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeRelease(index)}
+                    disabled={releases.length <= 1}
+                    className="rounded-full border border-[var(--color-line-muted)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Verwijderen
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-3 grid gap-3 md:grid-cols-3">
+                <label className="text-xs font-semibold text-[#d9c6ac]">
+                  Titel
+                  <input
+                    value={release.title}
+                    onChange={(event) => updateReleaseField(index, "title", event.target.value)}
+                    className={editorInputClass}
+                  />
+                  {fieldErrors[`discography.releases.${index}.title`]?.[0] ? (
+                    <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`discography.releases.${index}.title`]?.[0]}</span>
+                  ) : null}
+                </label>
+                <label className="text-xs font-semibold text-[#d9c6ac]">
+                  Jaar
+                  <input
+                    value={release.year}
+                    onChange={(event) => updateReleaseField(index, "year", event.target.value)}
+                    className={editorInputClass}
+                  />
+                  {fieldErrors[`discography.releases.${index}.year`]?.[0] ? (
+                    <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`discography.releases.${index}.year`]?.[0]}</span>
+                  ) : null}
+                </label>
+                <label className="text-xs font-semibold text-[#d9c6ac]">
+                  Type
+                  <select
+                    value={release.format}
+                    onChange={(event) => updateReleaseField(index, "format", event.target.value)}
+                    className={editorInputClass}
+                  >
+                    {RELEASE_FORMAT_OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                  {fieldErrors[`discography.releases.${index}.format`]?.[0] ? (
+                    <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`discography.releases.${index}.format`]?.[0]}</span>
+                  ) : null}
+                </label>
+              </div>
+
+              <label className="mt-3 block text-xs font-semibold text-[#d9c6ac]">
+                Korte toelichting
+                <textarea
+                  rows={3}
+                  value={release.note}
+                  onChange={(event) => updateReleaseField(index, "note", event.target.value)}
+                  className={editorInputClass}
+                />
+                {fieldErrors[`discography.releases.${index}.note`]?.[0] ? (
+                  <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`discography.releases.${index}.note`]?.[0]}</span>
+                ) : null}
+              </label>
+
+              <p className="mt-3 text-xs font-semibold text-[#d9c6ac]">Links in deze release: {release.links.length}</p>
+              <div className="mt-2 space-y-2">
+                {release.links.map((link, linkIndex) => (
+                  <div key={`${link.label}-${linkIndex}`} className="rounded-lg border border-[var(--color-line-muted)] p-2">
+                    <div className="grid gap-2 md:grid-cols-[1fr_2fr_auto] md:items-end">
+                      <label className="text-xs font-semibold text-[#d9c6ac]">
+                        Linktekst
+                        <input
+                          value={link.label}
+                          onChange={(event) => updateReleaseLinkField(index, linkIndex, "label", event.target.value)}
+                          className={editorInputClass}
+                        />
+                      </label>
+                      <label className="text-xs font-semibold text-[#d9c6ac]">
+                        Link URL
+                        <input
+                          value={link.href}
+                          onChange={(event) => updateReleaseLinkField(index, linkIndex, "href", event.target.value)}
+                          className={editorInputClass}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => removeReleaseLink(index, linkIndex)}
+                        disabled={release.links.length <= 1}
+                        className="h-10 rounded-full border border-[var(--color-line-muted)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Verwijder
+                      </button>
+                    </div>
+                    {fieldErrors[`discography.releases.${index}.links.${linkIndex}.label`]?.[0] ? (
+                      <p className="mt-1 text-xs text-[#ffb4a8]">{fieldErrors[`discography.releases.${index}.links.${linkIndex}.label`]?.[0]}</p>
+                    ) : null}
+                    {fieldErrors[`discography.releases.${index}.links.${linkIndex}.href`]?.[0] ? (
+                      <p className="mt-1 text-xs text-[#ffb4a8]">{fieldErrors[`discography.releases.${index}.links.${linkIndex}.href`]?.[0]}</p>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-5 pb-28">
         {groupedFields.map(([sectionTitle, fields]) => (
           <details
             key={sectionTitle}
-            open
+            id={sectionToId(sectionTitle)}
+            ref={(node) => {
+              sectionRefs.current[sectionToId(sectionTitle)] = node;
+            }}
+            open={openSections[sectionTitle] ?? true}
+            onToggle={(event) => onToggleSection(sectionTitle, (event.currentTarget as HTMLDetailsElement).open)}
             className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.36)] p-4 sm:p-5"
           >
             <summary className="cursor-pointer select-none text-base font-semibold text-[#f8f5f1]">{sectionTitle}</summary>
@@ -450,6 +807,7 @@ export function ContentEditorForm() {
                 const errorId = `${inputId}-error`;
                 const error = fieldErrors[field.path]?.[0];
                 const describedBy = [field.helper ? helperId : "", error ? errorId : ""].filter(Boolean).join(" ") || undefined;
+                const showImageTools = isImageSourcePath(field.path);
 
                 return (
                   <div key={field.path} className={field.multiline ? "md:col-span-2" : ""}>
@@ -483,6 +841,27 @@ export function ContentEditorForm() {
                         className="w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-[var(--color-text-primary)]"
                       />
                     )}
+                    {showImageTools ? (
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openMediaModal(field.path)}
+                          className="rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
+                        >
+                          Kies uit fotobibliotheek
+                        </button>
+                        {field.value ? (
+                          <a
+                            href={field.value}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs underline underline-offset-2 text-[#d9c6ac]"
+                          >
+                            Voorbeeld openen
+                          </a>
+                        ) : null}
+                      </div>
+                    ) : null}
                     {field.helper ? (
                       <p id={helperId} className="mt-1 text-xs text-[#d9c6ac]">
                         {field.helper}
@@ -515,8 +894,16 @@ export function ContentEditorForm() {
               disabled={isSaving || isPristine}
               className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Ongedaan maken
+              Annuleren
             </button>
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+            >
+              Voorbeeld
+            </a>
             <p className="text-xs text-[#d9c6ac]">
               Laatst opgeslagen: {lastSavedAt || "onbekend"} {lastSavedBy ? `door ${lastSavedBy}` : ""}
             </p>
@@ -526,6 +913,73 @@ export function ContentEditorForm() {
           </p>
         </div>
       </form>
+
+      {isMediaModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.72)] p-4" role="dialog" aria-modal="true" aria-label="Fotobibliotheek">
+          <div className="max-h-[85vh] w-full max-w-5xl overflow-hidden rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(14,19,30,0.98)]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-line-muted)] px-4 py-3 sm:px-5">
+              <div>
+                <p className="text-base font-semibold text-[#f8f5f1]">Fotobibliotheek</p>
+                <p className="text-xs text-[#d9c6ac]">Kies een bestaande foto of upload een nieuwe.</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => mediaUploadInputRef.current?.click()}
+                  disabled={isUploadingMedia}
+                  className="rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isUploadingMedia ? "Uploaden..." : "Foto uploaden"}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeMediaModal}
+                  className="rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
+                >
+                  Sluiten
+                </button>
+              </div>
+              <input
+                ref={mediaUploadInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                onChange={onUploadMedia}
+                className="sr-only"
+              />
+            </div>
+
+            <div className="max-h-[65vh] overflow-y-auto px-4 py-4 sm:px-5">
+              {mediaError ? <p className="mb-3 text-sm text-[#ffb4a8]">{mediaError}</p> : null}
+              {isMediaLoading ? <p className="text-sm text-[#d9c6ac]">Fotobibliotheek laden...</p> : null}
+              {!isMediaLoading && mediaFiles.length === 0 ? (
+                <p className="text-sm text-[#d9c6ac]">Nog geen afbeeldingen gevonden.</p>
+              ) : null}
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                {mediaFiles.map((file) => (
+                  <button
+                    key={file.src}
+                    type="button"
+                    onClick={() => onSelectMedia(file.src)}
+                    className="overflow-hidden rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.6)] text-left transition-colors hover:border-[var(--color-accent-copper)]"
+                  >
+                    <Image
+                      src={file.src}
+                      alt={file.name}
+                      width={480}
+                      height={280}
+                      className="h-28 w-full object-cover"
+                    />
+                    <p className="truncate px-2 py-2 text-[11px] text-[#d9c6ac]" title={file.src}>
+                      {file.src}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

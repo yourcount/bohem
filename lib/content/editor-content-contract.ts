@@ -3,10 +3,25 @@ import type { SiteContent } from "@/lib/types";
 
 type FieldErrors = Record<string, string[]>;
 
+export const EDITOR_CONTENT_KEYS = [
+  "brand",
+  "navigation",
+  "hero",
+  "about",
+  "discography",
+  "musicExperience",
+  "kampvuur",
+  "bookings",
+  "contact",
+  "footer"
+] as const;
+
+export type EditorContent = Pick<SiteContent, (typeof EDITOR_CONTENT_KEYS)[number]>;
+
 type ValidationResult =
   | {
       ok: true;
-      value: SiteContent;
+      value: EditorContent;
     }
   | {
       ok: false;
@@ -24,12 +39,7 @@ function sanitizeText(value: string) {
   return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
 }
 
-function validateAndSanitizeByTemplate(
-  input: unknown,
-  template: unknown,
-  path: string,
-  errors: FieldErrors
-): unknown {
+function validateAndSanitizeByTemplate(input: unknown, template: unknown, path: string, errors: FieldErrors): unknown {
   if (typeof template === "string") {
     if (typeof input !== "string") {
       addFieldError(errors, path, "Moet tekst zijn.");
@@ -67,6 +77,7 @@ function validateAndSanitizeByTemplate(
       addFieldError(errors, path, "Moet een lijst zijn.");
       return template;
     }
+
     if (template.length === 0) {
       return input;
     }
@@ -102,9 +113,72 @@ function validateAndSanitizeByTemplate(
   return template;
 }
 
-export function validateAndSanitizeFullSiteContent(input: unknown): ValidationResult {
+function isDisallowedReleaseLinkLabel(label: string) {
+  return label.toLowerCase().includes("artiestprofiel");
+}
+
+function stripDisallowedReleaseLinksFromDiscography(content: EditorContent): EditorContent {
+  return {
+    ...content,
+    discography: {
+      ...content.discography,
+      releases: content.discography.releases.map((release) => {
+        const filteredLinks = release.links.filter((link) => !isDisallowedReleaseLinkLabel(link.label));
+        return {
+          ...release,
+          links: filteredLinks.length > 0 ? filteredLinks : release.links
+        };
+      })
+    }
+  };
+}
+
+export function pickEditorContent(full: SiteContent): EditorContent {
+  const editorContent: EditorContent = {
+    brand: full.brand,
+    navigation: full.navigation,
+    hero: full.hero,
+    about: full.about,
+    discography: full.discography,
+    musicExperience: full.musicExperience,
+    kampvuur: full.kampvuur,
+    bookings: full.bookings,
+    contact: full.contact,
+    footer: full.footer
+  };
+
+  return stripDisallowedReleaseLinksFromDiscography(editorContent);
+}
+
+export function mergeEditorContent(full: SiteContent, editorContent: EditorContent): SiteContent {
+  return {
+    ...full,
+    ...editorContent
+  };
+}
+
+export function validateAndSanitizeEditorContent(input: unknown): ValidationResult {
   const errors: FieldErrors = {};
-  const sanitized = validateAndSanitizeByTemplate(input, siteContent, "content", errors) as SiteContent;
+
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    return {
+      ok: false,
+      fieldErrors: { content: ["Content moet een object zijn."] }
+    };
+  }
+
+  const raw = input as Record<string, unknown>;
+  const output: Record<string, unknown> = {};
+
+  for (const key of EDITOR_CONTENT_KEYS) {
+    const sanitizedValue = validateAndSanitizeByTemplate(raw[key], siteContent[key], `content.${key}`, errors);
+    output[key] = sanitizedValue;
+  }
+
+  const unknownTopLevel = Object.keys(raw).filter((key) => !EDITOR_CONTENT_KEYS.includes(key as (typeof EDITOR_CONTENT_KEYS)[number]));
+  for (const key of unknownTopLevel) {
+    addFieldError(errors, `content.${key}`, "Onbekend veld.");
+  }
 
   if (Object.keys(errors).length > 0) {
     return {
@@ -115,6 +189,6 @@ export function validateAndSanitizeFullSiteContent(input: unknown): ValidationRe
 
   return {
     ok: true,
-    value: sanitized
+    value: stripDisallowedReleaseLinksFromDiscography(output as EditorContent)
   };
 }

@@ -8,6 +8,8 @@ type DiscographySectionProps = {
 };
 
 export function DiscographySection({ discography }: DiscographySectionProps) {
+  const isReleaseLinkVisible = (label: string) => !label.toLowerCase().includes("artiestprofiel");
+
   return (
     <section
       id="discografie"
@@ -113,7 +115,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
                 <p className="mb-5 text-sm text-[#e7d6c1]">{release.note}</p>
 
                 <div className="mt-auto flex flex-wrap gap-2">
-                  {release.links.map((link) => (
+                  {release.links.filter((link) => isReleaseLinkVisible(link.label)).map((link) => (
                     <Link
                       key={`${release.title}-${link.label}`}
                       href={link.href}

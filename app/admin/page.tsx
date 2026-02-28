@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
-import { SimpleContentEditorForm } from "@/components/admin/SimpleContentEditorForm";
+import { ContentEditorForm } from "@/components/admin/ContentEditorForm";
 import { AUTH_COOKIE_NAME } from "@/lib/auth/constants";
 import { verifySessionToken } from "@/lib/auth/session";
 
@@ -17,7 +17,9 @@ export default async function AdminHomePage() {
   return (
     <main className="mx-auto w-full max-w-[1120px] px-4 py-12 sm:px-6">
       <h1 className="mb-2 font-display text-4xl">Website inhoud bewerken</h1>
-      <p className="mb-6 text-[#d9c6ac]">Ingelogd als {session.email}. Pas hier alleen zichtbare website-teksten en links aan.</p>
+      <p className="mb-6 text-[#d9c6ac]">
+        Ingelogd als {session.email}. Pas hier alle zichtbare website-inhoud aan, inclusief foto&apos;s en discografie.
+      </p>
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <form action="/api/auth/logout" method="post">
@@ -38,7 +40,7 @@ export default async function AdminHomePage() {
         </Link>
       </div>
 
-      <SimpleContentEditorForm />
+      <ContentEditorForm />
     </main>
   );
 }

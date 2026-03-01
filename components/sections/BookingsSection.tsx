@@ -58,41 +58,6 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
           </Reveal>
         ) : null}
 
-        {bookings.upcomingShows && bookings.upcomingShows.length > 0 ? (
-          <Reveal className="md:col-span-2">
-            <section
-              aria-label="Volgende shows"
-              className="rounded-2xl border border-[rgba(242,139,14,0.45)] bg-[linear-gradient(145deg,rgba(68,34,24,0.52)_0%,rgba(37,23,28,0.52)_100%)] p-6"
-            >
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <h3 className="font-display text-3xl text-[#f8f1e5]">Volgende shows</h3>
-                <span className="rounded-full border border-[rgba(242,139,14,0.45)] bg-[rgba(242,139,14,0.14)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[#f3d7b0]">
-                  Actueel
-                </span>
-              </div>
-              <div className="grid gap-3 md:grid-cols-3">
-                {bookings.upcomingShows.slice(0, 3).map((show) => (
-                  <article
-                    key={`${show.date}-${show.venue}`}
-                    className="rounded-xl border border-[rgba(242,139,14,0.28)] bg-[rgba(24,16,20,0.36)] p-4"
-                  >
-                    <p className="mb-1 text-xs font-semibold uppercase tracking-[0.08em] text-[#f3d7b0]">{show.date}</p>
-                    <p className="font-semibold text-[#f8f1e5]">{show.venue}</p>
-                    <p className="text-sm text-[#d9c4a8]">{show.city}</p>
-                    <Link
-                      href={show.ctaHref}
-                      data-cta={`show_${show.venue.toLowerCase().replace(/\s+/g, "_")}`}
-                      className="mt-3 inline-flex w-fit items-center justify-center rounded-full border border-[rgba(242,139,14,0.45)] px-4 py-2 text-xs font-semibold text-[#f2e7d8] transition-colors hover:border-[var(--color-accent-copper)] hover:bg-[rgba(181,47,29,0.18)]"
-                    >
-                      {show.ctaLabel}
-                    </Link>
-                  </article>
-                ))}
-              </div>
-            </section>
-          </Reveal>
-        ) : null}
-
         <Reveal className="md:self-start">
           <div className="md:max-w-[640px]">
             <h2 id="boekingen-title" className="mb-4 font-display text-3xl leading-tight sm:text-4xl lg:text-5xl">

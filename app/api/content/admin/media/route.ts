@@ -2,15 +2,40 @@ import { mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { extname, join } from "node:path";
 import { randomBytes } from "node:crypto";
 
+import sharp from "sharp";
 import { NextResponse } from "next/server";
 
 import { getAdminSession } from "@/lib/auth/admin-session";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
+import { parseTagInput, readMediaIndex, upsertMediaIndexEntry } from "@/lib/media/library-index";
+import { consumeRateLimit } from "@/lib/security/rate-limit";
 import { getRequestMeta } from "@/lib/security/request";
 
 const ALLOWED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
+type ListedMediaFile = {
+  src: string;
+  name: string;
+  tags: string[];
+  kind: "photo" | "asset";
+};
+
+function inferTagsFromPath(src: string) {
+  const tags = new Set<string>();
+  const lower = src.toLowerCase();
+
+  if (lower.includes("hero")) tags.add("hero");
+  if (lower.includes("bio") || lower.includes("about")) tags.add("bio");
+  if (lower.includes("disc") || lower.includes("release") || lower.includes("spotify")) tags.add("discografie");
+  if (lower.includes("kampvuur") || lower.includes("fire")) tags.add("kampvuur");
+  if (lower.includes("book") || lower.includes("show") || lower.includes("live")) tags.add("boekingen");
+  if (lower.includes("brand") || lower.includes("logo")) tags.add("brand");
+  if (lower.includes("uploads")) tags.add("uploads");
+
+  return Array.from(tags);
+}
 
 function walkPublicImages(baseDir: string, baseUrl: string, depth = 0): Array<{ src: string; name: string }> {
   if (depth > 3) return [];
@@ -37,7 +62,13 @@ function walkPublicImages(baseDir: string, baseUrl: string, depth = 0): Array<{ 
   return files;
 }
 
-function listMediaFiles() {
+function classifyMediaKind(src: string): "photo" | "asset" {
+  if (src.startsWith("/images/")) return "photo";
+  if (src.startsWith("/uploads/library/")) return "photo";
+  return "asset";
+}
+
+function listMediaFiles(filter: { query?: string; tag?: string; kind?: "all" | "photo" }): ListedMediaFile[] {
   const publicRoot = join(process.cwd(), "public");
   const candidates = [
     { dir: join(publicRoot, "images"), url: "/images" },
@@ -62,18 +93,68 @@ function listMediaFiles() {
     deduped.set(file.src, file);
   }
 
-  return Array.from(deduped.values()).sort((a, b) => a.src.localeCompare(b.src));
+  const index = readMediaIndex();
+  const query = (filter.query ?? "").trim().toLowerCase();
+  const tag = (filter.tag ?? "").trim().toLowerCase();
+  const kind = filter.kind ?? "all";
+
+  const list = Array.from(deduped.values()).map((file) => {
+    const indexed = index.files[file.src];
+    const inferred = inferTagsFromPath(file.src);
+    const tags = Array.from(new Set([...(indexed?.tags ?? []), ...inferred]));
+    const mediaKind = classifyMediaKind(file.src);
+
+    return {
+      src: file.src,
+      name: file.name,
+      tags,
+      kind: mediaKind
+    };
+  });
+
+  return list
+    .filter((file) => {
+      if (kind === "photo" && file.kind !== "photo") {
+        return false;
+      }
+      if (query && !(`${file.name} ${file.src} ${file.tags.join(" ")}`.toLowerCase().includes(query))) {
+        return false;
+      }
+      if (tag && !file.tags.map((item) => item.toLowerCase()).includes(tag)) {
+        return false;
+      }
+      return true;
+    })
+    .sort((a, b) => a.src.localeCompare(b.src));
 }
 
-export async function GET() {
+async function convertToOptimizedWebp(file: File) {
+  const input = Buffer.from(await file.arrayBuffer());
+  const output = await sharp(input)
+    .rotate()
+    .resize({ width: 2200, withoutEnlargement: true })
+    .webp({ quality: 82, effort: 5 })
+    .toBuffer();
+
+  return output;
+}
+
+export async function GET(request: Request) {
   const session = await getAdminSession();
   if (!session) {
     return NextResponse.json({ error: "Niet geautoriseerd.", code: "UNAUTHORIZED" }, { status: 401 });
   }
 
   try {
-    const files = listMediaFiles();
-    return NextResponse.json({ ok: true, files }, { status: 200 });
+    const { searchParams } = new URL(request.url);
+    const files = listMediaFiles({
+      query: searchParams.get("q") ?? "",
+      tag: searchParams.get("tag") ?? "",
+      kind: searchParams.get("kind") === "photo" ? "photo" : "all"
+    });
+
+    const tags = Array.from(new Set(files.flatMap((file) => file.tags))).sort((a, b) => a.localeCompare(b));
+    return NextResponse.json({ ok: true, files, tags }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Mediabibliotheek laden mislukt.", code: "MEDIA_READ_FAILED" }, { status: 500 });
   }
@@ -86,6 +167,10 @@ export async function POST(request: Request) {
   }
 
   const { ip, userAgent } = getRequestMeta(request);
+  const limiter = consumeRateLimit(`admin-media-upload:${ip}:${session.uid}`, 25, 15 * 60 * 1000);
+  if (!limiter.allowed) {
+    return NextResponse.json({ error: "Te veel uploads. Probeer later opnieuw.", code: "RATE_LIMITED" }, { status: 429 });
+  }
 
   let formData: FormData;
   try {
@@ -111,30 +196,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bestandstype niet toegestaan.", code: "UNSUPPORTED_FILE_TYPE" }, { status: 415 });
   }
 
-  const extension = extname(file.name).toLowerCase();
-  const safeExt = ALLOWED_EXTENSIONS.has(extension)
-    ? extension
-    : file.type === "image/jpeg"
-      ? ".jpg"
-      : file.type === "image/png"
-        ? ".png"
-        : file.type === "image/webp"
-          ? ".webp"
-          : ".avif";
-
-  const filename = `media-${Date.now()}-${randomBytes(6).toString("hex")}${safeExt}`;
+  const filename = `media-${Date.now()}-${randomBytes(6).toString("hex")}.webp`;
   const uploadDir = join(process.cwd(), "public", "uploads", "library");
   mkdirSync(uploadDir, { recursive: true });
 
   const absolutePath = join(uploadDir, filename);
   const publicUrl = `/uploads/library/${filename}`;
+  const requestedTags = parseTagInput(formData.get("tags"));
 
   try {
-    const buffer = Buffer.from(await file.arrayBuffer());
+    const buffer = await convertToOptimizedWebp(file);
     writeFileSync(absolutePath, buffer, { flag: "wx" });
   } catch {
     return NextResponse.json({ error: "Afbeelding opslaan mislukt.", code: "FILE_SAVE_FAILED" }, { status: 500 });
   }
+
+  const indexEntry = upsertMediaIndexEntry(publicUrl, {
+    tags: requestedTags,
+    originalName: file.name
+  });
 
   logAuditEvent({
     actorUserId: session.uid,
@@ -142,10 +222,10 @@ export async function POST(request: Request) {
     action: "CONTENT_MEDIA_UPLOADED",
     targetType: "media",
     targetId: publicUrl,
-    metadata: { mime: file.type, size: file.size },
+    metadata: { mime: file.type, size: file.size, tags: indexEntry.tags, optimizedTo: "webp" },
     ipAddress: ip,
     userAgent
   });
 
-  return NextResponse.json({ ok: true, file: { src: publicUrl, name: filename } }, { status: 201 });
+  return NextResponse.json({ ok: true, file: { src: publicUrl, name: filename, tags: indexEntry.tags } }, { status: 201 });
 }

@@ -14,6 +14,7 @@ type ApiError = {
   error?: string;
   code?: string;
   fieldErrors?: Record<string, string[]>;
+  validationSummary?: Array<{ path: string; message: string }>;
 };
 
 type AdminEditorContentResponse = {
@@ -35,6 +36,7 @@ type MediaFile = {
   src: string;
   name: string;
   tags: string[];
+  kind?: "photo" | "asset";
 };
 
 type StatusTone = "neutral" | "success" | "error";
@@ -200,6 +202,17 @@ function normalizeApiFieldErrors(fieldErrors?: Record<string, string[]>) {
   return normalized;
 }
 
+function formatValidationPath(path: string) {
+  const clean = path.replace(/^content\./, "");
+  return clean
+    .split(".")
+    .map((part) => {
+      if (/^\d+$/.test(part)) return `#${Number(part) + 1}`;
+      return keyLabels[part] ?? part.replace(/([A-Z])/g, " $1").replace(/_/g, " ").toLowerCase();
+    })
+    .join(" > ");
+}
+
 function isImageSourcePath(path: string) {
   return path.endsWith(".src");
 }
@@ -217,6 +230,7 @@ export function ContentEditorForm() {
   const [isSaving, setIsSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [statusTone, setStatusTone] = useState<StatusTone>("neutral");
+  const [statusDetails, setStatusDetails] = useState<string[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
@@ -227,6 +241,7 @@ export function ContentEditorForm() {
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
   const [mediaQuery, setMediaQuery] = useState("");
   const [mediaTag, setMediaTag] = useState("");
+  const [mediaKind, setMediaKind] = useState<"photo" | "all">("photo");
   const [mediaTags, setMediaTags] = useState<string[]>([]);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [jumpTarget, setJumpTarget] = useState("");
@@ -240,6 +255,7 @@ export function ContentEditorForm() {
       setIsLoading(true);
       setStatusMessage("");
       setStatusTone("neutral");
+      setStatusDetails([]);
 
       try {
         const response = await fetch("/api/content/admin/editor-full", { method: "GET" });
@@ -330,6 +346,7 @@ export function ContentEditorForm() {
     setIsSaving(true);
     setStatusMessage("Opslaan...");
     setStatusTone("neutral");
+    setStatusDetails([]);
     setFieldErrors({});
 
     try {
@@ -347,7 +364,13 @@ export function ContentEditorForm() {
         const apiError = payload as ApiError;
         const normalizedErrors = normalizeApiFieldErrors(apiError.fieldErrors);
         setFieldErrors(normalizedErrors);
-        setStatusMessage(apiError.error ?? "Opslaan is niet gelukt.");
+        const summaryLines =
+          apiError.validationSummary?.map((item) => `${formatValidationPath(item.path)}: ${item.message}`) ??
+          Object.entries(apiError.fieldErrors ?? {})
+            .slice(0, 6)
+            .map(([path, messages]) => `${formatValidationPath(path)}: ${messages.join(" ")}`);
+        setStatusDetails(summaryLines);
+        setStatusMessage(apiError.error ?? "Opslaan is niet gelukt. Controleer de velden hieronder.");
         setStatusTone("error");
 
         const firstPath = Object.keys(normalizedErrors)[0];
@@ -368,15 +391,17 @@ export function ContentEditorForm() {
 
       setStatusMessage("Wijzigingen opgeslagen en live.");
       setStatusTone("success");
+      setStatusDetails([]);
     } catch {
       setStatusMessage("Er ging iets mis bij opslaan. Probeer opnieuw.");
       setStatusTone("error");
+      setStatusDetails([]);
     } finally {
       setIsSaving(false);
     }
   };
 
-  const loadMediaLibrary = async (options?: { query?: string; tag?: string }) => {
+  const loadMediaLibrary = async (options?: { query?: string; tag?: string; kind?: "photo" | "all" }) => {
     setIsMediaLoading(true);
     setMediaError("");
 
@@ -384,8 +409,10 @@ export function ContentEditorForm() {
       const params = new URLSearchParams();
       const query = options?.query ?? mediaQuery;
       const tag = options?.tag ?? mediaTag;
+      const kind = options?.kind ?? mediaKind;
       if (query.trim()) params.set("q", query.trim());
       if (tag.trim()) params.set("tag", tag.trim());
+      params.set("kind", kind);
       const response = await fetch(`/api/content/admin/media?${params.toString()}`, { method: "GET" });
       const payload = (await response.json()) as { ok?: boolean; files?: MediaFile[]; tags?: string[]; error?: string };
 
@@ -407,8 +434,9 @@ export function ContentEditorForm() {
     setMediaTargetPath(path);
     setMediaQuery("");
     setMediaTag("");
+    setMediaKind("photo");
     setIsMediaModalOpen(true);
-    void loadMediaLibrary({ query: "", tag: "" });
+    void loadMediaLibrary({ query: "", tag: "", kind: "photo" });
   };
 
   const closeMediaModal = () => {
@@ -610,6 +638,13 @@ export function ContentEditorForm() {
             <p className={`mt-2 text-xs ${statusColorClass}`} aria-live="polite">
               {statusMessage || "Geen openstaande wijzigingen."}
             </p>
+            {statusDetails.length > 0 ? (
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[#ffb4a8]">
+                {statusDetails.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            ) : null}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -927,6 +962,13 @@ export function ContentEditorForm() {
             </p>
           </div>
           <p aria-live="polite" className={`mt-2 text-sm ${statusColorClass}`}>{statusMessage || "Geen openstaande wijzigingen."}</p>
+          {statusDetails.length > 0 ? (
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[#ffb4a8]">
+              {statusDetails.map((item) => (
+                <li key={`bottom-${item}`}>{item}</li>
+              ))}
+            </ul>
+          ) : null}
         </div>
       </form>
 
@@ -965,7 +1007,7 @@ export function ContentEditorForm() {
             </div>
 
             <div className="max-h-[65vh] overflow-y-auto px-4 py-4 sm:px-5">
-              <div className="mb-4 grid gap-2 sm:grid-cols-[1fr_220px_auto] sm:items-end">
+              <div className="mb-4 grid gap-2 sm:grid-cols-[1fr_220px_180px_auto] sm:items-end">
                 <label className="text-xs font-semibold text-[#d9c6ac]">
                   Zoek afbeelding
                   <input
@@ -988,6 +1030,17 @@ export function ContentEditorForm() {
                         {tag}
                       </option>
                     ))}
+                  </select>
+                </label>
+                <label className="text-xs font-semibold text-[#d9c6ac]">
+                  Type
+                  <select
+                    value={mediaKind}
+                    onChange={(event) => setMediaKind(event.target.value === "all" ? "all" : "photo")}
+                    className="mt-1 w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-sm text-[var(--color-text-primary)]"
+                  >
+                    <option value="photo">Alleen foto&apos;s</option>
+                    <option value="all">Alle assets</option>
                   </select>
                 </label>
                 <button
@@ -1023,8 +1076,19 @@ export function ContentEditorForm() {
                     <p className="truncate px-2 py-2 text-[11px] text-[#d9c6ac]" title={file.src}>
                       {file.src}
                     </p>
-                    {file.tags.length > 0 ? (
+                    {file.tags.length > 0 || file.kind ? (
                       <div className="flex flex-wrap gap-1 px-2 pb-2">
+                        {file.kind ? (
+                          <span
+                            className={`rounded-full border px-2 py-0.5 text-[10px] ${
+                              file.kind === "photo"
+                                ? "border-[rgba(118,203,147,0.4)] text-[#b6efb9]"
+                                : "border-[var(--color-line-muted)] text-[#d9c6ac]"
+                            }`}
+                          >
+                            {file.kind === "photo" ? "foto" : "asset"}
+                          </span>
+                        ) : null}
                         {file.tags.slice(0, 3).map((tag) => (
                           <span key={`${file.src}-${tag}`} className="rounded-full border border-[var(--color-line-muted)] px-2 py-0.5 text-[10px] text-[#d9c6ac]">
                             {tag}

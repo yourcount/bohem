@@ -14,6 +14,15 @@ import { logAuditEvent } from "@/lib/db/admin-auth-db";
 import { getRequestMeta } from "@/lib/security/request";
 import { shouldAutoInvalidateCacheOnUpdate } from "@/lib/system/technical-settings";
 
+function buildValidationSummary(fieldErrors: Record<string, string[]>, limit = 6) {
+  return Object.entries(fieldErrors)
+    .slice(0, limit)
+    .map(([path, messages]) => ({
+      path,
+      message: messages.join(" ")
+    }));
+}
+
 export async function GET() {
   const session = await getAdminSession();
   if (!session) {
@@ -64,7 +73,8 @@ export async function PATCH(request: Request) {
       {
         error: "Validatie mislukt.",
         code: "VALIDATION_ERROR",
-        fieldErrors: parsedEditor.fieldErrors
+        fieldErrors: parsedEditor.fieldErrors,
+        validationSummary: buildValidationSummary(parsedEditor.fieldErrors)
       },
       { status: 422 }
     );
@@ -84,7 +94,8 @@ export async function PATCH(request: Request) {
         {
           error: "Validatie op gecombineerde content mislukt.",
           code: "VALIDATION_ERROR",
-          fieldErrors: fullValidation.fieldErrors
+          fieldErrors: fullValidation.fieldErrors,
+          validationSummary: buildValidationSummary(fullValidation.fieldErrors)
         },
         { status: 422 }
       );

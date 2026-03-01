@@ -198,6 +198,35 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
     }
   };
 
+  const deleteUser = async (userId: number, email: string) => {
+    const confirmed = window.confirm(`Weet je zeker dat je ${email} wilt verwijderen? Deze actie kan niet ongedaan gemaakt worden via deze UI.`);
+    if (!confirmed) return;
+
+    setBusy(userId, true);
+    setStatusMessage("Gebruiker verwijderen...");
+    setStatusTone("neutral");
+
+    try {
+      const response = await fetch(`/api/super-admin/users/${userId}`, { method: "DELETE" });
+      const payload = (await response.json()) as { ok: true; message: string } | ApiError;
+
+      if (!response.ok) {
+        setStatusMessage((payload as ApiError).error ?? "Gebruiker verwijderen mislukt.");
+        setStatusTone("error");
+        return;
+      }
+
+      setStatusMessage((payload as { ok: true; message: string }).message);
+      setStatusTone("success");
+      await loadUsers();
+    } catch {
+      setStatusMessage("Netwerkfout bij verwijderen.");
+      setStatusTone("error");
+    } finally {
+      setBusy(userId, false);
+    }
+  };
+
   const createUser = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsCreating(true);
@@ -430,6 +459,17 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
                       Reset wachtwoord
                     </button>
                   </div>
+                </div>
+
+                <div className="mt-3 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => void deleteUser(user.id, user.email)}
+                    disabled={isBusy || !canManageTarget || isCurrent}
+                    className="inline-flex items-center justify-center rounded-full border border-[#7f3f34] px-5 py-2.5 text-sm font-semibold text-[#ffd3c8] transition-colors hover:bg-[rgba(181,47,29,0.2)] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Gebruiker verwijderen
+                  </button>
                 </div>
 
                 {!canManageTarget ? (

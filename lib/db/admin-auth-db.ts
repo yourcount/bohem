@@ -479,6 +479,41 @@ export function updateAdminUserPassword(userId: number, passwordHash: string) {
   }
 }
 
+export function countActiveSuperAdmins() {
+  ensureAdminAuthSchema();
+  const db = openDb();
+  try {
+    const row = db
+      .prepare("SELECT COUNT(*) as total FROM admin_users WHERE role = 'SUPER_ADMIN' AND deleted_at IS NULL")
+      .get() as { total: number };
+    return row.total;
+  } finally {
+    db.close();
+  }
+}
+
+export function softDeleteAdminUser(userId: number) {
+  ensureAdminAuthSchema();
+  const db = openDb();
+  try {
+    const transaction = db.transaction(() => {
+      db.prepare("UPDATE admin_sessions SET revoked_at = CURRENT_TIMESTAMP WHERE user_id = ? AND revoked_at IS NULL").run(userId);
+      const result = db
+        .prepare(
+          `UPDATE admin_users
+           SET status = 'suspended', deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+           WHERE id = ? AND deleted_at IS NULL`
+        )
+        .run(userId);
+      return result.changes > 0;
+    });
+
+    return transaction();
+  } finally {
+    db.close();
+  }
+}
+
 export function forceLogoutUserSessions(userId: number) {
   ensureAdminAuthSchema();
   const db = openDb();

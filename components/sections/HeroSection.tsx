@@ -81,8 +81,8 @@ export function HeroSection({ hero }: HeroSectionProps) {
         alt=""
         width={160}
         height={152}
-        className="pointer-events-none absolute bottom-8 right-8 hidden opacity-30 md:block"
-        style={{ transform: `translateY(${-parallaxY * 0.06}px)` }}
+        className="pointer-events-none absolute bottom-8 right-8 hidden h-auto w-[160px] opacity-30 md:block"
+        style={{ width: "auto", height: "auto", transform: `translateY(${-parallaxY * 0.06}px)` }}
         aria-hidden="true"
       />
 

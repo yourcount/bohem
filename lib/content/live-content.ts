@@ -1,4 +1,5 @@
 import { siteContent } from "@/lib/content";
+import { sanitizeSiteContent } from "@/lib/content/sanitize-site-content";
 import { validatePublicContent } from "@/lib/content/public-content";
 import { getCachePolicySafe } from "@/lib/cache/policy";
 import { readRuntimeCache, writeRuntimeCache } from "@/lib/cache/runtime-cache";
@@ -62,8 +63,9 @@ export function getLiveSiteContent(): SiteContent {
   try {
     const fullRecord = readFullSiteContent();
     if (fullRecord) {
-      writeRuntimeCache("site_content", fullRecord.content, policy.publicContentTtlSeconds);
-      return fullRecord.content;
+      const sanitized = sanitizeSiteContent(fullRecord.content);
+      writeRuntimeCache("site_content", sanitized, policy.publicContentTtlSeconds);
+      return sanitized;
     }
   } catch {
     // fall through
@@ -71,7 +73,7 @@ export function getLiveSiteContent(): SiteContent {
 
   const base = cloneBaseContent();
   try {
-    const resolved = applyCmsOverrides(base);
+    const resolved = sanitizeSiteContent(applyCmsOverrides(base));
     writeRuntimeCache("site_content", resolved, policy.publicContentTtlSeconds);
     return resolved;
   } catch {

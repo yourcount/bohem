@@ -181,48 +181,50 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
 
         {bookings.press ? (
           <Reveal className="md:col-span-2">
-            <section
-              id="pers"
-              aria-labelledby="pers-title"
-              className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6"
-            >
-              <h2 id="pers-title" className="mb-3 font-display text-3xl text-[var(--color-text-primary)]">
-                {bookings.press.title}
-              </h2>
-              <ul className="mb-4 grid gap-2 md:grid-cols-2">
-                {bookings.press.facts.map((fact) => (
-                  <li key={fact} className="text-sm text-[#ead7bc]">
-                    • {fact}
-                  </li>
-                ))}
-              </ul>
-              <p className="mb-4 max-w-[80ch] text-sm text-[#ead7bc]">{bookings.press.boilerplate}</p>
-              <div className="flex flex-wrap items-center gap-3">
-                <Link
-                  href={bookings.press.kitHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-cta="epk_download"
-                  className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
-                >
-                  {bookings.press.kitLabel}
-                </Link>
-                <a
-                  href={`mailto:${bookings.press.contactEmail}`}
-                  data-cta="press_contact_email"
-                  className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-                >
-                  {bookings.press.contactEmail}
-                </a>
-                <a
-                  href={`tel:${bookings.press.contactPhone.replace(/\s+/g, "")}`}
-                  data-cta="press_contact_phone"
-                  className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-                >
-                  {bookings.press.contactPhone}
-                </a>
-              </div>
-            </section>
+            <div className="mt-8 border-t border-[rgba(67,135,133,0.35)] pt-8 md:mt-12 md:pt-10">
+              <section
+                id="pers"
+                aria-labelledby="pers-title"
+                className="rounded-2xl border border-[rgba(67,135,133,0.45)] bg-[linear-gradient(150deg,rgba(20,30,42,0.88)_0%,rgba(22,30,38,0.9)_100%)] p-6 shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
+              >
+                <h2 id="pers-title" className="mb-3 font-display text-3xl text-[var(--color-text-primary)]">
+                  {bookings.press.title}
+                </h2>
+                <ul className="mb-4 grid gap-2 md:grid-cols-2">
+                  {bookings.press.facts.map((fact) => (
+                    <li key={fact} className="text-sm text-[#ead7bc]">
+                      • {fact}
+                    </li>
+                  ))}
+                </ul>
+                <p className="mb-4 max-w-[80ch] text-sm text-[#ead7bc]">{bookings.press.boilerplate}</p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link
+                    href={bookings.press.kitHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-cta="epk_download"
+                    className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+                  >
+                    {bookings.press.kitLabel}
+                  </Link>
+                  <a
+                    href={`mailto:${bookings.press.contactEmail}`}
+                    data-cta="press_contact_email"
+                    className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                  >
+                    {bookings.press.contactEmail}
+                  </a>
+                  <a
+                    href={`tel:${bookings.press.contactPhone.replace(/\s+/g, "")}`}
+                    data-cta="press_contact_phone"
+                    className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                  >
+                    {bookings.press.contactPhone}
+                  </a>
+                </div>
+              </section>
+            </div>
           </Reveal>
         ) : null}
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type MouseEvent } from "react";
+import { useMemo, useState, type FormEvent, type MouseEvent } from "react";
 
 import { Reveal } from "@/components/ui/Reveal";
 import type { SiteContent } from "@/lib/types";
@@ -78,6 +78,9 @@ function FormField({
 
 export function ContactSection({ contact }: ContactSectionProps) {
   const [mobileStep, setMobileStep] = useState<1 | 2>(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState("");
   const subjectOptions = contact.subjectOptions ?? [];
 
   const stepOneFields = useMemo(
@@ -107,6 +110,47 @@ export function ContactSection({ contact }: ContactSectionProps) {
     }
   };
 
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    setIsSubmitting(true);
+    setSubmitError("");
+    setSubmitSuccess("");
+
+    const payload = {
+      subject: String(formData.get("subject") ?? ""),
+      name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      phone: String(formData.get("phone") ?? ""),
+      message: String(formData.get("message") ?? ""),
+      company_website: String(formData.get("company_website") ?? "")
+    };
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const result = (await response.json()) as { ok?: boolean; error?: string };
+
+      if (!response.ok || !result.ok) {
+        setSubmitError(result.error ?? "Er ging iets mis. Probeer het opnieuw.");
+        return;
+      }
+
+      form.reset();
+      setMobileStep(1);
+      setSubmitSuccess("Bedankt, je bericht is verzonden. We reageren zo snel mogelijk.");
+    } catch {
+      setSubmitError("Er ging iets mis. Probeer het opnieuw.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section
       id="contact"
@@ -123,7 +167,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
         </Reveal>
 
         <Reveal delayMs={120}>
-          <form className="grid max-w-[820px] gap-3 md:hidden" action="#" method="post">
+          <form className="grid max-w-[820px] gap-3 md:hidden" action="#" method="post" onSubmit={handleSubmit}>
             <div className="mb-1 flex items-center justify-between text-xs uppercase tracking-[0.12em] text-[#d6be9f]">
               <span>Stap {mobileStep} van 2</span>
               <span>{mobileStep === 1 ? "Contact" : "Bericht"}</span>
@@ -163,16 +207,25 @@ export function ContactSection({ contact }: ContactSectionProps) {
                   <button
                     type="submit"
                     data-cta="contact_mobile_submit"
+                    disabled={isSubmitting}
                     className="inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                   >
-                    {contact.ctaLabel}
+                    {isSubmitting ? "Verzenden..." : contact.ctaLabel}
                   </button>
                 </div>
               </>
             )}
           </form>
 
-          <form className="hidden max-w-[820px] gap-3 md:grid md:grid-cols-2" action="#" method="post">
+          <form className="hidden max-w-[820px] gap-3 md:grid md:grid-cols-2" action="#" method="post" onSubmit={handleSubmit}>
+            <input
+              type="text"
+              name="company_website"
+              tabIndex={-1}
+              autoComplete="off"
+              className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden opacity-0"
+              aria-hidden="true"
+            />
             {contact.fields.map((field) => (
               <div key={field.id} className={`grid gap-2 ${field.id === "message" ? "md:col-span-2" : ""}`}>
                 <FormField field={field} idPrefix="desktop" subjectOptions={subjectOptions} />
@@ -181,11 +234,23 @@ export function ContactSection({ contact }: ContactSectionProps) {
             <button
               type="submit"
               data-cta="contact_desktop_submit"
+              disabled={isSubmitting}
               className="mt-4 inline-flex w-fit items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-6 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)] focus-visible:bg-[var(--color-accent-copper)] focus-visible:text-[var(--color-text-primary)] md:col-span-2"
             >
-              {contact.ctaLabel}
+              {isSubmitting ? "Verzenden..." : contact.ctaLabel}
             </button>
           </form>
+
+          {submitError ? (
+            <p role="alert" className="mt-3 text-sm text-[#ffb4a8]">
+              {submitError}
+            </p>
+          ) : null}
+          {submitSuccess ? (
+            <p aria-live="polite" className="mt-3 text-sm text-[#b6efb9]">
+              {submitSuccess}
+            </p>
+          ) : null}
         </Reveal>
 
         <Reveal delayMs={200}>
@@ -201,3 +266,11 @@ export function ContactSection({ contact }: ContactSectionProps) {
     </section>
   );
 }
+            <input
+              type="text"
+              name="company_website"
+              tabIndex={-1}
+              autoComplete="off"
+              className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden opacity-0"
+              aria-hidden="true"
+            />

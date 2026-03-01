@@ -1,4 +1,5 @@
 import { siteContent } from "@/lib/content";
+import { sanitizeSiteContent } from "@/lib/content/sanitize-site-content";
 import type { SiteContent } from "@/lib/types";
 
 type FieldErrors = Record<string, string[]>;
@@ -118,18 +119,31 @@ function isDisallowedReleaseLinkLabel(label: string) {
 }
 
 function stripDisallowedReleaseLinksFromDiscography(content: EditorContent): EditorContent {
+  const normalized = sanitizeSiteContent({
+    ...siteContent,
+    ...content
+  });
+
   return {
-    ...content,
+    brand: normalized.brand,
+    navigation: normalized.navigation,
+    hero: normalized.hero,
+    about: normalized.about,
     discography: {
-      ...content.discography,
-      releases: content.discography.releases.map((release) => {
+      ...normalized.discography,
+      releases: normalized.discography.releases.map((release) => {
         const filteredLinks = release.links.filter((link) => !isDisallowedReleaseLinkLabel(link.label));
         return {
           ...release,
           links: filteredLinks.length > 0 ? filteredLinks : release.links
         };
       })
-    }
+    },
+    musicExperience: normalized.musicExperience,
+    kampvuur: normalized.kampvuur,
+    bookings: normalized.bookings,
+    contact: normalized.contact,
+    footer: normalized.footer
   };
 }
 

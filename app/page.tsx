@@ -14,6 +14,8 @@ import { getLiveSiteContent } from "@/lib/content/live-content";
 import { getSeoSettingsSafe, resolveHomeJsonLd } from "@/lib/seo-settings";
 import { getFeatureFlagsSafe } from "@/lib/system/feature-flags";
 
+export const dynamic = "force-dynamic";
+
 export default function HomePage() {
   const siteContent = getLiveSiteContent();
   const flags = getFeatureFlagsSafe();

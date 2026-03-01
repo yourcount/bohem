@@ -18,6 +18,24 @@ function sanitizeText(value: string) {
   return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
 }
 
+function coerceBoolean(value: unknown): boolean | null {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") {
+    if (value === 1) return true;
+    if (value === 0) return false;
+    return null;
+  }
+
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "true" || normalized === "1") return true;
+    if (normalized === "false" || normalized === "0") return false;
+    return null;
+  }
+
+  return null;
+}
+
 export function validateFeatureFlagsPatch(input: unknown) {
   const fieldErrors: FieldErrors = {};
   if (!input || typeof input !== "object" || Array.isArray(input)) {
@@ -33,11 +51,12 @@ export function validateFeatureFlagsPatch(input: unknown) {
   const patch: Partial<Record<FeatureFlagKey, boolean>> = {};
   for (const key of ALLOWED_FLAG_KEYS) {
     if (!(key in raw)) continue;
-    if (typeof raw[key] !== "boolean") {
+    const parsed = coerceBoolean(raw[key]);
+    if (parsed === null) {
       addError(fieldErrors, key, "Waarde moet true of false zijn.");
       continue;
     }
-    patch[key] = raw[key] as boolean;
+    patch[key] = parsed;
   }
 
   if (Object.keys(patch).length === 0) {

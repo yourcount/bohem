@@ -34,6 +34,7 @@ type EditableField = {
 type MediaFile = {
   src: string;
   name: string;
+  tags: string[];
 };
 
 type StatusTone = "neutral" | "success" | "error";
@@ -224,6 +225,9 @@ export function ContentEditorForm() {
   const [isMediaLoading, setIsMediaLoading] = useState(false);
   const [mediaError, setMediaError] = useState("");
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const [mediaQuery, setMediaQuery] = useState("");
+  const [mediaTag, setMediaTag] = useState("");
+  const [mediaTags, setMediaTags] = useState<string[]>([]);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [jumpTarget, setJumpTarget] = useState("");
 
@@ -372,13 +376,18 @@ export function ContentEditorForm() {
     }
   };
 
-  const loadMediaLibrary = async () => {
+  const loadMediaLibrary = async (options?: { query?: string; tag?: string }) => {
     setIsMediaLoading(true);
     setMediaError("");
 
     try {
-      const response = await fetch("/api/content/admin/media", { method: "GET" });
-      const payload = (await response.json()) as { ok?: boolean; files?: MediaFile[]; error?: string };
+      const params = new URLSearchParams();
+      const query = options?.query ?? mediaQuery;
+      const tag = options?.tag ?? mediaTag;
+      if (query.trim()) params.set("q", query.trim());
+      if (tag.trim()) params.set("tag", tag.trim());
+      const response = await fetch(`/api/content/admin/media?${params.toString()}`, { method: "GET" });
+      const payload = (await response.json()) as { ok?: boolean; files?: MediaFile[]; tags?: string[]; error?: string };
 
       if (!response.ok || !payload.ok) {
         setMediaError(payload.error ?? "Mediabibliotheek kon niet geladen worden.");
@@ -386,6 +395,7 @@ export function ContentEditorForm() {
       }
 
       setMediaFiles(payload.files ?? []);
+      setMediaTags(payload.tags ?? []);
     } catch {
       setMediaError("Mediabibliotheek kon niet geladen worden.");
     } finally {
@@ -395,8 +405,10 @@ export function ContentEditorForm() {
 
   const openMediaModal = (path: string) => {
     setMediaTargetPath(path);
+    setMediaQuery("");
+    setMediaTag("");
     setIsMediaModalOpen(true);
-    void loadMediaLibrary();
+    void loadMediaLibrary({ query: "", tag: "" });
   };
 
   const closeMediaModal = () => {
@@ -421,6 +433,9 @@ export function ContentEditorForm() {
     try {
       const body = new FormData();
       body.append("file", selected);
+      if (mediaTag) {
+        body.append("tags", mediaTag);
+      }
 
       const response = await fetch("/api/content/admin/media", {
         method: "POST",
@@ -592,6 +607,9 @@ export function ContentEditorForm() {
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.08em] text-[var(--color-accent-amber)]">Sectiemenu</p>
             <p className="text-xs text-[#d9c6ac]">Spring direct naar een onderdeel of klap alle secties in één keer open/dicht.</p>
+            <p className={`mt-2 text-xs ${statusColorClass}`} aria-live="polite">
+              {statusMessage || "Geen openstaande wijzigingen."}
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -908,9 +926,7 @@ export function ContentEditorForm() {
               Laatst opgeslagen: {lastSavedAt || "onbekend"} {lastSavedBy ? `door ${lastSavedBy}` : ""}
             </p>
           </div>
-          <p aria-live="polite" className={`mt-2 text-sm ${statusColorClass}`}>
-            {statusMessage || "Geen openstaande wijzigingen."}
-          </p>
+          <p aria-live="polite" className={`mt-2 text-sm ${statusColorClass}`}>{statusMessage || "Geen openstaande wijzigingen."}</p>
         </div>
       </form>
 
@@ -949,6 +965,40 @@ export function ContentEditorForm() {
             </div>
 
             <div className="max-h-[65vh] overflow-y-auto px-4 py-4 sm:px-5">
+              <div className="mb-4 grid gap-2 sm:grid-cols-[1fr_220px_auto] sm:items-end">
+                <label className="text-xs font-semibold text-[#d9c6ac]">
+                  Zoek afbeelding
+                  <input
+                    value={mediaQuery}
+                    onChange={(event) => setMediaQuery(event.target.value)}
+                    placeholder="Zoek op naam of tag..."
+                    className="mt-1 w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-sm text-[var(--color-text-primary)]"
+                  />
+                </label>
+                <label className="text-xs font-semibold text-[#d9c6ac]">
+                  Filter op tag
+                  <select
+                    value={mediaTag}
+                    onChange={(event) => setMediaTag(event.target.value)}
+                    className="mt-1 w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-sm text-[var(--color-text-primary)]"
+                  >
+                    <option value="">Alle tags</option>
+                    {mediaTags.map((tag) => (
+                      <option key={tag} value={tag}>
+                        {tag}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => void loadMediaLibrary()}
+                  className="h-10 rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
+                >
+                  Toepassen
+                </button>
+              </div>
+
               {mediaError ? <p className="mb-3 text-sm text-[#ffb4a8]">{mediaError}</p> : null}
               {isMediaLoading ? <p className="text-sm text-[#d9c6ac]">Fotobibliotheek laden...</p> : null}
               {!isMediaLoading && mediaFiles.length === 0 ? (
@@ -973,6 +1023,15 @@ export function ContentEditorForm() {
                     <p className="truncate px-2 py-2 text-[11px] text-[#d9c6ac]" title={file.src}>
                       {file.src}
                     </p>
+                    {file.tags.length > 0 ? (
+                      <div className="flex flex-wrap gap-1 px-2 pb-2">
+                        {file.tags.slice(0, 3).map((tag) => (
+                          <span key={`${file.src}-${tag}`} className="rounded-full border border-[var(--color-line-muted)] px-2 py-0.5 text-[10px] text-[#d9c6ac]">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
                   </button>
                 ))}
               </div>

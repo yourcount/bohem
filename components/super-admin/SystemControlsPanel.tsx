@@ -107,6 +107,13 @@ export function SystemControlsPanel() {
     void load();
   }, []);
 
+  const hasFlagChanges =
+    flags.length > 0 &&
+    flags.some((flag) => {
+      const draftValue = flagDraft[flag.key];
+      return typeof draftValue === "boolean" && draftValue !== flag.enabled;
+    });
+
   const saveFlags = async () => {
     setIsSavingFlags(true);
     setStatusMessage("Feature flags opslaan...");
@@ -121,7 +128,13 @@ export function SystemControlsPanel() {
 
       const payload = (await response.json()) as { ok: true; flags: FeatureFlag[] } | ApiError;
       if (!response.ok || !("ok" in payload)) {
-        setStatusMessage((payload as ApiError).error || "Feature flags opslaan mislukt.");
+        const apiError = payload as ApiError;
+        const validationDetails = apiError.fieldErrors
+          ? Object.entries(apiError.fieldErrors)
+              .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
+              .join(" | ")
+          : "";
+        setStatusMessage(validationDetails ? `${apiError.error || "Feature flags opslaan mislukt."} (${validationDetails})` : (apiError.error || "Feature flags opslaan mislukt."));
         setStatusTone("error");
         return;
       }
@@ -130,12 +143,19 @@ export function SystemControlsPanel() {
       setFlagDraft(Object.fromEntries(payload.flags.map((flag) => [flag.key, flag.enabled])));
       setStatusMessage("Feature flags opgeslagen.");
       setStatusTone("success");
+      await load();
     } catch {
       setStatusMessage("Netwerkfout bij feature flags opslaan.");
       setStatusTone("error");
     } finally {
       setIsSavingFlags(false);
     }
+  };
+
+  const onToggleFlag = (key: string, checked: boolean) => {
+    setFlagDraft((prev) => ({ ...prev, [key]: checked }));
+    setStatusMessage("Niet-opgeslagen wijzigingen in feature flags.");
+    setStatusTone("neutral");
   };
 
   const saveSettings = async () => {
@@ -186,6 +206,9 @@ export function SystemControlsPanel() {
       <section className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
         <h2 className="font-display text-3xl">Feature flags</h2>
         <p className="mt-1 text-sm text-[#d9c6ac]">Schakel visuele of functionele onderdelen gecontroleerd aan of uit.</p>
+        <p className={`mt-2 text-xs ${toneClass(statusTone)}`} aria-live="polite">
+          {statusMessage || "Nog geen wijzigingen opgeslagen."}
+        </p>
 
         <ul className="mt-4 grid gap-3">
           {flags.map((flag) => (
@@ -194,12 +217,21 @@ export function SystemControlsPanel() {
                 <input
                   type="checkbox"
                   checked={Boolean(flagDraft[flag.key])}
-                  onChange={(event) => setFlagDraft((prev) => ({ ...prev, [flag.key]: event.target.checked }))}
+                  onChange={(event) => onToggleFlag(flag.key, event.target.checked)}
                   className="mt-1 h-4 w-4 rounded border-[var(--color-line-muted)]"
                 />
                 <span>
                   <span className="block font-semibold text-[var(--color-text-primary)]">{flag.key}</span>
                   <span className="block text-[#d9c6ac]">{flag.description}</span>
+                  <span
+                    className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                      flagDraft[flag.key]
+                        ? "bg-[rgba(118,203,147,0.2)] text-[#b6efb9]"
+                        : "bg-[rgba(255,180,168,0.2)] text-[#ffb4a8]"
+                    }`}
+                  >
+                    {flagDraft[flag.key] ? "Aan" : "Uit"}
+                  </span>
                 </span>
               </label>
             </li>
@@ -209,10 +241,10 @@ export function SystemControlsPanel() {
         <button
           type="button"
           onClick={() => void saveFlags()}
-          disabled={isSavingFlags}
+          disabled={isSavingFlags || !hasFlagChanges}
           className="mt-4 inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isSavingFlags ? "Opslaan..." : "Feature flags opslaan"}
+          {isSavingFlags ? "Opslaan..." : hasFlagChanges ? "Feature flags opslaan" : "Geen wijzigingen"}
         </button>
       </section>
 

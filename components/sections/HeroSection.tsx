@@ -65,7 +65,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
           sizes="(max-width: 767px) 100vw, 100vw"
         />
       </div>
-      <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(14,22,34,0.58)_0%,rgba(14,22,34,0.2)_42%,rgba(14,22,34,0.68)_100%)]" />
+      <div className="hero-mask absolute inset-0" />
       <div className="hero-spotlight pointer-events-none absolute inset-0 hidden md:block" />
       <Image
         src="/brand/elements/bohem-moon-element.webp"

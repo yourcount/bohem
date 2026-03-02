@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import type { MouseEvent } from "react";
 
 type ButtonLinkProps = {
   href: string;
@@ -15,9 +18,28 @@ const variants: Record<NonNullable<ButtonLinkProps["variant"]>, string> = {
 };
 
 export function ButtonLink({ href, children, variant = "primary", dataCta }: ButtonLinkProps) {
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!href.startsWith("#")) return;
+
+    event.preventDefault();
+    const targetId = href.slice(1);
+    const targetSection = document.getElementById(targetId);
+
+    if (targetSection) {
+      targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (window.location.hash !== href) {
+        history.pushState(null, "", href);
+      }
+      return;
+    }
+
+    history.pushState(null, "", href);
+  };
+
   return (
     <Link
       href={href}
+      onClick={handleClick}
       data-cta={dataCta}
       className={`inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-bold transition-colors ${variants[variant]}`}
     >

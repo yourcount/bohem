@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import type { NavItem } from "@/lib/types";
+import { scrollToAnchor } from "@/lib/ui/anchor-scroll";
 
 type SiteHeaderProps = {
   brandName: string;
@@ -45,19 +46,9 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
 
     if (!href.startsWith("#")) return;
 
-    const targetId = href.slice(1);
-    const targetSection = document.getElementById(targetId);
-
-    if (targetSection) {
-      targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
-
-      if (window.location.hash !== href) {
-        history.pushState(null, "", href);
-      }
-      return;
-    }
-
-    history.pushState(null, "", href);
+    requestAnimationFrame(() => {
+      scrollToAnchor(href, { behavior: "smooth" });
+    });
   };
 
   useEffect(() => {
@@ -116,7 +107,7 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
   }, [navigation, sectionIds]);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.82)] backdrop-blur">
+    <header id="site-header" className="sticky top-0 z-30 border-b border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.82)] backdrop-blur">
       <div className="mx-auto flex min-h-16 w-full max-w-[1120px] items-center justify-between gap-3 px-4 sm:gap-4 sm:px-6">
         <Link href="#" onClick={handleLogoClick} className="inline-flex items-center">
           <Image

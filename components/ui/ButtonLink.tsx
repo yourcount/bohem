@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { MouseEvent } from "react";
+import { scrollToAnchor } from "@/lib/ui/anchor-scroll";
 
 type ButtonLinkProps = {
   href: string;
@@ -22,18 +23,7 @@ export function ButtonLink({ href, children, variant = "primary", dataCta }: But
     if (!href.startsWith("#")) return;
 
     event.preventDefault();
-    const targetId = href.slice(1);
-    const targetSection = document.getElementById(targetId);
-
-    if (targetSection) {
-      targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      if (window.location.hash !== href) {
-        history.pushState(null, "", href);
-      }
-      return;
-    }
-
-    history.pushState(null, "", href);
+    scrollToAnchor(href, { behavior: "smooth" });
   };
 
   return (

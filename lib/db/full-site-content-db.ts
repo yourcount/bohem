@@ -52,13 +52,29 @@ async function readBlobPayload(): Promise<BlobPayload | null> {
     limit: 20
   });
 
-  const exact = blobs.find((blob) => blob.pathname === FULL_CONTENT_BLOB_PATH) ?? blobs[0];
-  if (!exact) return null;
+  const exact = blobs.find((blob) => blob.pathname === FULL_CONTENT_BLOB_PATH);
+  const fallbackLatest =
+    blobs.length > 0
+      ? [...blobs].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())[0]
+      : null;
+  const candidate = exact ?? fallbackLatest;
+  if (!candidate) return null;
 
-  const response = await fetch(exact.url, { cache: "no-store" });
+  const headers: HeadersInit = {};
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`;
+  }
+
+  const response = await fetch(candidate.url, { cache: "no-store", headers });
   if (!response.ok) return null;
 
-  const parsed = (await response.json()) as Partial<BlobPayload>;
+  let parsed: Partial<BlobPayload>;
+  try {
+    parsed = (await response.json()) as Partial<BlobPayload>;
+  } catch {
+    return null;
+  }
+
   if (!parsed || typeof parsed !== "object" || !parsed.content || !parsed.updated_at || !parsed.updated_by) {
     return null;
   }

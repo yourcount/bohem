@@ -35,6 +35,12 @@ function stripKampvuurFormatChoiceFields(kampvuur: SiteContent["kampvuur"]): Sit
   ) as SiteContent["kampvuur"];
 }
 
+function stripBookingsRouteChoiceFields(bookings: SiteContent["bookings"]): SiteContent["bookings"] {
+  return Object.fromEntries(
+    Object.entries(bookings).filter(([key]) => !["routeTitle", "routeItems"].includes(key))
+  ) as SiteContent["bookings"];
+}
+
 function addFieldError(errors: FieldErrors, path: string, message: string) {
   if (!errors[path]) {
     errors[path] = [];
@@ -147,7 +153,7 @@ function stripDisallowedReleaseLinksFromDiscography(content: EditorContent): Edi
     },
     musicExperience: normalized.musicExperience,
     kampvuur: stripKampvuurFormatChoiceFields(normalized.kampvuur),
-    bookings: normalized.bookings,
+    bookings: stripBookingsRouteChoiceFields(normalized.bookings),
     contact: normalized.contact,
     footer: normalized.footer
   };
@@ -162,7 +168,7 @@ export function pickEditorContent(full: SiteContent): EditorContent {
     discography: full.discography,
     musicExperience: full.musicExperience,
     kampvuur: stripKampvuurFormatChoiceFields(full.kampvuur),
-    bookings: full.bookings,
+    bookings: stripBookingsRouteChoiceFields(full.bookings),
     contact: full.contact,
     footer: full.footer
   };
@@ -181,7 +187,8 @@ export function validateAndSanitizeEditorContent(input: unknown): ValidationResu
   const errors: FieldErrors = {};
   const editorTemplate: SiteContent = {
     ...siteContent,
-    kampvuur: stripKampvuurFormatChoiceFields(siteContent.kampvuur)
+    kampvuur: stripKampvuurFormatChoiceFields(siteContent.kampvuur),
+    bookings: stripBookingsRouteChoiceFields(siteContent.bookings)
   };
 
   if (!input || typeof input !== "object" || Array.isArray(input)) {

@@ -47,19 +47,19 @@
     ],
     "lineupTitle": "Bezetting",
     "lineupItems": [
-      "Leadvocal en mondharmonica: Bettina Kraaieveld",
-      "Backingvocals en percussie: Arthur Bont",
-      "Gitaar, bas en piano: Evert Zeevalkink"
+      "Leadvocal, gitaar en mondharmonica: Bettina Kraaieveld",
+      "Gitaar, backingvocals en percussie: Arthur Bont",
+      "De bezetting van Bohèm kan worden uitgebreid, afhankelijk van de vraag of de locatie."
     ],
     "bios": [
       {
         "name": "Arthur",
-        "text": "Arthur Bont is drummer, percussionist en songwriter. Hij werkte samen met onder anderen Sjors van der Panne, Jack Poels, Mick Taylor en Smokey Wilson. Binnen Bohèm geeft hij ritmische gelaagdheid, backingvocals en percussie vorm, met een sterke focus op dynamiek en songverhaal.",
+        "text": "Arthur Bont is drummer, gitarist, percussionist en songwriter. Hij werkte samen met onder anderen Sjors van der Panne, Jack Poels, Mick Taylor en Smokey Wilson. Binnen Bohèm geeft hij melodische gelaagdheid en backing vocals vorm, met een sterke focus op dynamiek en muzikale zeggingskracht.",
         "website": "https://www.arthurbont.nl"
       },
       {
         "name": "Bettina",
-        "text": "Bettina Kraaieveld is zangeres, theatermaker en songwriter met een sterke podiumaanwezigheid en een liefde voor verhalen die raken. Als leadvocalist en mondharmonicaspeler geeft zij de songs van Bohèm een direct, persoonlijk en theatraal karakter.",
+        "text": "Bettina Kraaieveld is zangeres, theatermaker, gitarist en songwriter met een sterke podiumpresentatie vol diepgang én humor, en een liefde voor verhalen die raken. Als leadvocalist geeft zij de songs van Bohèm een direct, persoonlijk en expressief karakter.",
         "website": "https://www.bettinakraaieveld.nl"
       }
     ]
@@ -170,31 +170,23 @@
   },
   "bookings": {
     "title": "Live & Boekingen",
-    "body": "Bohèm speelt als Reizigers op theaters, kleinschalige culturele podia en intieme concertavonden. Voor aanvragen en beschikbaarheid reageren we persoonlijk en snel.",
+    "body": "Bohèm speelt als Reizigers in theaters, intieme concerten en bijzondere gelegenheden zoals culturele seizoensopeningen, community-events en huiskamerconcerten.",
     "fitTitle": "Past goed bij",
     "fitItems": [
       "Theateravonden en vlakkevloerprogramma's",
       "Culturele seizoensopeningen en community-events",
       "Intieme concerten en storytelling-sets"
     ],
-    "routeTitle": "Kies je route",
-    "routeItems": [
-      {
-        "label": "Theater",
-        "description": "Voor programmeurs die snel speelbaar format en technische basis willen.",
-        "href": "#contact"
-      },
-      {
-        "label": "Cultureel event",
-        "description": "Voor organisatoren die sfeer, publiek en context willen laten aansluiten.",
-        "href": "#contact"
-      },
-      {
-        "label": "Kampvuurklanken",
-        "description": "Voor teams en groepen die verbinding, vertraging en menselijkheid zoeken.",
-        "href": "#kampvuurklanken"
+    "coverKoffer": {
+      "title": "Coverkoffer",
+      "body": "Bohèm is ook te horen op live avonden en in muziekcafés. De coverkoffer staat garant voor verrassende en soms hilarische muziek, waarbij naast eigen werk ook interpretaties van iconische songs klinken.",
+      "image": {
+        "src": "/images/nieuw/bohem-nieuw-road.webp",
+        "alt": "Bohèm live met gitaar in een intieme setting, passend bij de coverkoffer",
+        "width": 1800,
+        "height": 2165
       }
-    ],
+    },
     "pressQuotes": [
       "“Een warm, volwassen geluid met een theatrale ziel.”",
       "“Verhalende songs die direct binnenkomen.”",
@@ -285,7 +277,7 @@
       "2. Vermeld zaalcapaciteit en gewenste setduur.",
       "3. Ontvang binnen 2 werkdagen een concreet voorstel."
     ],
-    "availabilityText": "Beschikbaar voor theaterzaal, vlakkevloer en intieme podiumsetting.",
+    "availabilityText": "",
     "press": {
       "title": "Pers in 30 seconden",
       "facts": [
@@ -310,7 +302,15 @@
     "email": "boekingen@bohem.nl",
     "responseTimeText": "We reageren meestal binnen 2 werkdagen.",
     "intakeHint": "Vermeld bij voorkeur datum, locatie en type avond, dan kunnen we direct gericht reageren.",
-    "subjectOptions": ["Theaterboeking", "Kampvuurklanken", "Pers", "Algemene vraag"],
+    "subjectOptions": [
+      "Theaterboeking",
+      "Kampvuurklanken",
+      "Huiskamerpodium",
+      "Live optreden op muziekpodia",
+      "Meer over de coverkoffer",
+      "Pers",
+      "Algemene vraag"
+    ],
     "fields": [
       {
         "id": "subject",

@@ -132,6 +132,16 @@ export type SiteContent = {
       description: string;
       href: string;
     }>;
+    coverKoffer?: {
+      title: string;
+      body: string;
+      image?: {
+        src: string;
+        alt: string;
+        width: number;
+        height: number;
+      };
+    };
     socialProofTitle?: string;
     socialProof?: Array<{
       quote: string;

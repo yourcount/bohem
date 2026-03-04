@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import { Reveal } from "@/components/ui/Reveal";
 import type { SiteContent } from "@/lib/types";
@@ -85,21 +86,27 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
               </article>
             ) : null}
 
-            {bookings.routeItems && bookings.routeItems.length > 0 ? (
-              <article className="mt-5">
-                {bookings.routeTitle ? <h3 className="mb-3 font-display text-2xl text-[var(--color-text-primary)]">{bookings.routeTitle}</h3> : null}
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {bookings.routeItems.map((item) => (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      data-cta={`route_${item.label.toLowerCase().replace(/\s+/g, "_")}`}
-                      className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] p-4 transition-colors hover:border-[#f28b0e]"
-                    >
-                      <p className="mb-1 font-semibold text-[var(--color-text-primary)]">{item.label}</p>
-                      <p className="text-xs text-[#d9c4a8]">{item.description}</p>
-                    </Link>
-                  ))}
+            {bookings.coverKoffer ? (
+              <article className="mt-5 overflow-hidden rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)]">
+                <div className="grid gap-0 md:grid-cols-[1.1fr_0.9fr]">
+                  <div className="p-5">
+                    <h3 className="mb-3 font-display text-2xl text-[var(--color-text-primary)]">{bookings.coverKoffer.title}</h3>
+                    <p className="text-[#ead7bc]">{bookings.coverKoffer.body}</p>
+                  </div>
+                  {bookings.coverKoffer.image ? (
+                    <figure className="h-full min-h-[220px]">
+                      <Image
+                        src={bookings.coverKoffer.image.src}
+                        alt={bookings.coverKoffer.image.alt}
+                        width={bookings.coverKoffer.image.width}
+                        height={bookings.coverKoffer.image.height}
+                        className="h-full w-full object-cover object-center"
+                        loading="lazy"
+                        quality={78}
+                        sizes="(max-width: 767px) 92vw, (max-width: 1279px) 38vw, 360px"
+                      />
+                    </figure>
+                  ) : null}
                 </div>
               </article>
             ) : null}

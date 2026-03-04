@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { Analytics } from "@vercel/analytics/next";
+
 import { getLiveSiteContent } from "@/lib/content/live-content";
 import { getSiteUrl } from "@/lib/seo";
 import { getSeoSettingsSafe, resolveHomeSeo } from "@/lib/seo-settings";
@@ -76,7 +78,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="nl">
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

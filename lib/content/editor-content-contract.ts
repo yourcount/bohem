@@ -179,7 +179,17 @@ export function pickEditorContent(full: SiteContent): EditorContent {
 export function mergeEditorContent(full: SiteContent, editorContent: EditorContent): SiteContent {
   return {
     ...full,
-    ...editorContent
+    ...editorContent,
+    // Keep non-editor (hidden) kampvuur fields intact when editor payload omits them.
+    kampvuur: {
+      ...full.kampvuur,
+      ...editorContent.kampvuur
+    },
+    // Keep non-editor (hidden) bookings fields intact when editor payload omits them.
+    bookings: {
+      ...full.bookings,
+      ...editorContent.bookings
+    }
   };
 }
 

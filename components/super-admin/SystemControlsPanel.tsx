@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { StickyStatusBar, formatFieldErrors, useUnsavedChangesGuard, type StatusTone } from "@/components/super-admin/admin-ui";
 
 type FeatureFlag = {
   key: string;
@@ -37,14 +38,6 @@ type ApiError = {
   fieldErrors?: Record<string, string[]>;
 };
 
-type StatusTone = "neutral" | "success" | "error";
-
-function toneClass(tone: StatusTone) {
-  if (tone === "success") return "text-[#b6efb9]";
-  if (tone === "error") return "text-[#ffb4a8]";
-  return "text-[#d9c6ac]";
-}
-
 export function SystemControlsPanel() {
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
   const [settings, setSettings] = useState<SystemSettings | null>(null);
@@ -54,6 +47,8 @@ export function SystemControlsPanel() {
   const [settingsDraft, setSettingsDraft] = useState<SystemSettings | null>(null);
   const [statusMessage, setStatusMessage] = useState("");
   const [statusTone, setStatusTone] = useState<StatusTone>("neutral");
+  const [statusDetails, setStatusDetails] = useState<string[]>([]);
+  const [lastActionAt, setLastActionAt] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingFlags, setIsSavingFlags] = useState(false);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
@@ -113,11 +108,29 @@ export function SystemControlsPanel() {
       const draftValue = flagDraft[flag.key];
       return typeof draftValue === "boolean" && draftValue !== flag.enabled;
     });
+  const hasSettingsChanges = settings && settingsDraft
+    ? settings.jobs_enabled !== settingsDraft.jobs_enabled ||
+      settings.jobs_poll_interval_seconds !== settingsDraft.jobs_poll_interval_seconds ||
+      settings.cache_auto_invalidate_on_update !== settingsDraft.cache_auto_invalidate_on_update
+    : false;
+
+  useUnsavedChangesGuard(hasFlagChanges || hasSettingsChanges);
 
   const saveFlags = async () => {
     setIsSavingFlags(true);
     setStatusMessage("Feature flags opslaan...");
     setStatusTone("neutral");
+    setStatusDetails([]);
+
+    const confirmed = window.confirm(
+      "Feature flags wijzigen kan direct invloed hebben op zichtbare onderdelen van de website.\n\nWeet je zeker dat je deze wijziging wilt opslaan?"
+    );
+    if (!confirmed) {
+      setIsSavingFlags(false);
+      setStatusMessage("Opslaan geannuleerd.");
+      setStatusTone("neutral");
+      return;
+    }
 
     try {
       const response = await fetch("/api/super-admin/system/feature-flags", {
@@ -129,13 +142,9 @@ export function SystemControlsPanel() {
       const payload = (await response.json()) as { ok: true; flags: FeatureFlag[] } | ApiError;
       if (!response.ok || !("ok" in payload)) {
         const apiError = payload as ApiError;
-        const validationDetails = apiError.fieldErrors
-          ? Object.entries(apiError.fieldErrors)
-              .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
-              .join(" | ")
-          : "";
-        setStatusMessage(validationDetails ? `${apiError.error || "Feature flags opslaan mislukt."} (${validationDetails})` : (apiError.error || "Feature flags opslaan mislukt."));
+        setStatusMessage(apiError.error || "Feature flags opslaan mislukt.");
         setStatusTone("error");
+        setStatusDetails(formatFieldErrors(apiError.fieldErrors));
         return;
       }
 
@@ -143,10 +152,13 @@ export function SystemControlsPanel() {
       setFlagDraft(Object.fromEntries(payload.flags.map((flag) => [flag.key, flag.enabled])));
       setStatusMessage("Feature flags opgeslagen.");
       setStatusTone("success");
+      setStatusDetails([]);
+      setLastActionAt(new Date().toLocaleString("nl-NL"));
       await load();
     } catch {
       setStatusMessage("Netwerkfout bij feature flags opslaan.");
       setStatusTone("error");
+      setStatusDetails([]);
     } finally {
       setIsSavingFlags(false);
     }
@@ -156,6 +168,7 @@ export function SystemControlsPanel() {
     setFlagDraft((prev) => ({ ...prev, [key]: checked }));
     setStatusMessage("Niet-opgeslagen wijzigingen in feature flags.");
     setStatusTone("neutral");
+    setStatusDetails([]);
   };
 
   const saveSettings = async () => {
@@ -164,6 +177,17 @@ export function SystemControlsPanel() {
     setIsSavingSettings(true);
     setStatusMessage("Technische instellingen opslaan...");
     setStatusTone("neutral");
+    setStatusDetails([]);
+
+    const confirmed = window.confirm(
+      "Je wijzigt technische runtime-instellingen. Dit kan effect hebben op performance en gedrag van de site.\n\nWeet je zeker dat je wilt doorgaan?"
+    );
+    if (!confirmed) {
+      setIsSavingSettings(false);
+      setStatusMessage("Opslaan geannuleerd.");
+      setStatusTone("neutral");
+      return;
+    }
 
     try {
       const response = await fetch("/api/super-admin/system/settings", {
@@ -178,8 +202,10 @@ export function SystemControlsPanel() {
 
       const payload = (await response.json()) as { ok: true; settings: SystemSettings; environment: EnvProfile } | ApiError;
       if (!response.ok || !("ok" in payload)) {
-        setStatusMessage((payload as ApiError).error || "Technische instellingen opslaan mislukt.");
+        const apiError = payload as ApiError;
+        setStatusMessage(apiError.error || "Technische instellingen opslaan mislukt.");
         setStatusTone("error");
+        setStatusDetails(formatFieldErrors(apiError.fieldErrors));
         return;
       }
 
@@ -188,10 +214,13 @@ export function SystemControlsPanel() {
       setEnv(payload.environment);
       setStatusMessage("Technische instellingen opgeslagen.");
       setStatusTone("success");
+      setStatusDetails([]);
+      setLastActionAt(payload.settings.updated_at);
       await load();
     } catch {
       setStatusMessage("Netwerkfout bij technische instellingen opslaan.");
       setStatusTone("error");
+      setStatusDetails([]);
     } finally {
       setIsSavingSettings(false);
     }
@@ -203,13 +232,16 @@ export function SystemControlsPanel() {
 
   return (
     <div className="grid gap-6">
+      <StickyStatusBar
+        tone={statusTone}
+        message={statusMessage}
+        details={statusDetails}
+        hasUnsavedChanges={hasFlagChanges || hasSettingsChanges}
+        updatedAt={lastActionAt || settings.updated_at}
+      />
       <section className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
         <h2 className="font-display text-3xl">Feature flags</h2>
         <p className="mt-1 text-sm text-[#d9c6ac]">Schakel visuele of functionele onderdelen gecontroleerd aan of uit.</p>
-        <p className={`mt-2 text-xs ${toneClass(statusTone)}`} aria-live="polite">
-          {statusTone === "success" && statusMessage ? <span aria-hidden="true" className="success-pop">✓</span> : null}
-          {statusMessage || "Nog geen wijzigingen opgeslagen."}
-        </p>
 
         <ul className="mt-4 grid gap-3">
           {flags.map((flag) => (
@@ -239,14 +271,29 @@ export function SystemControlsPanel() {
           ))}
         </ul>
 
-        <button
-          type="button"
-          onClick={() => void saveFlags()}
-          disabled={isSavingFlags || !hasFlagChanges}
-          className="mt-4 inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isSavingFlags ? "Opslaan..." : hasFlagChanges ? "Feature flags opslaan" : "Geen wijzigingen"}
-        </button>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setFlagDraft(Object.fromEntries(flags.map((flag) => [flag.key, flag.enabled])));
+              setStatusMessage("Feature flag wijzigingen teruggezet.");
+              setStatusTone("neutral");
+              setStatusDetails([]);
+            }}
+            disabled={isSavingFlags || !hasFlagChanges}
+            className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Annuleren
+          </button>
+          <button
+            type="button"
+            onClick={() => void saveFlags()}
+            disabled={isSavingFlags || !hasFlagChanges}
+            className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isSavingFlags ? "Opslaan..." : "Opslaan"}
+          </button>
+        </div>
       </section>
 
       <section className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
@@ -320,14 +367,30 @@ export function SystemControlsPanel() {
 
         <p className="mt-3 text-xs text-[#d9c6ac]">Laatst bijgewerkt: {settings.updated_at} door {settings.updated_by}</p>
 
-        <button
-          type="button"
-          onClick={() => void saveSettings()}
-          disabled={isSavingSettings}
-          className="mt-4 inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isSavingSettings ? "Opslaan..." : "Technische instellingen opslaan"}
-        </button>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (!settings) return;
+              setSettingsDraft(settings);
+              setStatusMessage("Technische instellingen teruggezet.");
+              setStatusTone("neutral");
+              setStatusDetails([]);
+            }}
+            disabled={isSavingSettings || !hasSettingsChanges}
+            className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Annuleren
+          </button>
+          <button
+            type="button"
+            onClick={() => void saveSettings()}
+            disabled={isSavingSettings || !hasSettingsChanges}
+            className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isSavingSettings ? "Opslaan..." : "Opslaan"}
+          </button>
+        </div>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-2">
@@ -356,10 +419,6 @@ export function SystemControlsPanel() {
         </article>
       </section>
 
-      <p className={`text-sm ${toneClass(statusTone)}`}>
-        {statusTone === "success" && statusMessage ? <span aria-hidden="true" className="success-pop">✓</span> : null}
-        {statusMessage}
-      </p>
     </div>
   );
 }

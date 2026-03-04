@@ -18,17 +18,57 @@ import { getFeatureFlagsSafe } from "@/lib/system/feature-flags";
 
 export const dynamic = "force-dynamic";
 
+const NON_CONTENT_KEYS = new Set(["href", "variant", "id", "type", "autoComplete", "required", "width", "height"]);
+
+function hasSectionContent(value: unknown): boolean {
+  if (typeof value === "string") {
+    return value.trim().length > 0;
+  }
+
+  if (typeof value === "number" || typeof value === "boolean") {
+    return true;
+  }
+
+  if (Array.isArray(value)) {
+    return value.some((item) => hasSectionContent(item));
+  }
+
+  if (value && typeof value === "object") {
+    return Object.entries(value as Record<string, unknown>).some(([entryKey, entryValue]) => {
+      if (NON_CONTENT_KEYS.has(entryKey)) return false;
+      return hasSectionContent(entryValue);
+    });
+  }
+
+  return false;
+}
+
 export default async function HomePage() {
   const siteContent = await getLiveSiteContent();
   const flags = getFeatureFlagsSafe();
   const seoSettings = getSeoSettingsSafe();
   const jsonLd = resolveHomeJsonLd(siteContent, seoSettings);
+  const hasAboutSection = hasSectionContent(siteContent.about);
+  const hasDiscographySection = flags.enable_discography_section && hasSectionContent(siteContent.discography);
+  const hasMusicExperienceSection = hasSectionContent(siteContent.musicExperience);
+  const hasShows = (siteContent.bookings.upcomingShows?.length ?? 0) > 0;
+  const hasKampvuurSection = flags.enable_kampvuur_section && hasSectionContent(siteContent.kampvuur);
+  const hasBookingsSection = hasSectionContent(siteContent.bookings);
+  const hasContactSection = hasSectionContent(siteContent.contact);
+  const hasPressSection = hasBookingsSection && hasSectionContent(siteContent.bookings.press ?? null);
+
   const baseNavigation = siteContent.navigation.filter((item) => {
-    if (item.href === "#discografie") return flags.enable_discography_section;
-    if (item.href === "#kampvuurklanken") return flags.enable_kampvuur_section;
+    if (item.href === "#bio") return hasAboutSection;
+    if (item.href === "#discografie") return hasDiscographySection;
+    if (item.href === "#muziek") return hasMusicExperienceSection;
+    if (item.href === "#shows") return hasShows;
+    if (item.href === "#kampvuurklanken") return hasKampvuurSection;
+    if (item.href === "#boekingen") return hasBookingsSection;
+    if (item.href === "#pers") return hasPressSection;
+    if (item.href === "#contact") return hasContactSection;
     return true;
   });
-  const hasShows = (siteContent.bookings.upcomingShows?.length ?? 0) > 0;
+
   const hasShowsNav = baseNavigation.some((item) => item.href === "#shows");
   const navigation =
     hasShows && !hasShowsNav
@@ -66,28 +106,40 @@ export default async function HomePage() {
       <main id="main-content">
         <HeroSection hero={siteContent.hero} />
         <SectionMotifDivider />
-        <AboutSection about={siteContent.about} />
-        <SectionMotifDivider />
-        {flags.enable_discography_section ? <DiscographySection discography={siteContent.discography} /> : null}
-        <SectionMotifDivider />
-        <MusicExperienceSection musicExperience={siteContent.musicExperience} />
-        <SectionMotifDivider />
+        {hasAboutSection ? (
+          <>
+            <AboutSection about={siteContent.about} />
+            <SectionMotifDivider />
+          </>
+        ) : null}
+        {hasDiscographySection ? (
+          <>
+            <DiscographySection discography={siteContent.discography} />
+            <SectionMotifDivider />
+          </>
+        ) : null}
+        {hasMusicExperienceSection ? (
+          <>
+            <MusicExperienceSection musicExperience={siteContent.musicExperience} />
+            <SectionMotifDivider />
+          </>
+        ) : null}
         {hasShows ? <ShowsSection shows={siteContent.bookings.upcomingShows ?? []} /> : null}
         {hasShows ? <SectionMotifDivider /> : null}
-        {flags.enable_kampvuur_section ? <KampvuurSection kampvuur={siteContent.kampvuur} /> : null}
-        {flags.enable_kampvuur_section ? <SectionMotifDivider /> : null}
-        <BookingsSection bookings={siteContent.bookings} />
-        <SectionMotifDivider />
-        <ContactSection contact={siteContent.contact} />
+        {hasKampvuurSection ? <KampvuurSection kampvuur={siteContent.kampvuur} /> : null}
+        {hasKampvuurSection ? <SectionMotifDivider /> : null}
+        {hasBookingsSection ? <BookingsSection bookings={siteContent.bookings} /> : null}
+        {hasBookingsSection ? <SectionMotifDivider /> : null}
+        {hasContactSection ? <ContactSection contact={siteContent.contact} /> : null}
       </main>
-      {flags.enable_sticky_listen_bar ? (
+      {flags.enable_sticky_listen_bar && hasDiscographySection && hasSectionContent(siteContent.discography.featuredSingle) ? (
         <StickyListenBar
           visibleSectionIds={["bio", "discografie"]}
           trackTitle={siteContent.discography.featuredSingle.title}
           trackHref={siteContent.discography.featuredSingle.href}
         />
       ) : null}
-      {flags.enable_mobile_sticky_cta ? (
+      {flags.enable_mobile_sticky_cta && hasBookingsSection ? (
         <MobileStickyCta
           href={siteContent.bookings.cta.href}
           label={siteContent.bookings.cta.label}

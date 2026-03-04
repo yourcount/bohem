@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { StickyStatusBar, formatFieldErrors, useUnsavedChangesGuard, type StatusTone } from "@/components/super-admin/admin-ui";
 
 type CacheSettings = {
   id: number;
@@ -37,14 +38,6 @@ type ApiError = {
   fieldErrors?: Record<string, string[]>;
 };
 
-type StatusTone = "neutral" | "success" | "error";
-
-function toneClass(tone: StatusTone) {
-  if (tone === "success") return "text-[#b6efb9]";
-  if (tone === "error") return "text-[#ffb4a8]";
-  return "text-[#d9c6ac]";
-}
-
 export function CacheManagementPanel() {
   const [settings, setSettings] = useState<CacheSettings | null>(null);
   const [initialSettings, setInitialSettings] = useState<CacheSettings | null>(null);
@@ -56,6 +49,8 @@ export function CacheManagementPanel() {
   const [isInvalidating, setIsInvalidating] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [statusTone, setStatusTone] = useState<StatusTone>("neutral");
+  const [statusDetails, setStatusDetails] = useState<string[]>([]);
+  const [lastActionAt, setLastActionAt] = useState("");
   const [invalidationScope, setInvalidationScope] = useState<"sitewide" | "route">("sitewide");
   const [invalidationRoute, setInvalidationRoute] = useState("/");
   const [invalidationReason, setInvalidationReason] = useState("");
@@ -67,6 +62,7 @@ export function CacheManagementPanel() {
       settings.seo_settings_ttl_seconds === initialSettings.seo_settings_ttl_seconds
     );
   }, [settings, initialSettings]);
+  useUnsavedChangesGuard(!isPristine);
 
   const load = async () => {
     setIsLoading(true);
@@ -77,6 +73,7 @@ export function CacheManagementPanel() {
         const apiError = payload as ApiError;
         setStatusMessage(apiError.error ?? "Cache data laden mislukt.");
         setStatusTone("error");
+        setStatusDetails(formatFieldErrors(apiError.fieldErrors));
         return;
       }
 
@@ -84,9 +81,11 @@ export function CacheManagementPanel() {
       setInitialSettings(payload.settings);
       setRuntime(payload.runtime);
       setInvalidations(payload.recentInvalidations);
+      setLastActionAt(payload.settings.updated_at);
     } catch {
       setStatusMessage("Netwerkfout bij laden van cache data.");
       setStatusTone("error");
+      setStatusDetails([]);
     } finally {
       setIsLoading(false);
     }
@@ -107,6 +106,7 @@ export function CacheManagementPanel() {
     setFieldErrors({});
     setStatusMessage("Cache instellingen opslaan...");
     setStatusTone("neutral");
+    setStatusDetails([]);
 
     try {
       const response = await fetch("/api/super-admin/cache/settings", {
@@ -124,6 +124,7 @@ export function CacheManagementPanel() {
         setFieldErrors(apiError.fieldErrors ?? {});
         setStatusMessage(apiError.error ?? "Opslaan mislukt.");
         setStatusTone("error");
+        setStatusDetails(formatFieldErrors(apiError.fieldErrors));
         return;
       }
 
@@ -133,18 +134,29 @@ export function CacheManagementPanel() {
       setInvalidations(payload.recentInvalidations);
       setStatusMessage("Cache instellingen opgeslagen.");
       setStatusTone("success");
+      setStatusDetails([]);
+      setLastActionAt(payload.settings.updated_at);
     } catch {
       setStatusMessage("Netwerkfout bij opslaan.");
       setStatusTone("error");
+      setStatusDetails([]);
     } finally {
       setIsSaving(false);
     }
   };
 
   const runInvalidation = async () => {
+    const impact =
+      invalidationScope === "sitewide"
+        ? "Deze actie leegt de volledige sitecache."
+        : `Deze actie leegt de cache voor route "${invalidationRoute}".`;
+    const confirmed = window.confirm(`Cache invalidatie starten?\n\nImpact: ${impact}\n\nWeet je zeker dat je door wilt gaan?`);
+    if (!confirmed) return;
+
     setIsInvalidating(true);
     setStatusMessage("Cache invalidatie uitvoeren...");
     setStatusTone("neutral");
+    setStatusDetails([]);
 
     try {
       const response = await fetch("/api/super-admin/cache/invalidate", {
@@ -165,6 +177,7 @@ export function CacheManagementPanel() {
         const apiError = payload as ApiError;
         setStatusMessage(apiError.error ?? "Cache invalidatie mislukt.");
         setStatusTone("error");
+        setStatusDetails(formatFieldErrors(apiError.fieldErrors));
         return;
       }
 
@@ -172,9 +185,12 @@ export function CacheManagementPanel() {
       setInvalidations(payload.recentInvalidations);
       setStatusMessage(payload.message);
       setStatusTone("success");
+      setStatusDetails([]);
+      setLastActionAt(new Date().toLocaleString("nl-NL"));
     } catch {
       setStatusMessage("Netwerkfout bij invalidatie.");
       setStatusTone("error");
+      setStatusDetails([]);
     } finally {
       setIsInvalidating(false);
     }
@@ -186,6 +202,13 @@ export function CacheManagementPanel() {
 
   return (
     <div className="grid gap-6">
+      <StickyStatusBar
+        tone={statusTone}
+        message={statusMessage}
+        details={statusDetails}
+        hasUnsavedChanges={!isPristine}
+        updatedAt={lastActionAt || settings.updated_at}
+      />
       <form onSubmit={saveSettings} className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
         <h2 className="font-display text-3xl">TTL instellingen</h2>
         <p className="mt-1 text-sm text-[#d9c6ac]">Stel per cachetype in hoe lang data in runtime-cache mag blijven.</p>
@@ -232,13 +255,30 @@ export function CacheManagementPanel() {
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs text-[#d9c6ac]">Laatst bijgewerkt: {settings.updated_at} door {settings.updated_by}</p>
-          <button
-            type="submit"
-            disabled={isSaving || isPristine}
-            className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSaving ? "Opslaan..." : "TTL opslaan"}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (!initialSettings) return;
+                setSettings(initialSettings);
+                setFieldErrors({});
+                setStatusDetails([]);
+                setStatusMessage("TTL wijzigingen teruggezet.");
+                setStatusTone("neutral");
+              }}
+              disabled={isSaving || isPristine}
+              className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Annuleren
+            </button>
+            <button
+              type="submit"
+              disabled={isSaving || isPristine}
+              className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSaving ? "Opslaan..." : "Opslaan"}
+            </button>
+          </div>
         </div>
       </form>
 
@@ -312,7 +352,6 @@ export function CacheManagementPanel() {
         </ul>
       </section>
 
-      <p className={`text-sm ${toneClass(statusTone)}`}>{statusMessage}</p>
     </div>
   );
 }

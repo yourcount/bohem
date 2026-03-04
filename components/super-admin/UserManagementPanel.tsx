@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { StickyStatusBar, formatFieldErrors, useUnsavedChangesGuard, type StatusTone } from "@/components/super-admin/admin-ui";
 
 type AdminRole = "EDITOR" | "ADMIN" | "SUPER_ADMIN";
 type AccountStatus = "active" | "suspended";
@@ -28,26 +29,22 @@ type ApiError = {
   fieldErrors?: Record<string, string[]>;
 };
 
-type StatusTone = "neutral" | "success" | "error";
-
 type Props = {
   currentUserId: number;
   currentUserEmail: string;
   currentUserRole: AdminRole;
 };
 
-function toneClass(tone: StatusTone) {
-  if (tone === "success") return "text-[#b6efb9]";
-  if (tone === "error") return "text-[#ffb4a8]";
-  return "text-[#d9c6ac]";
-}
-
 export function UserManagementPanel({ currentUserId, currentUserEmail, currentUserRole }: Props) {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [query, setQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<"all" | AdminRole>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | AccountStatus>("all");
   const [isLoading, setIsLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState("");
   const [statusTone, setStatusTone] = useState<StatusTone>("neutral");
+  const [statusDetails, setStatusDetails] = useState<string[]>([]);
+  const [lastActionAt, setLastActionAt] = useState("");
   const [busyByUser, setBusyByUser] = useState<Record<number, boolean>>({});
   const [editing, setEditing] = useState<Record<number, { role: AdminRole; status: AccountStatus }>>({});
   const [resetValues, setResetValues] = useState<Record<number, string>>({});
@@ -91,21 +88,58 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
 
   const filteredUsers = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return users;
-    return users.filter((user) => user.email.toLowerCase().includes(q) || user.role.toLowerCase().includes(q));
-  }, [users, query]);
+    return users.filter((user) => {
+      const matchesQuery = !q || user.email.toLowerCase().includes(q) || user.role.toLowerCase().includes(q);
+      const matchesRole = roleFilter === "all" || user.role === roleFilter;
+      const matchesStatus = statusFilter === "all" || user.status === statusFilter;
+      return matchesQuery && matchesRole && matchesStatus;
+    });
+  }, [users, query, roleFilter, statusFilter]);
+
+  const hasUnsavedRowChanges = useMemo(() => {
+    return users.some((user) => {
+      const local = editing[user.id];
+      if (!local) return false;
+      return local.role !== user.role || local.status !== user.status;
+    });
+  }, [users, editing]);
+  const hasUnsavedPasswordInputs = useMemo(() => Object.values(resetValues).some((value) => value.trim().length > 0), [resetValues]);
+  const hasUnsavedCreateForm = useMemo(() => {
+    return createForm.email.trim().length > 0 || createForm.password.trim().length > 0;
+  }, [createForm.email, createForm.password]);
+  const hasUnsavedChanges = hasUnsavedRowChanges || hasUnsavedPasswordInputs || hasUnsavedCreateForm;
+  useUnsavedChangesGuard(hasUnsavedChanges);
 
   const setBusy = (userId: number, busy: boolean) => {
     setBusyByUser((prev) => ({ ...prev, [userId]: busy }));
   };
 
-  const updateUser = async (userId: number) => {
-    const next = editing[userId];
+  const updateUserWithDraft = async (userId: number, draft?: { role: AdminRole; status: AccountStatus }) => {
+    const next = draft ?? editing[userId];
     if (!next) return;
 
     setBusy(userId, true);
     setStatusMessage("Wijziging opslaan...");
     setStatusTone("neutral");
+    setStatusDetails([]);
+
+    const current = users.find((item) => item.id === userId);
+    const isSuspending = current?.status !== "suspended" && next.status === "suspended";
+    const roleChanging = current?.role !== next.role;
+    if (isSuspending || roleChanging) {
+      const impactLines = [];
+      if (isSuspending) impactLines.push("Het account kan niet meer inloggen.");
+      if (roleChanging) impactLines.push(`Rol wijzigt van ${current?.role ?? "onbekend"} naar ${next.role}.`);
+      const confirmed = window.confirm(
+        `Deze wijziging heeft directe impact op toegang.\n\n${impactLines.join("\n")}\n\nWeet je zeker dat je wilt opslaan?`
+      );
+      if (!confirmed) {
+        setBusy(userId, false);
+        setStatusMessage("Wijziging geannuleerd.");
+        setStatusTone("neutral");
+        return;
+      }
+    }
 
     try {
       const response = await fetch(`/api/super-admin/users/${userId}`, {
@@ -116,13 +150,17 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
       const payload = (await response.json()) as { ok: true } | ApiError;
 
       if (!response.ok) {
-        setStatusMessage((payload as ApiError).error ?? "Gebruiker bijwerken mislukt.");
+        const apiError = payload as ApiError;
+        setStatusMessage(apiError.error ?? "Gebruiker bijwerken mislukt.");
         setStatusTone("error");
+        setStatusDetails(formatFieldErrors(apiError.fieldErrors));
         return;
       }
 
       setStatusMessage("Gebruiker bijgewerkt.");
       setStatusTone("success");
+      setStatusDetails([]);
+      setLastActionAt(new Date().toLocaleString("nl-NL"));
       await loadUsers();
     } catch {
       setStatusMessage("Netwerkfout bij opslaan.");
@@ -132,17 +170,28 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
     }
   };
 
+  const updateUser = async (userId: number) => {
+    await updateUserWithDraft(userId);
+  };
+
   const resetPassword = async (userId: number) => {
     const value = (resetValues[userId] ?? "").trim();
     if (!value) {
       setStatusMessage("Vul een nieuw wachtwoord in.");
       setStatusTone("error");
+      setStatusDetails(["Veld \"nieuw wachtwoord\": Vul een wachtwoord in voordat je reset. Oplossing: gebruik minimaal 12 tekens met letters en cijfers."]);
       return;
     }
+
+    const confirmed = window.confirm(
+      "Wachtwoord resetten?\n\nImpact: De gebruiker moet direct met het nieuwe wachtwoord inloggen."
+    );
+    if (!confirmed) return;
 
     setBusy(userId, true);
     setStatusMessage("Wachtwoord resetten...");
     setStatusTone("neutral");
+    setStatusDetails([]);
 
     try {
       const response = await fetch(`/api/super-admin/users/${userId}/password`, {
@@ -153,15 +202,19 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
       const payload = (await response.json()) as { ok: true; message: string } | ApiError;
 
       if (!response.ok) {
-        setStatusMessage((payload as ApiError).error ?? "Wachtwoord resetten mislukt.");
+        const apiError = payload as ApiError;
+        setStatusMessage(apiError.error ?? "Wachtwoord resetten mislukt.");
         setStatusTone("error");
+        setStatusDetails(formatFieldErrors(apiError.fieldErrors));
         return;
       }
 
       const successPayload = payload as { ok: true; message: string };
       setStatusMessage(successPayload.message);
       setStatusTone("success");
+      setStatusDetails([]);
       setResetValues((prev) => ({ ...prev, [userId]: "" }));
+      setLastActionAt(new Date().toLocaleString("nl-NL"));
       await loadUsers();
     } catch {
       setStatusMessage("Netwerkfout bij wachtwoord resetten.");
@@ -172,23 +225,33 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
   };
 
   const forceLogout = async (userId: number) => {
+    const confirmed = window.confirm(
+      "Actieve sessies afmelden?\n\nImpact: De gebruiker wordt direct uitgelogd op alle apparaten."
+    );
+    if (!confirmed) return;
+
     setBusy(userId, true);
     setStatusMessage("Actieve sessies afmelden...");
     setStatusTone("neutral");
+    setStatusDetails([]);
 
     try {
       const response = await fetch(`/api/super-admin/users/${userId}/force-logout`, { method: "POST" });
       const payload = (await response.json()) as { ok: true; message: string } | ApiError;
 
       if (!response.ok) {
-        setStatusMessage((payload as ApiError).error ?? "Force logout mislukt.");
+        const apiError = payload as ApiError;
+        setStatusMessage(apiError.error ?? "Force logout mislukt.");
         setStatusTone("error");
+        setStatusDetails(formatFieldErrors(apiError.fieldErrors));
         return;
       }
 
       const successPayload = payload as { ok: true; message: string };
       setStatusMessage(successPayload.message);
       setStatusTone("success");
+      setStatusDetails([]);
+      setLastActionAt(new Date().toLocaleString("nl-NL"));
       await loadUsers();
     } catch {
       setStatusMessage("Netwerkfout bij force logout.");
@@ -199,25 +262,32 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
   };
 
   const deleteUser = async (userId: number, email: string) => {
-    const confirmed = window.confirm(`Weet je zeker dat je ${email} wilt verwijderen? Deze actie kan niet ongedaan gemaakt worden via deze UI.`);
+    const confirmed = window.confirm(
+      `Gebruiker definitief verwijderen?\n\nAccount: ${email}\nImpact: account en sessies verdwijnen uit beheer.\n\nDeze actie is niet via de UI te herstellen.`
+    );
     if (!confirmed) return;
 
     setBusy(userId, true);
     setStatusMessage("Gebruiker verwijderen...");
     setStatusTone("neutral");
+    setStatusDetails([]);
 
     try {
       const response = await fetch(`/api/super-admin/users/${userId}`, { method: "DELETE" });
       const payload = (await response.json()) as { ok: true; message: string } | ApiError;
 
       if (!response.ok) {
-        setStatusMessage((payload as ApiError).error ?? "Gebruiker verwijderen mislukt.");
+        const apiError = payload as ApiError;
+        setStatusMessage(apiError.error ?? "Gebruiker verwijderen mislukt.");
         setStatusTone("error");
+        setStatusDetails(formatFieldErrors(apiError.fieldErrors));
         return;
       }
 
       setStatusMessage((payload as { ok: true; message: string }).message);
       setStatusTone("success");
+      setStatusDetails([]);
+      setLastActionAt(new Date().toLocaleString("nl-NL"));
       await loadUsers();
     } catch {
       setStatusMessage("Netwerkfout bij verwijderen.");
@@ -233,6 +303,7 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
     setCreateErrors({});
     setStatusMessage("Gebruiker aanmaken...");
     setStatusTone("neutral");
+    setStatusDetails([]);
 
     try {
       const response = await fetch("/api/super-admin/users", {
@@ -247,6 +318,7 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
         setCreateErrors(apiError.fieldErrors ?? {});
         setStatusMessage(apiError.error ?? "Gebruiker aanmaken mislukt.");
         setStatusTone("error");
+        setStatusDetails(formatFieldErrors(apiError.fieldErrors));
         return;
       }
 
@@ -255,6 +327,8 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
       setCreateForm({ email: "", password: "", role: "ADMIN", status: "active" });
       setStatusMessage("Nieuwe gebruiker toegevoegd.");
       setStatusTone("success");
+      setStatusDetails([]);
+      setLastActionAt(new Date().toLocaleString("nl-NL"));
     } catch {
       setStatusMessage("Netwerkfout bij gebruiker aanmaken.");
       setStatusTone("error");
@@ -268,6 +342,13 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
 
   return (
     <div className="grid gap-6">
+      <StickyStatusBar
+        tone={statusTone}
+        message={statusMessage}
+        details={statusDetails}
+        hasUnsavedChanges={hasUnsavedChanges}
+        updatedAt={lastActionAt}
+      />
       <section className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
         <h2 className="font-display text-3xl">Gebruiker toevoegen</h2>
         <p className="mt-1 text-sm text-[#d9c6ac]">Voeg een beheeraccount toe met rol `EDITOR` of `ADMIN`.</p>
@@ -345,12 +426,44 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
       <section className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-3xl">Gebruikersbeheer</h2>
-          <input
-            className="w-full max-w-[300px] rounded-full border border-[var(--color-line-muted)] bg-[rgba(15,24,37,0.45)] px-4 py-2 text-sm text-[var(--color-text-primary)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-amber)]"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Zoek op e-mail of rol"
-          />
+          <div className="grid w-full gap-2 sm:max-w-[720px] sm:grid-cols-[1fr_auto_auto_auto]">
+            <input
+              className="rounded-full border border-[var(--color-line-muted)] bg-[rgba(15,24,37,0.45)] px-4 py-2 text-sm text-[var(--color-text-primary)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-amber)]"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Zoek op e-mail of rol"
+            />
+            <select
+              className="rounded-full border border-[var(--color-line-muted)] bg-[rgba(15,24,37,0.45)] px-4 py-2 text-sm text-[var(--color-text-primary)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-amber)]"
+              value={roleFilter}
+              onChange={(event) => setRoleFilter(event.target.value as "all" | AdminRole)}
+            >
+              <option value="all">Alle rollen</option>
+              <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="EDITOR">EDITOR</option>
+            </select>
+            <select
+              className="rounded-full border border-[var(--color-line-muted)] bg-[rgba(15,24,37,0.45)] px-4 py-2 text-sm text-[var(--color-text-primary)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-amber)]"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value as "all" | AccountStatus)}
+            >
+              <option value="all">Alle statussen</option>
+              <option value="active">Actief</option>
+              <option value="suspended">Gepauzeerd</option>
+            </select>
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                setRoleFilter("all");
+                setStatusFilter("all");
+              }}
+              className="rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+            >
+              Wis filters
+            </button>
+          </div>
         </div>
 
         {isLoading ? <p className="mt-4 text-sm text-[#d9c6ac]">Gebruikers laden...</p> : null}
@@ -429,6 +542,19 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
                     >
                       Force logout
                     </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void updateUserWithDraft(user.id, {
+                          role: local.role,
+                          status: local.status === "active" ? "suspended" : "active"
+                        })
+                      }
+                      disabled={isBusy || !canManageTarget || isCurrent}
+                      className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {local.status === "active" ? "Snel pauzeren" : "Snel activeren"}
+                    </button>
                   </div>
                 </div>
 
@@ -483,7 +609,6 @@ export function UserManagementPanel({ currentUserId, currentUserEmail, currentUs
         {!isLoading && filteredUsers.length === 0 ? <p className="mt-4 text-sm text-[#d9c6ac]">Geen gebruikers gevonden.</p> : null}
       </section>
 
-      <p className={`text-sm ${toneClass(statusTone)}`}>{statusMessage}</p>
     </div>
   );
 }

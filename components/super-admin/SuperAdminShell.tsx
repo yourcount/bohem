@@ -57,28 +57,33 @@ export function SuperAdminShell() {
   const [audit, setAudit] = useState<AuditResponse | null>(null);
   const [loadError, setLoadError] = useState<string>("");
 
-  useEffect(() => {
-    const load = async () => {
-      setLoadError("");
-      try {
-        const [healthRes, auditRes] = await Promise.all([
-          fetch("/api/super-admin/system/health"),
-          fetch("/api/super-admin/audit/recent")
-        ]);
+  const load = async () => {
+    setLoadError("");
+    try {
+      const [healthRes, auditRes] = await Promise.all([
+        fetch("/api/super-admin/system/health"),
+        fetch("/api/super-admin/audit/recent")
+      ]);
 
-        if (!healthRes.ok || !auditRes.ok) {
-          setLoadError("Admin backend data laden mislukt.");
-          return;
-        }
-
-        setHealth((await healthRes.json()) as HealthResponse);
-        setAudit((await auditRes.json()) as AuditResponse);
-      } catch {
+      if (!healthRes.ok || !auditRes.ok) {
         setLoadError("Admin backend data laden mislukt.");
+        return;
       }
+
+      setHealth((await healthRes.json()) as HealthResponse);
+      setAudit((await auditRes.json()) as AuditResponse);
+    } catch {
+      setLoadError("Admin backend data laden mislukt.");
+    }
+  };
+
+  useEffect(() => {
+    const run = async () => {
+      setLoadError("");
+      await load();
     };
 
-    void load();
+    void run();
   }, []);
 
   return (
@@ -134,7 +139,16 @@ export function SuperAdminShell() {
         </article>
 
         <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
-          <h2 className="font-display text-2xl">Recent changes</h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-display text-2xl">Recent changes</h2>
+            <button
+              type="button"
+              onClick={() => void load()}
+              className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+            >
+              Vernieuwen
+            </button>
+          </div>
           {audit ? (
             <ul className="mt-4 max-h-[420px] space-y-2 overflow-auto">
               {audit.events.map((event) => (
@@ -149,6 +163,7 @@ export function SuperAdminShell() {
           ) : (
             <p className="mt-4 text-sm text-[#d9c6ac]">Audit events laden...</p>
           )}
+          {audit && audit.events.length === 0 ? <p className="mt-4 text-sm text-[#d9c6ac]">Nog geen recente wijzigingen.</p> : null}
         </article>
       </section>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { StickyStatusBar, formatFieldErrors, useUnsavedChangesGuard, type StatusTone } from "@/components/super-admin/admin-ui";
 
 type SeoSettings = {
   global_title_template: string;
@@ -29,8 +30,6 @@ type SeoApiError = {
   fieldErrors?: Record<string, string[]>;
 };
 
-type StatusTone = "neutral" | "success" | "error";
-
 const initialValues: SeoSettings = {
   global_title_template: "%s",
   global_meta_template: "%s",
@@ -45,12 +44,6 @@ const initialValues: SeoSettings = {
   home_json_ld_custom: ""
 };
 
-function toneClasses(tone: StatusTone) {
-  if (tone === "success") return "text-[#b6efb9]";
-  if (tone === "error") return "text-[#ffb4a8]";
-  return "text-[#d9c6ac]";
-}
-
 export function SeoSettingsForm() {
   const [form, setForm] = useState<SeoSettings>(initialValues);
   const [initial, setInitial] = useState<SeoSettings>(initialValues);
@@ -60,6 +53,8 @@ export function SeoSettingsForm() {
   const [isSaving, setIsSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [statusTone, setStatusTone] = useState<StatusTone>("neutral");
+  const [statusDetails, setStatusDetails] = useState<string[]>([]);
+  const [lastActionAt, setLastActionAt] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
@@ -67,6 +62,7 @@ export function SeoSettingsForm() {
       setIsLoading(true);
       setStatusMessage("");
       setStatusTone("neutral");
+      setStatusDetails([]);
 
       try {
         const response = await fetch("/api/super-admin/seo/settings", { method: "GET" });
@@ -83,6 +79,7 @@ export function SeoSettingsForm() {
         setInitial(payload.settings);
         setUpdatedAt(payload.updated_at);
         setUpdatedBy(payload.updated_by);
+        setLastActionAt(payload.updated_at);
       } catch {
         setStatusMessage("Er ging iets mis bij laden. Ververs de pagina.");
         setStatusTone("error");
@@ -95,10 +92,12 @@ export function SeoSettingsForm() {
   }, []);
 
   const isPristine = useMemo(() => JSON.stringify(form) === JSON.stringify(initial), [form, initial]);
+  useUnsavedChangesGuard(!isPristine);
 
   const updateField = <K extends keyof SeoSettings>(key: K, value: SeoSettings[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     setFieldErrors((prev) => ({ ...prev, [key]: [] }));
+    setStatusDetails([]);
 
     if (statusTone !== "error") {
       setStatusMessage("Niet-opgeslagen wijzigingen.");
@@ -109,6 +108,7 @@ export function SeoSettingsForm() {
   const onReset = () => {
     setForm(initial);
     setFieldErrors({});
+    setStatusDetails([]);
     setStatusMessage("Wijzigingen teruggezet.");
     setStatusTone("neutral");
   };
@@ -119,6 +119,7 @@ export function SeoSettingsForm() {
     setStatusMessage("Opslaan...");
     setStatusTone("neutral");
     setFieldErrors({});
+    setStatusDetails([]);
 
     try {
       const response = await fetch("/api/super-admin/seo/settings", {
@@ -134,6 +135,7 @@ export function SeoSettingsForm() {
         setFieldErrors(apiError.fieldErrors ?? {});
         setStatusMessage(apiError.error ?? "SEO instellingen opslaan mislukt.");
         setStatusTone("error");
+        setStatusDetails(formatFieldErrors(apiError.fieldErrors));
         return;
       }
 
@@ -141,6 +143,7 @@ export function SeoSettingsForm() {
       setInitial(payload.settings);
       setUpdatedAt(payload.updated_at);
       setUpdatedBy(payload.updated_by);
+      setLastActionAt(payload.updated_at);
       setStatusMessage("SEO instellingen opgeslagen.");
       setStatusTone("success");
     } catch {
@@ -160,6 +163,13 @@ export function SeoSettingsForm() {
 
   return (
     <form onSubmit={onSubmit} className="grid gap-6">
+      <StickyStatusBar
+        tone={statusTone}
+        message={statusMessage}
+        details={statusDetails}
+        hasUnsavedChanges={!isPristine}
+        updatedAt={lastActionAt || updatedAt}
+      />
       <section className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
         <h2 className="font-display text-3xl">Global SEO defaults</h2>
         <p className="mt-1 text-sm text-[#d9c6ac]">Gebruik `%s` als placeholder. Voorbeeld: `%s | Bohèm`.</p>
@@ -325,8 +335,7 @@ export function SeoSettingsForm() {
         </div>
       </section>
 
-      <section className="flex flex-wrap items-center justify-between gap-3">
-        <div className={`text-sm ${toneClasses(statusTone)}`}>{statusMessage}</div>
+      <section className="flex flex-wrap items-center justify-end gap-3">
         <div className="flex flex-wrap gap-3">
           <button
             type="button"

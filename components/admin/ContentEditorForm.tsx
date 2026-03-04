@@ -61,9 +61,11 @@ const DUTCH_MONTH_MAP: Record<string, number> = {
   nov: 10,
   dec: 11
 };
+const DISC_SECTION_TITLE = "Releases beheren";
+const SHOWS_SECTION_TITLE = "Volgende shows beheren";
 
 const sectionLabels: Record<string, string> = {
-  brand: "Merk",
+  brand: "Hero",
   navigation: "Navigatie",
   hero: "Hero",
   about: "Over Bohèm",
@@ -205,6 +207,22 @@ function setValueAtPath<T>(input: T, path: string, value: string): T {
   return draft as T;
 }
 
+function readValueAtPath(input: unknown, path: string): unknown {
+  const parts = pathParts(path);
+  let current: unknown = input;
+
+  for (const part of parts) {
+    if (current == null) return undefined;
+    if (Array.isArray(current)) {
+      current = current[Number(part)];
+    } else {
+      current = (current as Record<string, unknown>)[part];
+    }
+  }
+
+  return current;
+}
+
 function normalizeApiFieldErrors(fieldErrors?: Record<string, string[]>) {
   const normalized: Record<string, string[]> = {};
   if (!fieldErrors) return normalized;
@@ -285,11 +303,12 @@ export function ContentEditorForm() {
   const [mediaKind, setMediaKind] = useState<"photo" | "all">("photo");
   const [mediaTags, setMediaTags] = useState<string[]>([]);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
-  const [jumpTarget, setJumpTarget] = useState("");
+  const [isSectionMenuCompact, setIsSectionMenuCompact] = useState(false);
 
   const fieldRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const mediaUploadInputRef = useRef<HTMLInputElement | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDetailsElement | null>>({});
+  const sectionMenuRef = useRef<HTMLDivElement | null>(null);
   const releaseItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
   const showItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
 
@@ -365,15 +384,29 @@ export function ContentEditorForm() {
     return Array.from(groups.entries());
   }, [editableFields]);
 
+  const managedSectionTitles = useMemo(
+    () => [DISC_SECTION_TITLE, SHOWS_SECTION_TITLE, ...groupedFields.map(([sectionTitle]) => sectionTitle)],
+    [groupedFields]
+  );
+
   useEffect(() => {
     setOpenSections((previous) => {
       const next: Record<string, boolean> = {};
-      for (const [sectionTitle] of groupedFields) {
-        next[sectionTitle] = previous[sectionTitle] ?? true;
+      for (const sectionTitle of managedSectionTitles) {
+        next[sectionTitle] = previous[sectionTitle] ?? false;
       }
       return next;
     });
-  }, [groupedFields]);
+  }, [managedSectionTitles]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setIsSectionMenuCompact(window.scrollY > 120);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const isPristine = useMemo(() => {
     if (!content || !initialContent) return true;
@@ -750,7 +783,7 @@ export function ContentEditorForm() {
   const setAllSectionsOpen = (isOpen: boolean) => {
     setOpenSections(() => {
       const next: Record<string, boolean> = {};
-      for (const [sectionTitle] of groupedFields) {
+      for (const sectionTitle of managedSectionTitles) {
         next[sectionTitle] = isOpen;
       }
       return next;
@@ -765,7 +798,14 @@ export function ContentEditorForm() {
     setOpenSections((previous) => ({ ...previous, [sectionTitle]: true }));
     const sectionId = sectionToId(sectionTitle);
     const node = sectionRefs.current[sectionId] ?? document.getElementById(sectionId);
-    node?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!node) return;
+
+    requestAnimationFrame(() => {
+      const menuHeight = sectionMenuRef.current?.getBoundingClientRect().height ?? 0;
+      const offset = Math.ceil(menuHeight) + 24;
+      const targetTop = node.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+    });
   };
 
   if (isLoading) {
@@ -793,84 +833,86 @@ export function ContentEditorForm() {
         Pas hier alle zichtbare website-inhoud aan. Technische instellingen staan bewust in de Admin Backend.
       </p>
 
-      <div className="sticky top-0 z-30 mb-6 rounded-xl border border-[var(--color-accent-copper)] bg-[linear-gradient(135deg,rgba(16,22,33,0.96),rgba(35,27,22,0.94))] p-4 shadow-[0_10px_28px_rgba(0,0,0,0.35)] backdrop-blur">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div
+        ref={sectionMenuRef}
+        className={`sticky z-30 mb-6 rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.92)] shadow-[0_10px_28px_rgba(0,0,0,0.32)] backdrop-blur transition-all ${
+          isSectionMenuCompact ? "top-1 p-2.5" : "top-2 p-4"
+        }`}
+      >
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.08em] text-[var(--color-accent-amber)]">Sectiemenu</p>
-            <p className="text-xs text-[#d9c6ac]">Spring direct naar een onderdeel of klap alle secties in één keer open/dicht.</p>
-            <p className={`mt-2 text-xs ${statusColorClass}`} aria-live="polite">
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--color-accent-amber)]">Sectiemenu</p>
+            {!isSectionMenuCompact ? <p className="mt-1 text-sm text-[#d9c6ac]">Ga direct naar een sectie en beheer alles zonder scrollen.</p> : null}
+            <p className={`${isSectionMenuCompact ? "mt-1" : "mt-2"} text-xs ${statusColorClass}`} aria-live="polite">
               {statusTone === "success" && statusMessage ? <span aria-hidden="true" className="success-pop">✓</span> : null}
               {statusMessage || "Geen openstaande wijzigingen."}
             </p>
-            {statusDetails.length > 0 ? (
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[#ffb4a8]">
-                {statusDetails.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            ) : null}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:w-auto">
             <button
               type="button"
               onClick={() => setAllSectionsOpen(true)}
-              className="rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.12)]"
+              className={`inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.08)] text-xs font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.16)] ${
+                isSectionMenuCompact ? "px-3 py-1.5" : "px-4 py-2"
+              }`}
             >
-              Alles openklappen
+              Alles open
             </button>
             <button
               type="button"
               onClick={() => setAllSectionsOpen(false)}
-              className="rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.12)]"
+              className={`inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.08)] text-xs font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.16)] ${
+                isSectionMenuCompact ? "px-3 py-1.5" : "px-4 py-2"
+              }`}
             >
-              Alles dichtklappen
+              Alles dicht
             </button>
           </div>
         </div>
-        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <label className="text-xs font-semibold text-[#d9c6ac]" htmlFor="editor-section-jump">
-            Ga naar sectie
-          </label>
-          <select
-            id="editor-section-jump"
-            value={jumpTarget}
-            onChange={(event) => {
-              const value = event.target.value;
-              setJumpTarget(value);
-              if (value) {
-                onJumpToSection(value);
-              }
-            }}
-            className="w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-sm text-[var(--color-text-primary)] sm:max-w-sm"
-          >
-            <option value="">Kies een sectie...</option>
-            {groupedFields.map(([sectionTitle]) => (
-              <option key={sectionTitle} value={sectionTitle}>
-                {sectionTitle}
-              </option>
+
+        {!isSectionMenuCompact && statusDetails.length > 0 ? (
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-[#ffb4a8]">
+            {statusDetails.map((item) => (
+              <li key={item}>{item}</li>
             ))}
-          </select>
-          <div className="flex flex-wrap gap-2">
-            {groupedFields.map(([sectionTitle]) => (
+          </ul>
+        ) : null}
+
+        <div className={isSectionMenuCompact ? "mt-2" : "mt-4"}>
+          {!isSectionMenuCompact ? <p className="mb-2 text-xs font-semibold uppercase tracking-[0.06em] text-[#d9c6ac]">Snel naar sectie</p> : null}
+          <div className={`grid gap-2 ${isSectionMenuCompact ? "sm:grid-cols-3 lg:grid-cols-4" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
+            {managedSectionTitles.map((sectionTitle) => (
               <button
                 key={`jump-${sectionTitle}`}
                 type="button"
                 onClick={() => onJumpToSection(sectionTitle)}
-                className="rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.14)]"
+                className={`inline-flex items-center justify-between rounded-lg border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.34)] text-left font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(36,58,86,0.5)] ${
+                  isSectionMenuCompact ? "min-h-8 px-2.5 py-1.5 text-xs" : "min-h-10 px-3 py-2 text-sm"
+                }`}
               >
-                {sectionTitle}
+                <span className="truncate">{sectionTitle}</span>
+                <span aria-hidden="true" className="ml-2 text-xs text-[#d9c6ac]">→</span>
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="mb-6 rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.52)] p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-[#f8f5f1]">Discografie beheren</p>
-            <p className="text-xs text-[#d9c6ac]">Voeg hier nieuwe liedjes/releases toe of verwijder ze.</p>
-          </div>
+      <details
+        id={sectionToId(DISC_SECTION_TITLE)}
+        ref={(node) => {
+          sectionRefs.current[sectionToId(DISC_SECTION_TITLE)] = node;
+        }}
+        open={openSections[DISC_SECTION_TITLE] ?? false}
+        onToggle={(event) => onToggleSection(DISC_SECTION_TITLE, (event.currentTarget as HTMLDetailsElement).open)}
+        className="mb-6 rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.52)] p-4 [&_summary::-webkit-details-marker]:hidden"
+      >
+        <summary className="flex w-full cursor-pointer list-none items-center justify-between rounded-lg border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] px-3 py-2 text-base font-semibold text-[#f8f5f1]">
+          <span>Releases beheren</span>
+          <span aria-hidden="true" className="text-sm text-[#d9c6ac]">Open/dicht</span>
+        </summary>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-[#d9c6ac]">Voeg hier nieuwe liedjes/releases toe of verwijder ze.</p>
           <button
             type="button"
             onClick={addRelease}
@@ -879,7 +921,7 @@ export function ContentEditorForm() {
             Nieuw liedje toevoegen
           </button>
         </div>
-        <ul className="mt-3 space-y-3">
+        <ul className="mt-4 space-y-3">
           {releases.map((release, index) => (
             <li
               key={`${release.title}-${index}`}
@@ -1023,14 +1065,23 @@ export function ContentEditorForm() {
             </li>
           ))}
         </ul>
-      </div>
+      </details>
 
-      <div className="mb-6 rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.52)] p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-[#f8f5f1]">Volgende shows beheren</p>
-            <p className="text-xs text-[#d9c6ac]">Voeg shows toe, bewerk ze direct en bepaal per show de CTA.</p>
-          </div>
+      <details
+        id={sectionToId(SHOWS_SECTION_TITLE)}
+        ref={(node) => {
+          sectionRefs.current[sectionToId(SHOWS_SECTION_TITLE)] = node;
+        }}
+        open={openSections[SHOWS_SECTION_TITLE] ?? false}
+        onToggle={(event) => onToggleSection(SHOWS_SECTION_TITLE, (event.currentTarget as HTMLDetailsElement).open)}
+        className="mb-6 rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.52)] p-4 [&_summary::-webkit-details-marker]:hidden"
+      >
+        <summary className="flex w-full cursor-pointer list-none items-center justify-between rounded-lg border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] px-3 py-2 text-base font-semibold text-[#f8f5f1]">
+          <span>Volgende shows beheren</span>
+          <span aria-hidden="true" className="text-sm text-[#d9c6ac]">Open/dicht</span>
+        </summary>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-[#d9c6ac]">Voeg shows toe, bewerk ze direct en bepaal per show de CTA.</p>
           <button
             type="button"
             onClick={addShow}
@@ -1039,7 +1090,7 @@ export function ContentEditorForm() {
             Show toevoegen
           </button>
         </div>
-        <ul className="mt-3 space-y-3">
+        <ul className="mt-4 space-y-3">
           {shows.map((show, index) => (
             <li
               key={`${show.date}-${show.venue}-${index}`}
@@ -1126,7 +1177,7 @@ export function ContentEditorForm() {
             </li>
           ))}
         </ul>
-      </div>
+      </details>
 
       <form onSubmit={onSubmit} className="space-y-5 pb-28">
         {groupedFields.map(([sectionTitle, fields]) => (
@@ -1136,11 +1187,14 @@ export function ContentEditorForm() {
             ref={(node) => {
               sectionRefs.current[sectionToId(sectionTitle)] = node;
             }}
-            open={openSections[sectionTitle] ?? true}
+            open={openSections[sectionTitle] ?? false}
             onToggle={(event) => onToggleSection(sectionTitle, (event.currentTarget as HTMLDetailsElement).open)}
-            className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.36)] p-4 sm:p-5"
+            className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.36)] p-4 sm:p-5 [&_summary::-webkit-details-marker]:hidden"
           >
-            <summary className="cursor-pointer select-none text-base font-semibold text-[#f8f5f1]">{sectionTitle}</summary>
+            <summary className="flex w-full cursor-pointer list-none items-center justify-between rounded-lg border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] px-3 py-2 text-base font-semibold text-[#f8f5f1]">
+              <span>{sectionTitle}</span>
+              <span aria-hidden="true" className="text-sm text-[#d9c6ac]">Open/dicht</span>
+            </summary>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               {fields.map((field) => {
                 const inputId = `field-${field.path.replace(/[^a-zA-Z0-9]+/g, "-")}`;
@@ -1149,6 +1203,9 @@ export function ContentEditorForm() {
                 const error = fieldErrors[field.path]?.[0];
                 const describedBy = [field.helper ? helperId : "", error ? errorId : ""].filter(Boolean).join(" ") || undefined;
                 const showImageTools = isImageSourcePath(field.path);
+                const imageAltPath = showImageTools ? field.path.replace(/\.src$/, ".alt") : "";
+                const imageAltRaw = imageAltPath ? readValueAtPath(content, imageAltPath) : "";
+                const imageAlt = typeof imageAltRaw === "string" && imageAltRaw.trim().length > 0 ? imageAltRaw : "Afbeelding preview";
 
                 return (
                   <div key={field.path} className={field.multiline ? "md:col-span-2" : ""}>
@@ -1168,6 +1225,59 @@ export function ContentEditorForm() {
                         aria-describedby={describedBy}
                         className="w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-[var(--color-text-primary)]"
                       />
+                    ) : showImageTools ? (
+                      <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(15,24,37,0.45)] p-3">
+                        {field.value ? (
+                          <div className="overflow-hidden rounded-lg border border-[var(--color-line-muted)]">
+                            <Image
+                              src={field.value}
+                              alt={imageAlt}
+                              width={960}
+                              height={640}
+                              unoptimized
+                              className="h-44 w-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex h-44 w-full items-center justify-center rounded-lg border border-dashed border-[var(--color-line-muted)] text-xs text-[#d9c6ac]">
+                            Nog geen afbeelding geselecteerd
+                          </div>
+                        )}
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openMediaModal(field.path)}
+                            className="rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
+                          >
+                            Kies uit fotobibliotheek
+                          </button>
+                          {field.value ? (
+                            <a
+                              href={field.value}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs underline underline-offset-2 text-[#d9c6ac]"
+                            >
+                              Open origineel
+                            </a>
+                          ) : null}
+                        </div>
+                        <details className="mt-3">
+                          <summary className="cursor-pointer select-none text-xs text-[#d9c6ac]">Pad handmatig aanpassen</summary>
+                          <input
+                            id={inputId}
+                            ref={(node) => {
+                              fieldRefs.current[field.path] = node;
+                            }}
+                            type="text"
+                            value={field.value}
+                            onChange={(event) => onChangeField(field.path, event.target.value)}
+                            aria-invalid={Boolean(error)}
+                            aria-describedby={describedBy}
+                            className="mt-2 w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-[var(--color-text-primary)]"
+                          />
+                        </details>
+                      </div>
                     ) : (
                       <input
                         id={inputId}
@@ -1182,27 +1292,6 @@ export function ContentEditorForm() {
                         className="w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-[var(--color-text-primary)]"
                       />
                     )}
-                    {showImageTools ? (
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => openMediaModal(field.path)}
-                          className="rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
-                        >
-                          Kies uit fotobibliotheek
-                        </button>
-                        {field.value ? (
-                          <a
-                            href={field.value}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs underline underline-offset-2 text-[#d9c6ac]"
-                          >
-                            Voorbeeld openen
-                          </a>
-                        ) : null}
-                      </div>
-                    ) : null}
                     {field.helper ? (
                       <p id={helperId} className="mt-1 text-xs text-[#d9c6ac]">
                         {field.helper}

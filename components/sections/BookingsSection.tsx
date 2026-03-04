@@ -48,10 +48,10 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                 {bookings.socialProof.map((item) => (
                   <blockquote
                     key={item.quote}
-                    className="rounded-xl border border-[rgba(255,255,255,0.12)] bg-[rgba(15,24,37,0.35)] p-4"
+                    className="flex h-full flex-col rounded-xl border border-[rgba(255,255,255,0.12)] bg-[rgba(15,24,37,0.35)] p-4"
                   >
                     <p className="mb-3 text-sm text-[var(--color-text-primary)]">“{item.quote}”</p>
-                    <footer className="text-xs text-[#d6be9f]">{item.source}</footer>
+                    <footer className="mt-auto text-left text-xs text-[#d6be9f]">{item.source}</footer>
                   </blockquote>
                 ))}
               </div>
@@ -133,13 +133,13 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
           <Reveal className="md:col-span-2">
             <section
               aria-label="Coverkoffer"
-              className="overflow-hidden rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(145deg,rgba(38,24,20,0.82)_0%,rgba(25,20,27,0.86)_100%)] shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
+              className="max-h-[60vh] overflow-hidden rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(145deg,rgba(38,24,20,0.82)_0%,rgba(25,20,27,0.86)_100%)] shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
             >
-                <div className="grid gap-0 md:min-h-[360px] md:grid-cols-[1fr_1fr]">
-                  <div className="flex items-center p-6 sm:p-8">
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.1em] text-[#f3d7b0]">
-                        {bookings.coverKoffer.eyebrow ?? "Extra live-set"}
+              <div className="grid h-full gap-0 md:grid-cols-[1fr_1fr]">
+                <div className="flex items-center overflow-auto p-6 sm:p-8">
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.1em] text-[#f3d7b0]">
+                      {bookings.coverKoffer.eyebrow ?? "Extra live-set"}
                       </p>
                       <h3 className="mb-4 font-display text-3xl text-[var(--color-text-primary)] sm:text-4xl">
                         {bookings.coverKoffer.title}

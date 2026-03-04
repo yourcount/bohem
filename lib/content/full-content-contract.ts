@@ -91,11 +91,6 @@ function validateAndSanitizeByTemplate(
       output[key] = validateAndSanitizeByTemplate(inputObject[key], templateObject[key], `${path}.${key}`, errors);
     }
 
-    const unknownKeys = Object.keys(inputObject).filter((key) => !(key in templateObject));
-    for (const key of unknownKeys) {
-      addFieldError(errors, `${path}.${key}`, "Onbekend veld.");
-    }
-
     return output;
   }
 

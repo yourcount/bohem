@@ -152,9 +152,10 @@ export async function readFullSiteContent(): Promise<FullSiteContentRecord | nul
       return await writeBlobPayload(siteContent, "system@vercel");
     } catch (error) {
       console.error("readFullSiteContent blob failed:", error);
+      const detail = error instanceof Error ? error.message : String(error);
       throw new FullContentStorageError(
         "STORAGE_READ_FAILED",
-        "Kon de content-opslag op Vercel Blob niet lezen."
+        `Kon de content-opslag op Vercel Blob niet lezen. Detail: ${detail}`
       );
     }
   }

@@ -4,12 +4,12 @@ import Link from "next/link";
 
 import { ContentEditorForm } from "@/components/admin/ContentEditorForm";
 import { AUTH_COOKIE_NAME } from "@/lib/auth/constants";
-import { verifySessionToken } from "@/lib/auth/session";
+import { getAdminSession } from "@/lib/auth/admin-session";
 
 export default async function AdminHomePage() {
   const cookieStore = await cookies();
   const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
+  const session = token ? await getAdminSession() : null;
   if (!session) {
     redirect("/admin/login");
   }

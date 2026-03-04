@@ -5,12 +5,12 @@ import Link from "next/link";
 
 import { LoginForm } from "@/components/admin/LoginForm";
 import { AUTH_COOKIE_NAME } from "@/lib/auth/constants";
-import { verifySessionToken } from "@/lib/auth/session";
+import { getAdminSession } from "@/lib/auth/admin-session";
 
 export default async function AdminLoginPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
-  const session = verifySessionToken(token);
+  const session = token ? await getAdminSession() : null;
   if (session) {
     redirect(session.role === "ADMIN" || session.role === "SUPER_ADMIN" ? "/admin/backend" : "/admin");
   }

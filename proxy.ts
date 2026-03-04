@@ -12,11 +12,6 @@ export async function proxy(request: NextRequest) {
   const session = await verifySessionTokenEdge(token, authSecret);
   const isAuthed = Boolean(session);
 
-  if (pathname === ADMIN_LOGIN_PATH && isAuthed) {
-    const nextPath = session?.role === "ADMIN" || session?.role === "SUPER_ADMIN" ? "/admin/backend" : "/admin";
-    return NextResponse.redirect(new URL(nextPath, request.url));
-  }
-
   if (pathname.startsWith("/admin") && pathname !== ADMIN_LOGIN_PATH && !isAuthed) {
     return NextResponse.redirect(new URL(ADMIN_LOGIN_PATH, request.url));
   }

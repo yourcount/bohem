@@ -543,7 +543,6 @@ export function ContentEditorForm() {
       if (!prev) return prev;
       const next = structuredClone(prev);
       if (!next.bookings.upcomingShows || next.bookings.upcomingShows.length === 0) return prev;
-      if (next.bookings.upcomingShows.length <= 1) return prev;
       next.bookings.upcomingShows.splice(index, 1);
       return next;
     });
@@ -927,7 +926,6 @@ export function ContentEditorForm() {
                 <button
                   type="button"
                   onClick={() => removeShow(index)}
-                  disabled={shows.length <= 1}
                   className="rounded-full border border-[var(--color-line-muted)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Verwijderen

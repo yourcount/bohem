@@ -1,7 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 
-import { list, put } from "@vercel/blob";
+import { get, put } from "@vercel/blob";
 import Database from "better-sqlite3";
 
 import { siteContent } from "@/lib/content";
@@ -47,30 +47,14 @@ function assertVercelBlobConfigured() {
 }
 
 async function readBlobPayload(): Promise<BlobPayload | null> {
-  const { blobs } = await list({
-    prefix: FULL_CONTENT_BLOB_PATH,
-    limit: 20
-  });
-
-  const exact = blobs.find((blob) => blob.pathname === FULL_CONTENT_BLOB_PATH);
-  const fallbackLatest =
-    blobs.length > 0
-      ? [...blobs].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())[0]
-      : null;
-  const candidate = exact ?? fallbackLatest;
-  if (!candidate) return null;
-
-  const headers: HeadersInit = {};
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
-    headers.Authorization = `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`;
-  }
-
-  const response = await fetch(candidate.url, { cache: "no-store", headers });
-  if (!response.ok) return null;
+  const blob =
+    (await get(FULL_CONTENT_BLOB_PATH, { access: "public", useCache: false })) ??
+    (await get(FULL_CONTENT_BLOB_PATH, { access: "private", useCache: false }));
+  if (!blob || blob.statusCode !== 200 || !blob.stream) return null;
 
   let parsed: Partial<BlobPayload>;
   try {
-    parsed = (await response.json()) as Partial<BlobPayload>;
+    parsed = (await new Response(blob.stream).json()) as Partial<BlobPayload>;
   } catch {
     return null;
   }

@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth/admin-session";
 import { invalidateSiteRuntimeCache } from "@/lib/cache/runtime-cache";
 import { contentDbExists, getDbPath, readPublicContent, updatePublicContentPatch } from "@/lib/db/content-db";
-import { readFullSiteContent, updateFullSiteContent } from "@/lib/db/full-site-content-db";
+import { FullContentStorageError, readFullSiteContent, updateFullSiteContent } from "@/lib/db/full-site-content-db";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
 import { getRequestMeta } from "@/lib/security/request";
 import { shouldAutoInvalidateCacheOnUpdate } from "@/lib/system/technical-settings";
@@ -19,6 +19,14 @@ import {
   isManagedHeroImageUrl,
   safeDeleteManagedHeroImageByUrl
 } from "@/lib/media/hero-image";
+
+function toStorageResponse(error: unknown) {
+  if (error instanceof FullContentStorageError) {
+    return NextResponse.json({ error: error.message, code: error.code }, { status: 500 });
+  }
+
+  return NextResponse.json({ error: "Database-update mislukt.", code: "DB_WRITE_FAILED" }, { status: 500 });
+}
 
 export async function POST(request: Request) {
   const session = await getAdminSession();
@@ -134,8 +142,8 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
-  } catch {
+  } catch (error) {
     safeDeleteManagedHeroImageByUrl(publicUrl);
-    return NextResponse.json({ error: "Database-update mislukt.", code: "DB_WRITE_FAILED" }, { status: 500 });
+    return toStorageResponse(error);
   }
 }

@@ -4,10 +4,18 @@ import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth/admin-session";
 import { invalidateSiteRuntimeCache } from "@/lib/cache/runtime-cache";
 import { validateAndSanitizeFullSiteContent } from "@/lib/content/full-content-contract";
-import { readFullSiteContent, updateFullSiteContent } from "@/lib/db/full-site-content-db";
+import { FullContentStorageError, readFullSiteContent, updateFullSiteContent } from "@/lib/db/full-site-content-db";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
 import { getRequestMeta } from "@/lib/security/request";
 import { shouldAutoInvalidateCacheOnUpdate } from "@/lib/system/technical-settings";
+
+function toStorageResponse(error: unknown, fallbackMessage: string) {
+  if (error instanceof FullContentStorageError) {
+    return NextResponse.json({ error: error.message, code: error.code }, { status: 500 });
+  }
+
+  return NextResponse.json({ error: fallbackMessage, code: "DB_WRITE_FAILED" }, { status: 500 });
+}
 
 export async function GET() {
   const session = await getAdminSession();
@@ -29,8 +37,8 @@ export async function GET() {
       },
       { status: 200 }
     );
-  } catch {
-    return NextResponse.json({ error: "Content lezen mislukt.", code: "DB_READ_FAILED" }, { status: 500 });
+  } catch (error) {
+    return toStorageResponse(error, "Content lezen mislukt.");
   }
 }
 
@@ -95,7 +103,7 @@ export async function PATCH(request: Request) {
       },
       { status: 200 }
     );
-  } catch {
-    return NextResponse.json({ error: "Opslaan mislukt.", code: "DB_WRITE_FAILED" }, { status: 500 });
+  } catch (error) {
+    return toStorageResponse(error, "Opslaan mislukt.");
   }
 }

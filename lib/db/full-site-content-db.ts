@@ -18,8 +18,32 @@ type BlobPayload = FullSiteContentRecord;
 
 const FULL_CONTENT_BLOB_PATH = "cms/site-content-full-v1.json";
 
+export class FullContentStorageError extends Error {
+  code: "STORAGE_NOT_CONFIGURED" | "STORAGE_READ_FAILED" | "STORAGE_WRITE_FAILED";
+
+  constructor(code: FullContentStorageError["code"], message: string) {
+    super(message);
+    this.name = "FullContentStorageError";
+    this.code = code;
+  }
+}
+
+function isVercelRuntime() {
+  return Boolean(process.env.VERCEL);
+}
+
 function shouldUseBlobStorage() {
-  return Boolean(process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN);
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+}
+
+function assertVercelBlobConfigured() {
+  if (!isVercelRuntime()) return;
+  if (shouldUseBlobStorage()) return;
+
+  throw new FullContentStorageError(
+    "STORAGE_NOT_CONFIGURED",
+    "Content-opslag is niet geconfigureerd. Voeg BLOB_READ_WRITE_TOKEN toe in Vercel."
+  );
 }
 
 async function readBlobPayload(): Promise<BlobPayload | null> {
@@ -104,13 +128,18 @@ function ensureSeedRow(db: Database.Database) {
 }
 
 export async function readFullSiteContent(): Promise<FullSiteContentRecord | null> {
-  if (shouldUseBlobStorage()) {
+  if (isVercelRuntime()) {
+    assertVercelBlobConfigured();
     try {
       const existing = await readBlobPayload();
       if (existing) return existing;
       return await writeBlobPayload(siteContent, "system@vercel");
-    } catch {
-      // fall back to sqlite behavior if Blob is temporarily unavailable
+    } catch (error) {
+      console.error("readFullSiteContent blob failed:", error);
+      throw new FullContentStorageError(
+        "STORAGE_READ_FAILED",
+        "Kon de content-opslag op Vercel Blob niet lezen."
+      );
     }
   }
 
@@ -139,11 +168,16 @@ export async function readFullSiteContent(): Promise<FullSiteContentRecord | nul
 }
 
 export async function updateFullSiteContent(content: SiteContent, updatedBy: string): Promise<FullSiteContentRecord | null> {
-  if (shouldUseBlobStorage()) {
+  if (isVercelRuntime()) {
+    assertVercelBlobConfigured();
     try {
       return await writeBlobPayload(content, updatedBy);
-    } catch {
-      return null;
+    } catch (error) {
+      console.error("updateFullSiteContent blob write failed:", error);
+      throw new FullContentStorageError(
+        "STORAGE_WRITE_FAILED",
+        "Kon wijzigingen niet opslaan naar Vercel Blob."
+      );
     }
   }
 

@@ -2,7 +2,14 @@ import { existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import Database from "better-sqlite3";
 
-const dbPath = join(process.cwd(), "data", "content.db");
+function resolveDbPath() {
+  if (process.env.VERCEL) {
+    return "/tmp/bohem-content.db";
+  }
+  return join(process.cwd(), "data", "content.db");
+}
+
+const dbPath = resolveDbPath();
 
 export type PublicContentRow = {
   hero_title: string;

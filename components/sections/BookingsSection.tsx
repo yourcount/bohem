@@ -134,7 +134,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
           <Reveal className="md:col-span-2">
             <section
               aria-label="Coverkoffer"
-              className="max-h-[60vh] overflow-hidden rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(145deg,rgba(38,24,20,0.82)_0%,rgba(25,20,27,0.86)_100%)] shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
+              className="max-h-[30rem] overflow-hidden rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(145deg,rgba(38,24,20,0.82)_0%,rgba(25,20,27,0.86)_100%)] shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
             >
               <div className="grid h-full gap-0 md:grid-cols-[1fr_1fr]">
                 <div className="flex items-center overflow-auto p-6 sm:p-8">
@@ -149,7 +149,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                   </div>
                 </div>
                 {bookings.coverKoffer.image ? (
-                  <figure className="h-full min-h-[260px]">
+                  <figure className="h-full min-h-0">
                     <Image
                       src={bookings.coverKoffer.image.src}
                       alt={bookings.coverKoffer.image.alt}

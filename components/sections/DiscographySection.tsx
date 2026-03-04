@@ -60,8 +60,13 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-cta="discography_featured_single"
-                className="mt-4 inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+                className="cta-glow listen-pulse mt-4 inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
               >
+                <span className="equalizer-icon mr-2" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </span>
                 Luister op Spotify
               </Link>
             </article>
@@ -103,7 +108,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
         <div className="grid gap-5 md:grid-cols-2">
           {discography.releases.map((release, index) => (
             <Reveal key={release.title} delayMs={index * 100}>
-              <article className="group h-full rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(165deg,rgba(244,233,220,0.12)_0%,rgba(244,233,220,0.04)_100%)] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#b17a47]">
+              <article className="discography-tilt-card group h-full rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(165deg,rgba(244,233,220,0.12)_0%,rgba(244,233,220,0.04)_100%)] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#b17a47]">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <span className="rounded-full border border-[#9c744e] bg-[rgba(200,135,62,0.12)] px-3 py-1 text-xs font-semibold tracking-[0.08em] text-[#f3d7b0]">
                     {release.format}
@@ -122,7 +127,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                       data-cta={`release_${release.title.toLowerCase().replace(/\s+/g, "_")}`}
-                      className="rounded-full border border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.4)] px-3 py-2 text-xs font-semibold transition-colors hover:border-[#c8873e] hover:bg-[rgba(200,135,62,0.18)] focus-visible:border-[#c8873e]"
+                      className="cta-glow rounded-full border border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.4)] px-3 py-2 text-xs font-semibold transition-colors hover:border-[#c8873e] hover:bg-[rgba(200,135,62,0.18)] focus-visible:border-[#c8873e]"
                     >
                       {link.label}
                     </Link>

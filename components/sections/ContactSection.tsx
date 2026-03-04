@@ -91,6 +91,16 @@ export function ContactSection({ contact }: ContactSectionProps) {
     () => contact.fields.find((field) => field.id === "message"),
     [contact.fields]
   );
+  const submittingLabel = (
+    <span className="inline-flex items-center gap-2">
+      <span className="send-lottie" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </span>
+      Verzenden...
+    </span>
+  );
 
   const handleNextStep = (event: MouseEvent<HTMLButtonElement>) => {
     const form = event.currentTarget.form;
@@ -188,7 +198,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                   type="button"
                   onClick={handleNextStep}
                   data-cta="contact_mobile_next"
-                  className="mt-2 inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-6 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+                  className="cta-glow mt-2 inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-6 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                 >
                   Volgende stap
                 </button>
@@ -208,9 +218,9 @@ export function ContactSection({ contact }: ContactSectionProps) {
                     type="submit"
                     data-cta="contact_mobile_submit"
                     disabled={isSubmitting}
-                    className="inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+                    className="cta-glow inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                   >
-                    {isSubmitting ? "Verzenden..." : contact.ctaLabel}
+                    {isSubmitting ? submittingLabel : contact.ctaLabel}
                   </button>
                 </div>
               </>
@@ -235,9 +245,9 @@ export function ContactSection({ contact }: ContactSectionProps) {
               type="submit"
               data-cta="contact_desktop_submit"
               disabled={isSubmitting}
-              className="mt-4 inline-flex w-fit items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-6 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)] focus-visible:bg-[var(--color-accent-copper)] focus-visible:text-[var(--color-text-primary)] md:col-span-2"
+              className="cta-glow mt-4 inline-flex w-fit items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-6 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)] focus-visible:bg-[var(--color-accent-copper)] focus-visible:text-[var(--color-text-primary)] md:col-span-2"
             >
-              {isSubmitting ? "Verzenden..." : contact.ctaLabel}
+              {isSubmitting ? submittingLabel : contact.ctaLabel}
             </button>
           </form>
 
@@ -248,6 +258,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
           ) : null}
           {submitSuccess ? (
             <p aria-live="polite" className="mt-3 text-sm text-[#b6efb9]">
+              <span aria-hidden="true" className="success-pop">✓</span>
               {submitSuccess}
             </p>
           ) : null}
@@ -266,11 +277,3 @@ export function ContactSection({ contact }: ContactSectionProps) {
     </section>
   );
 }
-            <input
-              type="text"
-              name="company_website"
-              tabIndex={-1}
-              autoComplete="off"
-              className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden opacity-0"
-              aria-hidden="true"
-            />

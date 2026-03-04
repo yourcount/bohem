@@ -636,6 +636,7 @@ export function ContentEditorForm() {
             <p className="text-sm font-semibold uppercase tracking-[0.08em] text-[var(--color-accent-amber)]">Sectiemenu</p>
             <p className="text-xs text-[#d9c6ac]">Spring direct naar een onderdeel of klap alle secties in één keer open/dicht.</p>
             <p className={`mt-2 text-xs ${statusColorClass}`} aria-live="polite">
+              {statusTone === "success" && statusMessage ? <span aria-hidden="true" className="success-pop">✓</span> : null}
               {statusMessage || "Geen openstaande wijzigingen."}
             </p>
             {statusDetails.length > 0 ? (
@@ -961,7 +962,10 @@ export function ContentEditorForm() {
               Laatst opgeslagen: {lastSavedAt || "onbekend"} {lastSavedBy ? `door ${lastSavedBy}` : ""}
             </p>
           </div>
-          <p aria-live="polite" className={`mt-2 text-sm ${statusColorClass}`}>{statusMessage || "Geen openstaande wijzigingen."}</p>
+          <p aria-live="polite" className={`mt-2 text-sm ${statusColorClass}`}>
+            {statusTone === "success" && statusMessage ? <span aria-hidden="true" className="success-pop">✓</span> : null}
+            {statusMessage || "Geen openstaande wijzigingen."}
+          </p>
           {statusDetails.length > 0 ? (
             <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[#ffb4a8]">
               {statusDetails.map((item) => (

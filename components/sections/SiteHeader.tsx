@@ -115,7 +115,7 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
             alt={brandName}
             width={220}
             height={84}
-            className="h-10 w-auto sm:h-11"
+            className="logo-intro h-10 w-auto sm:h-11"
             priority
           />
         </Link>

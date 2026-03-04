@@ -35,24 +35,25 @@ export function ShowsSection({ shows }: ShowsSectionProps) {
               </span>
             </div>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {shows.map((show) => (
-                <article
-                  key={`${show.date}-${show.venue}`}
-                  className="flex h-full flex-col rounded-2xl border border-[rgba(242,139,14,0.34)] bg-[linear-gradient(160deg,rgba(26,18,22,0.8)_0%,rgba(21,17,21,0.92)_100%)] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(242,139,14,0.58)] hover:shadow-[0_10px_26px_rgba(0,0,0,0.32)]"
-                >
-                  <p className="mb-3 inline-flex w-fit rounded-full border border-[rgba(242,139,14,0.36)] bg-[rgba(242,139,14,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[#f3d7b0]">
-                    {show.date}
-                  </p>
-                  <p className="text-xl font-semibold text-[#f8f1e5]">{show.venue}</p>
-                  <p className="mt-1 text-sm text-[#d9c4a8]">{show.city}</p>
-                  <Link
-                    href={show.ctaHref}
-                    data-cta={`show_${show.venue.toLowerCase().replace(/\s+/g, "_")}`}
-                    className="mt-5 inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+              {shows.map((show, index) => (
+                <Reveal key={`${show.date}-${show.venue}`} delayMs={index * 90}>
+                  <article
+                    className="flex h-full flex-col rounded-2xl border border-[rgba(242,139,14,0.34)] bg-[linear-gradient(160deg,rgba(26,18,22,0.8)_0%,rgba(21,17,21,0.92)_100%)] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(242,139,14,0.58)] hover:shadow-[0_10px_26px_rgba(0,0,0,0.32)]"
                   >
-                    {show.ctaLabel || "Tickets"}
-                  </Link>
-                </article>
+                    <p className="mb-3 inline-flex w-fit rounded-full border border-[rgba(242,139,14,0.36)] bg-[rgba(242,139,14,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[#f3d7b0]">
+                      {show.date}
+                    </p>
+                    <p className="text-xl font-semibold text-[#f8f1e5]">{show.venue}</p>
+                    <p className="mt-1 text-sm text-[#d9c4a8]">{show.city}</p>
+                    <Link
+                      href={show.ctaHref}
+                      data-cta={`show_${show.venue.toLowerCase().replace(/\s+/g, "_")}`}
+                      className="cta-glow ticket-burst mt-5 inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+                    >
+                      <span className="ticket-burst-label">{show.ctaLabel || "Tickets"}</span>
+                    </Link>
+                  </article>
+                </Reveal>
               ))}
             </div>
           </section>

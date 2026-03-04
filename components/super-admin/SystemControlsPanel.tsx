@@ -207,6 +207,7 @@ export function SystemControlsPanel() {
         <h2 className="font-display text-3xl">Feature flags</h2>
         <p className="mt-1 text-sm text-[#d9c6ac]">Schakel visuele of functionele onderdelen gecontroleerd aan of uit.</p>
         <p className={`mt-2 text-xs ${toneClass(statusTone)}`} aria-live="polite">
+          {statusTone === "success" && statusMessage ? <span aria-hidden="true" className="success-pop">✓</span> : null}
           {statusMessage || "Nog geen wijzigingen opgeslagen."}
         </p>
 
@@ -355,7 +356,10 @@ export function SystemControlsPanel() {
         </article>
       </section>
 
-      <p className={`text-sm ${toneClass(statusTone)}`}>{statusMessage}</p>
+      <p className={`text-sm ${toneClass(statusTone)}`}>
+        {statusTone === "success" && statusMessage ? <span aria-hidden="true" className="success-pop">✓</span> : null}
+        {statusMessage}
+      </p>
     </div>
   );
 }

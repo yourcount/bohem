@@ -42,9 +42,19 @@ export function KampvuurSection({ kampvuur }: KampvuurSectionProps) {
                 <span className="kampvuur-ember-dot" aria-hidden="true" />
                 Speciale avond
               </p>
-              <h2 id="kampvuur-title" className="mb-4 font-display text-3xl leading-tight sm:text-4xl lg:text-5xl">
-                {kampvuur.title}
-              </h2>
+              <div className="mb-4 flex items-center gap-3">
+                <h2 id="kampvuur-title" className="font-display text-3xl leading-tight sm:text-4xl lg:text-5xl">
+                  {kampvuur.title}
+                </h2>
+                <div className="kampvuur-flame-lottie shrink-0 self-center -translate-y-1" aria-hidden="true">
+                  <span className="kampvuur-flame-core" />
+                  <span className="kampvuur-flame-mid" />
+                  <span className="kampvuur-flame-outer" />
+                  <span className="kampvuur-flame-spark kampvuur-flame-spark-a" />
+                  <span className="kampvuur-flame-spark kampvuur-flame-spark-b" />
+                  <span className="kampvuur-flame-spark kampvuur-flame-spark-c" />
+                </div>
+              </div>
               <div className="kampvuur-flame-divider mb-4" aria-hidden="true" />
               <p className="mb-4 text-lg text-[var(--color-text-primary)]">{kampvuur.intro}</p>
               <div className="space-y-4 text-[var(--color-text-primary)]">

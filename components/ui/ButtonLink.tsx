@@ -31,7 +31,7 @@ export function ButtonLink({ href, children, variant = "primary", dataCta }: But
       href={href}
       onClick={handleClick}
       data-cta={dataCta}
-      className={`inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-bold transition-colors ${variants[variant]}`}
+      className={`cta-glow inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-bold transition-colors ${variants[variant]}`}
     >
       {children}
     </Link>

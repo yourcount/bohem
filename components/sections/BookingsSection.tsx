@@ -169,8 +169,12 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     data-cta="epk_download"
-                    className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+                    className="perskit-download-cue inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                   >
+                    <span className="perskit-download-icon" aria-hidden="true">
+                      <span className="perskit-download-shaft" />
+                      <span className="perskit-download-head" />
+                    </span>
                     {bookings.press.kitLabel}
                   </Link>
                   <a

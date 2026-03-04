@@ -10,6 +10,7 @@ import { SiteFooter } from "@/components/sections/SiteFooter";
 import { SiteHeader } from "@/components/sections/SiteHeader";
 import { MobileStickyCta } from "@/components/ui/MobileStickyCta";
 import { ScrollExperience } from "@/components/ui/ScrollExperience";
+import { SectionMotifDivider } from "@/components/ui/SectionMotifDivider";
 import { StickyListenBar } from "@/components/ui/StickyListenBar";
 import { getLiveSiteContent } from "@/lib/content/live-content";
 import { getSeoSettingsSafe, resolveHomeJsonLd } from "@/lib/seo-settings";
@@ -64,12 +65,19 @@ export default function HomePage() {
 
       <main id="main-content">
         <HeroSection hero={siteContent.hero} />
+        <SectionMotifDivider />
         <AboutSection about={siteContent.about} />
+        <SectionMotifDivider />
         {flags.enable_discography_section ? <DiscographySection discography={siteContent.discography} /> : null}
+        <SectionMotifDivider />
         <MusicExperienceSection musicExperience={siteContent.musicExperience} />
+        <SectionMotifDivider />
         {hasShows ? <ShowsSection shows={siteContent.bookings.upcomingShows ?? []} /> : null}
+        {hasShows ? <SectionMotifDivider /> : null}
         {flags.enable_kampvuur_section ? <KampvuurSection kampvuur={siteContent.kampvuur} /> : null}
+        {flags.enable_kampvuur_section ? <SectionMotifDivider /> : null}
         <BookingsSection bookings={siteContent.bookings} />
+        <SectionMotifDivider />
         <ContactSection contact={siteContent.contact} />
       </main>
       {flags.enable_sticky_listen_bar ? (

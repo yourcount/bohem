@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { Reveal } from "@/components/ui/Reveal";
+import { getImageObjectPosition } from "@/lib/image-focus";
 import type { SiteContent } from "@/lib/types";
 
 type BookingsSectionProps = {
@@ -154,7 +155,8 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                       alt={bookings.coverKoffer.image.alt}
                       width={bookings.coverKoffer.image.width}
                       height={bookings.coverKoffer.image.height}
-                      className="h-full w-full object-cover object-center"
+                      className="h-full w-full object-cover"
+                      style={{ objectPosition: getImageObjectPosition(bookings.coverKoffer.image) }}
                       loading="lazy"
                       quality={80}
                       sizes="(max-width: 767px) 92vw, (max-width: 1279px) 46vw, 540px"

@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { Reveal } from "@/components/ui/Reveal";
+import { getImageObjectPosition } from "@/lib/image-focus";
 import type { SiteContent } from "@/lib/types";
 
 type KampvuurSectionProps = {
@@ -73,7 +74,8 @@ export function KampvuurSection({ kampvuur }: KampvuurSectionProps) {
                   alt={kampvuur.image.alt}
                   width={kampvuur.image.width}
                   height={kampvuur.image.height}
-                  className="h-full w-full object-cover object-center contrast-[1.08] saturate-[1.14]"
+                  className="h-full w-full object-cover contrast-[1.08] saturate-[1.14]"
+                  style={{ objectPosition: getImageObjectPosition(kampvuur.image) }}
                   loading="lazy"
                   quality={78}
                   sizes="(max-width: 767px) 92vw, (max-width: 1279px) 44vw, 460px"

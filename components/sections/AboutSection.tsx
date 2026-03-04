@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import type { SiteContent } from "@/lib/types";
 import { Reveal } from "@/components/ui/Reveal";
+import { getImageObjectPosition } from "@/lib/image-focus";
 
 type AboutSectionProps = {
   about: SiteContent["about"];
@@ -32,7 +33,8 @@ export function AboutSection({ about }: AboutSectionProps) {
                     alt={photo.alt}
                     width={photo.width}
                     height={photo.height}
-                    className="h-full w-full object-cover object-center"
+                    className="h-full w-full object-cover"
+                    style={{ objectPosition: getImageObjectPosition(photo) }}
                     loading="lazy"
                     quality={78}
                     sizes="(max-width: 767px) 92vw, (max-width: 1279px) 46vw, 520px"

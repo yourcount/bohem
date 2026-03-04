@@ -114,8 +114,7 @@ const helperByKey: Record<string, string> = {
   contactEmail: "Gebruik een geldig e-mailadres.",
   contactPhone: "Gebruik internationaal formaat, bijvoorbeeld +31 6...",
   alt: "Beschrijf kort wat er op de foto te zien is (toegankelijkheid).",
-  embedUrl: "Spotify embed URL, bijvoorbeeld https://open.spotify.com/embed/...",
-  src: "Kies via de fotobibliotheek of vul een afbeeldingspad in, bijvoorbeeld /uploads/library/....webp"
+  embedUrl: "Spotify embed URL, bijvoorbeeld https://open.spotify.com/embed/..."
 };
 
 function pathParts(path: string) {
@@ -183,7 +182,7 @@ function flattenEditableFields(value: unknown, path = "", section = ""): Editabl
   return [];
 }
 
-function setValueAtPath<T>(input: T, path: string, value: string): T {
+function setValueAtPath<T>(input: T, path: string, value: unknown): T {
   const draft = structuredClone(input) as unknown;
   const parts = pathParts(path);
   let current: unknown = draft;
@@ -250,6 +249,20 @@ function isImageSourcePath(path: string) {
   return path.endsWith(".src");
 }
 
+function isManagedLibraryImage(src: string) {
+  return src.startsWith("/uploads/library/");
+}
+
+function toFocusPath(srcPath: string, key: "focusX" | "focusY") {
+  return srcPath.replace(/\.src$/, `.${key}`);
+}
+
+function toNumberInRange(value: unknown, fallback: number) {
+  const parsed = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(100, Math.max(0, parsed));
+}
+
 function sectionToId(sectionTitle: string) {
   return `editor-section-${sectionTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 }
@@ -298,10 +311,12 @@ export function ContentEditorForm() {
   const [isMediaLoading, setIsMediaLoading] = useState(false);
   const [mediaError, setMediaError] = useState("");
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const [deletingMediaSrc, setDeletingMediaSrc] = useState<string | null>(null);
   const [mediaQuery, setMediaQuery] = useState("");
   const [mediaTag, setMediaTag] = useState("");
   const [mediaKind, setMediaKind] = useState<"photo" | "all">("photo");
   const [mediaTags, setMediaTags] = useState<string[]>([]);
+  const [activeFocusPath, setActiveFocusPath] = useState<string | null>(null);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [isSectionMenuCompact, setIsSectionMenuCompact] = useState(false);
 
@@ -423,10 +438,14 @@ export function ContentEditorForm() {
     }
   };
 
-  const onChangeField = (path: string, value: string) => {
+  const onSetFieldValue = (path: string, value: unknown) => {
     setContent((prev) => (prev ? setValueAtPath(prev, path, value) : prev));
     setFieldErrors((prev) => ({ ...prev, [path]: [] }));
     setDirty();
+  };
+
+  const onChangeField = (path: string, value: string) => {
+    onSetFieldValue(path, value);
   };
 
   const onReset = () => {
@@ -589,6 +608,57 @@ export function ContentEditorForm() {
     } finally {
       setIsUploadingMedia(false);
       event.target.value = "";
+    }
+  };
+
+  const getFocusForPath = (srcPath: string) => {
+    if (!content) return { x: 50, y: 50 };
+    const rawX = readValueAtPath(content, toFocusPath(srcPath, "focusX"));
+    const rawY = readValueAtPath(content, toFocusPath(srcPath, "focusY"));
+    return {
+      x: toNumberInRange(rawX, 50),
+      y: toNumberInRange(rawY, 50)
+    };
+  };
+
+  const setFocusForPath = (srcPath: string, x: number, y: number) => {
+    onSetFieldValue(toFocusPath(srcPath, "focusX"), Math.round(toNumberInRange(x, 50)));
+    onSetFieldValue(toFocusPath(srcPath, "focusY"), Math.round(toNumberInRange(y, 50)));
+  };
+
+  const onDeleteMediaFile = async (src: string) => {
+    if (!isManagedLibraryImage(src)) {
+      setMediaError("Alleen geuploade bibliotheekfoto's kunnen verwijderd worden.");
+      return;
+    }
+
+    const confirmed = window.confirm("Weet je zeker dat je deze foto uit de fotobibliotheek wilt verwijderen?");
+    if (!confirmed) return;
+
+    setDeletingMediaSrc(src);
+    setMediaError("");
+
+    try {
+      const response = await fetch("/api/content/admin/media", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ src })
+      });
+      const payload = (await response.json()) as { ok?: boolean; error?: string };
+
+      if (!response.ok || !payload.ok) {
+        setMediaError(payload.error ?? "Foto verwijderen is mislukt.");
+        return;
+      }
+
+      setMediaFiles((prev) => prev.filter((file) => file.src !== src));
+      if (mediaTargetPath && typeof readValueAtPath(content, mediaTargetPath) === "string" && readValueAtPath(content, mediaTargetPath) === src) {
+        onChangeField(mediaTargetPath, "");
+      }
+    } catch {
+      setMediaError("Foto verwijderen is mislukt.");
+    } finally {
+      setDeletingMediaSrc(null);
     }
   };
 
@@ -1206,6 +1276,8 @@ export function ContentEditorForm() {
                 const imageAltPath = showImageTools ? field.path.replace(/\.src$/, ".alt") : "";
                 const imageAltRaw = imageAltPath ? readValueAtPath(content, imageAltPath) : "";
                 const imageAlt = typeof imageAltRaw === "string" && imageAltRaw.trim().length > 0 ? imageAltRaw : "Afbeelding preview";
+                const focusPoint = showImageTools ? getFocusForPath(field.path) : { x: 50, y: 50 };
+                const isEditingFocus = activeFocusPath === field.path;
 
                 return (
                   <div key={field.path} className={field.multiline ? "md:col-span-2" : ""}>
@@ -1227,8 +1299,24 @@ export function ContentEditorForm() {
                       />
                     ) : showImageTools ? (
                       <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(15,24,37,0.45)] p-3">
+                        <input
+                          id={inputId}
+                          ref={(node) => {
+                            fieldRefs.current[field.path] = node;
+                          }}
+                          readOnly
+                          value={field.value}
+                          aria-invalid={Boolean(error)}
+                          aria-describedby={describedBy}
+                          className="sr-only"
+                        />
                         {field.value ? (
-                          <div className="overflow-hidden rounded-lg border border-[var(--color-line-muted)]">
+                          <button
+                            type="button"
+                            onClick={() => openMediaModal(field.path)}
+                            className="block w-full overflow-hidden rounded-lg border border-[var(--color-line-muted)] transition-colors hover:border-[var(--color-accent-copper)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-amber)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgba(15,24,37,0.9)]"
+                            aria-label="Kies een andere foto uit de fotobibliotheek"
+                          >
                             <Image
                               src={field.value}
                               alt={imageAlt}
@@ -1236,12 +1324,17 @@ export function ContentEditorForm() {
                               height={640}
                               unoptimized
                               className="h-44 w-full object-cover"
+                              style={{ objectPosition: `${focusPoint.x}% ${focusPoint.y}%` }}
                             />
-                          </div>
+                          </button>
                         ) : (
-                          <div className="flex h-44 w-full items-center justify-center rounded-lg border border-dashed border-[var(--color-line-muted)] text-xs text-[#d9c6ac]">
+                          <button
+                            type="button"
+                            onClick={() => openMediaModal(field.path)}
+                            className="flex h-44 w-full items-center justify-center rounded-lg border border-dashed border-[var(--color-line-muted)] text-xs text-[#d9c6ac] transition-colors hover:border-[var(--color-accent-copper)] hover:text-[#f8f5f1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-amber)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgba(15,24,37,0.9)]"
+                          >
                             Nog geen afbeelding geselecteerd
-                          </div>
+                          </button>
                         )}
                         <div className="mt-3 flex flex-wrap items-center gap-2">
                           <button
@@ -1251,6 +1344,15 @@ export function ContentEditorForm() {
                           >
                             Kies uit fotobibliotheek
                           </button>
+                          {field.value ? (
+                            <button
+                              type="button"
+                              onClick={() => setActiveFocusPath((prev) => (prev === field.path ? null : field.path))}
+                              className="rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
+                            >
+                              {isEditingFocus ? "Focuspunt sluiten" : "Focuspunt aanpassen"}
+                            </button>
+                          ) : null}
                           {field.value ? (
                             <a
                               href={field.value}
@@ -1262,21 +1364,79 @@ export function ContentEditorForm() {
                             </a>
                           ) : null}
                         </div>
-                        <details className="mt-3">
-                          <summary className="cursor-pointer select-none text-xs text-[#d9c6ac]">Pad handmatig aanpassen</summary>
-                          <input
-                            id={inputId}
-                            ref={(node) => {
-                              fieldRefs.current[field.path] = node;
-                            }}
-                            type="text"
-                            value={field.value}
-                            onChange={(event) => onChangeField(field.path, event.target.value)}
-                            aria-invalid={Boolean(error)}
-                            aria-describedby={describedBy}
-                            className="mt-2 w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-[var(--color-text-primary)]"
-                          />
-                        </details>
+                        {field.value && isEditingFocus ? (
+                          <div className="mt-3 rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.56)] p-3">
+                            <p className="text-xs text-[#d9c6ac]">Klik op de foto waar het belangrijkste deel moet blijven staan.</p>
+                            <div className="mt-2 grid gap-3 lg:grid-cols-2">
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  const rect = event.currentTarget.getBoundingClientRect();
+                                  const x = ((event.clientX - rect.left) / rect.width) * 100;
+                                  const y = ((event.clientY - rect.top) / rect.height) * 100;
+                                  setFocusForPath(field.path, x, y);
+                                }}
+                                className="relative overflow-hidden rounded-lg border border-[var(--color-line-muted)]"
+                                aria-label="Kies focuspunt op mobiele uitsnede"
+                              >
+                                <Image
+                                  src={field.value}
+                                  alt={imageAlt}
+                                  width={480}
+                                  height={640}
+                                  unoptimized
+                                  className="h-48 w-full object-cover"
+                                  style={{ objectPosition: `${focusPoint.x}% ${focusPoint.y}%` }}
+                                />
+                                <span
+                                  className="pointer-events-none absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#f8f5f1] bg-[rgba(255,153,51,0.65)] shadow-[0_0_0_2px_rgba(10,12,18,0.6)]"
+                                  style={{ left: `${focusPoint.x}%`, top: `${focusPoint.y}%` }}
+                                />
+                                <span className="pointer-events-none absolute left-2 top-2 rounded bg-[rgba(10,12,18,0.6)] px-2 py-0.5 text-[10px] text-[#f8f5f1]">
+                                  Mobiel
+                                </span>
+                              </button>
+                              <div className="space-y-2">
+                                <div className="relative overflow-hidden rounded-lg border border-[var(--color-line-muted)]">
+                                  <Image
+                                    src={field.value}
+                                    alt={imageAlt}
+                                    width={640}
+                                    height={360}
+                                    unoptimized
+                                    className="h-28 w-full object-cover"
+                                    style={{ objectPosition: `${focusPoint.x}% ${focusPoint.y}%` }}
+                                  />
+                                  <span className="pointer-events-none absolute left-2 top-2 rounded bg-[rgba(10,12,18,0.6)] px-2 py-0.5 text-[10px] text-[#f8f5f1]">
+                                    Desktop
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2">
+                                  {[
+                                    { label: "Boven", x: 50, y: 15 },
+                                    { label: "Midden", x: 50, y: 50 },
+                                    { label: "Onder", x: 50, y: 85 },
+                                    { label: "Links", x: 20, y: 50 },
+                                    { label: "Rechts", x: 80, y: 50 },
+                                    { label: "Reset", x: 50, y: 50 }
+                                  ].map((preset) => (
+                                    <button
+                                      key={`${field.path}-${preset.label}`}
+                                      type="button"
+                                      onClick={() => setFocusForPath(field.path, preset.x, preset.y)}
+                                      className="rounded-md border border-[var(--color-line-muted)] px-2 py-1 text-[11px] font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
+                                    >
+                                      {preset.label}
+                                    </button>
+                                  ))}
+                                </div>
+                                <p className="text-[11px] text-[#d9c6ac]">
+                                  Focuspunt: X {Math.round(focusPoint.x)}% · Y {Math.round(focusPoint.y)}%
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
                     ) : (
                       <input
@@ -1440,22 +1600,26 @@ export function ContentEditorForm() {
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {mediaFiles.map((file) => (
-                  <button
+                  <div
                     key={file.src}
-                    type="button"
-                    onClick={() => onSelectMedia(file.src)}
-                    className="overflow-hidden rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.6)] text-left transition-colors hover:border-[var(--color-accent-copper)]"
+                    className="overflow-hidden rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.6)] text-left"
                   >
-                    <Image
-                      src={file.src}
-                      alt={file.name}
-                      width={480}
-                      height={280}
-                      className="h-28 w-full object-cover"
-                    />
-                    <p className="truncate px-2 py-2 text-[11px] text-[#d9c6ac]" title={file.src}>
-                      {file.src}
-                    </p>
+                    <button
+                      type="button"
+                      onClick={() => onSelectMedia(file.src)}
+                      className="block w-full text-left transition-colors hover:border-[var(--color-accent-copper)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-amber)] focus-visible:ring-inset"
+                    >
+                      <Image
+                        src={file.src}
+                        alt={file.name}
+                        width={480}
+                        height={280}
+                        className="h-28 w-full object-cover"
+                      />
+                      <p className="truncate px-2 py-2 text-[11px] text-[#d9c6ac]" title={file.src}>
+                        {file.src}
+                      </p>
+                    </button>
                     {file.tags.length > 0 || file.kind ? (
                       <div className="flex flex-wrap gap-1 px-2 pb-2">
                         {file.kind ? (
@@ -1476,7 +1640,19 @@ export function ContentEditorForm() {
                         ))}
                       </div>
                     ) : null}
-                  </button>
+                    {isManagedLibraryImage(file.src) ? (
+                      <div className="border-t border-[var(--color-line-muted)] px-2 py-2">
+                        <button
+                          type="button"
+                          onClick={() => void onDeleteMediaFile(file.src)}
+                          disabled={deletingMediaSrc === file.src}
+                          className="w-full rounded-md border border-[rgba(255,136,120,0.45)] px-2 py-1.5 text-[11px] font-semibold text-[#ffc3b8] hover:bg-[rgba(255,136,120,0.12)] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {deletingMediaSrc === file.src ? "Verwijderen..." : "Verwijder uit bibliotheek"}
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
                 ))}
               </div>
             </div>

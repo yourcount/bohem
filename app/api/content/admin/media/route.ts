@@ -1,4 +1,4 @@
-import { mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { extname, join } from "node:path";
 import { randomBytes } from "node:crypto";
 
@@ -7,13 +7,14 @@ import { NextResponse } from "next/server";
 
 import { getAdminSession } from "@/lib/auth/admin-session";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
-import { parseTagInput, readMediaIndex, upsertMediaIndexEntry } from "@/lib/media/library-index";
+import { parseTagInput, readMediaIndex, removeMediaIndexEntry, upsertMediaIndexEntry } from "@/lib/media/library-index";
 import { consumeRateLimit } from "@/lib/security/rate-limit";
 import { getRequestMeta } from "@/lib/security/request";
 
 const ALLOWED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const MANAGED_UPLOAD_PREFIX = "/uploads/library/";
 
 type ListedMediaFile = {
   src: string;
@@ -228,4 +229,63 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json({ ok: true, file: { src: publicUrl, name: filename, tags: indexEntry.tags } }, { status: 201 });
+}
+
+export async function DELETE(request: Request) {
+  const session = await getAdminSession();
+  if (!session) {
+    return NextResponse.json({ error: "Niet geautoriseerd.", code: "UNAUTHORIZED" }, { status: 401 });
+  }
+
+  const { ip, userAgent } = getRequestMeta(request);
+  const limiter = consumeRateLimit(`admin-media-delete:${ip}:${session.uid}`, 30, 15 * 60 * 1000);
+  if (!limiter.allowed) {
+    return NextResponse.json({ error: "Te veel verwijderacties. Probeer later opnieuw.", code: "RATE_LIMITED" }, { status: 429 });
+  }
+
+  let payload: { src?: string };
+  try {
+    payload = (await request.json()) as { src?: string };
+  } catch {
+    return NextResponse.json({ error: "Ongeldige aanvraag.", code: "INVALID_JSON" }, { status: 400 });
+  }
+
+  const src = typeof payload.src === "string" ? payload.src.trim() : "";
+  if (!src) {
+    return NextResponse.json({ error: "Geen afbeeldingpad opgegeven.", code: "SRC_REQUIRED" }, { status: 400 });
+  }
+
+  if (!src.startsWith(MANAGED_UPLOAD_PREFIX)) {
+    return NextResponse.json(
+      { error: "Alleen afbeeldingen uit de fotobibliotheek kunnen verwijderd worden.", code: "FORBIDDEN_TARGET" },
+      { status: 403 }
+    );
+  }
+
+  const filename = src.slice(MANAGED_UPLOAD_PREFIX.length);
+  if (!filename || filename.includes("..") || filename.includes("/")) {
+    return NextResponse.json({ error: "Ongeldig afbeeldingpad.", code: "INVALID_SRC" }, { status: 400 });
+  }
+
+  const absolutePath = join(process.cwd(), "public", "uploads", "library", filename);
+  try {
+    unlinkSync(absolutePath);
+  } catch {
+    return NextResponse.json({ error: "Afbeelding kon niet verwijderd worden.", code: "FILE_DELETE_FAILED" }, { status: 404 });
+  }
+
+  removeMediaIndexEntry(src);
+
+  logAuditEvent({
+    actorUserId: session.uid,
+    actorEmail: session.email,
+    action: "CONTENT_MEDIA_DELETED",
+    targetType: "media",
+    targetId: src,
+    metadata: { src },
+    ipAddress: ip,
+    userAgent
+  });
+
+  return NextResponse.json({ ok: true, removed: src }, { status: 200 });
 }

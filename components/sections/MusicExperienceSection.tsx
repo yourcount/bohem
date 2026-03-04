@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import type { SiteContent } from "@/lib/types";
 import { Reveal } from "@/components/ui/Reveal";
+import { getImageObjectPosition } from "@/lib/image-focus";
 
 type MusicExperienceSectionProps = {
   musicExperience: SiteContent["musicExperience"];
@@ -37,7 +38,8 @@ export function MusicExperienceSection({ musicExperience }: MusicExperienceSecti
               alt={musicExperience.image.alt}
               width={musicExperience.image.width}
               height={musicExperience.image.height}
-              className="h-full w-full object-cover object-[center_30%] contrast-[1.12] saturate-[1.04] aspect-[4/5] md:aspect-[16/10]"
+              className="h-full w-full object-cover contrast-[1.12] saturate-[1.04] aspect-[4/5] md:aspect-[16/10]"
+              style={{ objectPosition: getImageObjectPosition(musicExperience.image, 50, 30) }}
               loading="lazy"
               quality={78}
               sizes="(max-width: 767px) 92vw, (max-width: 1279px) 44vw, 460px"

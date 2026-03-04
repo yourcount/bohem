@@ -18,7 +18,7 @@ import { getFeatureFlagsSafe } from "@/lib/system/feature-flags";
 
 export const dynamic = "force-dynamic";
 
-const NON_CONTENT_KEYS = new Set(["href", "variant", "id", "type", "autoComplete", "required", "width", "height"]);
+const NON_CONTENT_KEYS = new Set(["href", "variant", "id", "type", "autoComplete", "required", "width", "height", "focusX", "focusY"]);
 
 function hasSectionContent(value: unknown): boolean {
   if (typeof value === "string") {

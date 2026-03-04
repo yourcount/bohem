@@ -65,6 +65,16 @@ export function upsertMediaIndexEntry(src: string, input: { tags?: string[]; ori
   return index.files[src];
 }
 
+export function removeMediaIndexEntry(src: string) {
+  const index = readMediaIndex();
+  if (!index.files[src]) {
+    return false;
+  }
+  delete index.files[src];
+  writeMediaIndex(index);
+  return true;
+}
+
 export function parseTagInput(raw: unknown): string[] {
   if (typeof raw !== "string") return [];
   return uniqueTags(
@@ -74,4 +84,3 @@ export function parseTagInput(raw: unknown): string[] {
       .filter(Boolean)
   );
 }
-

@@ -11,12 +11,30 @@
     "name": "Bohèm"
   },
   "navigation": [
-    { "label": "Bio", "href": "#bio" },
-    { "label": "Discografie", "href": "#discografie" },
-    { "label": "Kampvuurklanken", "href": "#kampvuurklanken" },
-    { "label": "Boekingen", "href": "#boekingen" },
-    { "label": "Pers", "href": "#pers" },
-    { "label": "Contact", "href": "#contact" }
+    {
+      "label": "Bio",
+      "href": "#bio"
+    },
+    {
+      "label": "Discografie",
+      "href": "#discografie"
+    },
+    {
+      "label": "Kampvuurklanken",
+      "href": "#kampvuurklanken"
+    },
+    {
+      "label": "Boekingen",
+      "href": "#boekingen"
+    },
+    {
+      "label": "Pers",
+      "href": "#pers"
+    },
+    {
+      "label": "Contact",
+      "href": "#contact"
+    }
   ],
   "hero": {
     "eyebrow": "Bohèm",
@@ -24,9 +42,17 @@
     "subhead": "Melodisch, verhalend en persoonlijk: Nederlandstalige en Engelstalige songs over het leven in al zijn facetten.",
     "image": {
       "src": "/images/bohem-hero.jpg",
-      "alt": "Arthur Bont en Bettina Kraaieveld in warm podiumlicht"
+      "alt": "Arthur Bont en Bettina Kraaieveld in warm podiumlicht",
+      "focusX": 50,
+      "focusY": 12
     },
-    "ctas": [{ "label": "Boek Bohèm", "href": "#boekingen", "variant": "primary" }]
+    "ctas": [
+      {
+        "label": "Boek Bohèm",
+        "href": "#boekingen",
+        "variant": "primary"
+      }
+    ]
   },
   "about": {
     "title": "Over Bohèm",
@@ -36,13 +62,17 @@
         "src": "/images/nieuw/bohem-nieuw-tree.webp",
         "alt": "Arthur en Bettina in open veld bij een boom, met gitaar en warme avondlucht",
         "width": 2200,
-        "height": 1573
+        "height": 1573,
+        "focusX": 50,
+        "focusY": 50
       },
       {
         "src": "/images/nieuw/bohem-nieuw-road.webp",
         "alt": "Bohèm op een landelijke weg in een verstild moment",
         "width": 1800,
-        "height": 2165
+        "height": 2165,
+        "focusX": 50,
+        "focusY": 50
       }
     ],
     "lineupTitle": "Bezetting",
@@ -119,12 +149,17 @@
   "musicExperience": {
     "title": "Muziekbeleving",
     "body": "Live, onder de noemer Reizigers, neemt Bohèm het publiek mee op een muzikale mini-trip: verrassende arrangementen, diepgang, flair, humor en interactie. Liedjes om bij stil te staan en energie om in mee te bewegen.",
-    "cta": { "label": "Bekijk boekingsopties", "href": "#boekingen" },
+    "cta": {
+      "label": "Bekijk boekingsopties",
+      "href": "#boekingen"
+    },
     "image": {
       "src": "/images/nieuw/bohem-nieuw-field-wide.webp",
       "alt": "Arthur en Bettina in tegenlicht in het veld, met gitaar en warme avondzon",
       "width": 2200,
-      "height": 1469
+      "height": 1469,
+      "focusX": 50,
+      "focusY": 30
     }
   },
   "kampvuur": {
@@ -161,7 +196,11 @@
         "description": "Een complete Kampvuurklanken-avond met opbouw, rust en energie."
       }
     ],
-    "packageCta": { "label": "Plan 15-min verkenning", "href": "#contact", "variant": "primary" },
+    "packageCta": {
+      "label": "Plan 15-min verkenning",
+      "href": "#contact",
+      "variant": "primary"
+    },
     "contactPrompt": "Neem gerust contact op, we denken graag mee.",
     "contactEmail": "info@musicbybohem.nl",
     "contactPhone": "+31 6 36313948",
@@ -169,7 +208,9 @@
       "src": "/images/nieuw/bohem-nieuw-sunset-portrait.webp",
       "alt": "Bohèm in warm avondlicht als uitnodiging voor een intieme teamsessie",
       "width": 1800,
-      "height": 1202
+      "height": 1202,
+      "focusX": 50,
+      "focusY": 50
     }
   },
   "bookings": {
@@ -193,7 +234,9 @@
         "src": "/images/nieuw/bohem-nieuw-road.webp",
         "alt": "Bohèm live met gitaar in een intieme setting, passend bij de coverkoffer",
         "width": 1800,
-        "height": 2165
+        "height": 2165,
+        "focusX": 50,
+        "focusY": 50
       }
     },
     "pressQuotes": [
@@ -264,9 +307,15 @@
       "alt": "Bohèm in gouden zonsondergang, klaar voor liveoptreden",
       "width": 1800,
       "height": 1202,
-      "caption": "Nieuwe fotoserie 2026"
+      "caption": "Nieuwe fotoserie 2026",
+      "focusX": 50,
+      "focusY": 50
     },
-    "cta": { "label": "Vraag beschikbaarheid aan", "href": "#contact", "variant": "primary" },
+    "cta": {
+      "label": "Vraag beschikbaarheid aan",
+      "href": "#contact",
+      "variant": "primary"
+    },
     "infoTitle": "Boekingsinformatie",
     "infoItems": [
       "Format: duo-set met zang, mondharmonica, backingvocals en percussie.",

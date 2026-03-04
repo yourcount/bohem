@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type PointerEvent } from "react";
 
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Reveal } from "@/components/ui/Reveal";
+import { getImageObjectPosition } from "@/lib/image-focus";
 import type { SiteContent } from "@/lib/types";
 
 type HeroSectionProps = {
@@ -84,6 +85,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
           alt={hero.image.alt}
           fill
           className="hero-mobile-zoom object-cover object-top"
+          style={{ objectPosition: getImageObjectPosition(hero.image, 50, 12) }}
           priority
           quality={75}
           sizes="(max-width: 767px) 100vw, 100vw"

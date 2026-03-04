@@ -30,6 +30,10 @@ function validateAndSanitizeByTemplate(
   path: string,
   errors: FieldErrors
 ): unknown {
+  if (typeof input === "undefined") {
+    return structuredClone(template);
+  }
+
   if (typeof template === "string") {
     if (typeof input !== "string") {
       addFieldError(errors, path, "Moet tekst zijn.");

@@ -9,6 +9,15 @@ export type Cta = {
   variant?: "primary" | "secondary";
 };
 
+export type ImageAsset = {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  focusX?: number;
+  focusY?: number;
+};
+
 export type SiteContent = {
   meta: {
     title: string;
@@ -26,10 +35,7 @@ export type SiteContent = {
     eyebrow: string;
     headline: string;
     subhead: string;
-    image: {
-      src: string;
-      alt: string;
-    };
+    image: ImageAsset;
     ctas: Cta[];
     listenNow?: {
       label: string;
@@ -51,6 +57,8 @@ export type SiteContent = {
       alt: string;
       width: number;
       height: number;
+      focusX?: number;
+      focusY?: number;
     }>;
     bios: Array<{
       name: string;
@@ -94,9 +102,7 @@ export type SiteContent = {
     title: string;
     body: string;
     cta: Cta;
-    image: {
-      src: string;
-      alt: string;
+    image: ImageAsset & {
       width: number;
       height: number;
     };
@@ -111,9 +117,7 @@ export type SiteContent = {
     contactPrompt: string;
     contactEmail: string;
     contactPhone: string;
-    image?: {
-      src: string;
-      alt: string;
+    image?: ImageAsset & {
       width: number;
       height: number;
     };
@@ -140,9 +144,7 @@ export type SiteContent = {
       eyebrow?: string;
       title: string;
       body: string;
-      image?: {
-        src: string;
-        alt: string;
+      image?: ImageAsset & {
         width: number;
         height: number;
       };
@@ -170,9 +172,7 @@ export type SiteContent = {
       ctaLabel: string;
       ctaHref: string;
     }>;
-    highlightImage?: {
-      src: string;
-      alt: string;
+    highlightImage?: ImageAsset & {
       width: number;
       height: number;
       caption?: string;

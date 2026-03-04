@@ -85,7 +85,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
           fill
           className="hero-mobile-zoom object-cover object-top"
           priority
-          quality={84}
+          quality={75}
           sizes="(max-width: 767px) 100vw, 100vw"
         />
       </div>

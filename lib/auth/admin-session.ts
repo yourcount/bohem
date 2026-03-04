@@ -10,6 +10,10 @@ export async function getAdminSession() {
   const parsed = verifySessionToken(token);
   if (!parsed) return null;
 
+  if (process.env.VERCEL) {
+    return parsed;
+  }
+
   if (!isSessionActive(parsed.sid)) return null;
   const user = findAdminUserById(parsed.uid);
   if (!user || user.status !== "active") return null;

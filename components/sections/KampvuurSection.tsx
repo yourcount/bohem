@@ -97,32 +97,6 @@ export function KampvuurSection({ kampvuur }: KampvuurSectionProps) {
               </ul>
             </article>
 
-            {kampvuur.packages && kampvuur.packages.length > 0 ? (
-              <article className="mt-6 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-5 text-center">
-                {kampvuur.packagesTitle ? <h3 className="mb-3 font-display text-2xl sm:text-3xl">{kampvuur.packagesTitle}</h3> : null}
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {kampvuur.packages.map((item) => (
-                    <div key={item.name} className="kampvuur-package-card rounded-xl border border-[rgba(242,139,14,0.35)] bg-[rgba(24,16,20,0.28)] p-3">
-                      <p className="font-semibold text-[#f8f1e5]">{item.name}</p>
-                      <p className="mt-1 inline-flex items-center rounded-full border border-[rgba(255,180,88,0.42)] bg-[rgba(255,146,57,0.12)] px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-[#ffd8a5]">
-                        {item.duration}
-                      </p>
-                      <p className="mt-1 text-xs text-[#d9c4a8]">{item.description}</p>
-                    </div>
-                  ))}
-                </div>
-                {kampvuur.packageCta ? (
-                  <a
-                    href={kampvuur.packageCta.href}
-                    data-cta="kampvuur_package_explore"
-                    className="kampvuur-fire-cta mt-4 inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
-                  >
-                    {kampvuur.packageCta.label}
-                  </a>
-                ) : null}
-              </article>
-            ) : null}
-
             <blockquote className="kampvuur-quote mx-auto mt-5 max-w-[44ch] text-center text-[#f3d7b0]">“{kampvuur.quote}”</blockquote>
 
             <p className="mt-5 text-center text-[var(--color-text-primary)]">{kampvuur.contactPrompt}</p>

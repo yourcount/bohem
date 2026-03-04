@@ -29,6 +29,12 @@ type ValidationResult =
       fieldErrors: FieldErrors;
     };
 
+function stripKampvuurFormatChoiceFields(kampvuur: SiteContent["kampvuur"]): SiteContent["kampvuur"] {
+  return Object.fromEntries(
+    Object.entries(kampvuur).filter(([key]) => !["packagesTitle", "packages", "packageCta"].includes(key))
+  ) as SiteContent["kampvuur"];
+}
+
 function addFieldError(errors: FieldErrors, path: string, message: string) {
   if (!errors[path]) {
     errors[path] = [];
@@ -140,7 +146,7 @@ function stripDisallowedReleaseLinksFromDiscography(content: EditorContent): Edi
       })
     },
     musicExperience: normalized.musicExperience,
-    kampvuur: normalized.kampvuur,
+    kampvuur: stripKampvuurFormatChoiceFields(normalized.kampvuur),
     bookings: normalized.bookings,
     contact: normalized.contact,
     footer: normalized.footer
@@ -155,7 +161,7 @@ export function pickEditorContent(full: SiteContent): EditorContent {
     about: full.about,
     discography: full.discography,
     musicExperience: full.musicExperience,
-    kampvuur: full.kampvuur,
+    kampvuur: stripKampvuurFormatChoiceFields(full.kampvuur),
     bookings: full.bookings,
     contact: full.contact,
     footer: full.footer
@@ -173,6 +179,10 @@ export function mergeEditorContent(full: SiteContent, editorContent: EditorConte
 
 export function validateAndSanitizeEditorContent(input: unknown): ValidationResult {
   const errors: FieldErrors = {};
+  const editorTemplate: SiteContent = {
+    ...siteContent,
+    kampvuur: stripKampvuurFormatChoiceFields(siteContent.kampvuur)
+  };
 
   if (!input || typeof input !== "object" || Array.isArray(input)) {
     return {
@@ -185,7 +195,7 @@ export function validateAndSanitizeEditorContent(input: unknown): ValidationResu
   const output: Record<string, unknown> = {};
 
   for (const key of EDITOR_CONTENT_KEYS) {
-    const sanitizedValue = validateAndSanitizeByTemplate(raw[key], siteContent[key], `content.${key}`, errors);
+    const sanitizedValue = validateAndSanitizeByTemplate(raw[key], editorTemplate[key], `content.${key}`, errors);
     output[key] = sanitizedValue;
   }
 

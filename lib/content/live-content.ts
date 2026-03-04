@@ -52,7 +52,7 @@ function applyCmsOverrides(base: SiteContent) {
   return base;
 }
 
-export function getLiveSiteContent(): SiteContent {
+export async function getLiveSiteContent(): Promise<SiteContent> {
   const cached = readRuntimeCache<SiteContent>("site_content");
   if (cached) {
     return cached;
@@ -61,7 +61,7 @@ export function getLiveSiteContent(): SiteContent {
   const policy = getCachePolicySafe();
 
   try {
-    const fullRecord = readFullSiteContent();
+    const fullRecord = await readFullSiteContent();
     if (fullRecord) {
       const sanitized = sanitizeSiteContent(fullRecord.content);
       writeRuntimeCache("site_content", sanitized, policy.publicContentTtlSeconds);

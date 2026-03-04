@@ -7,7 +7,7 @@ import { getSeoSettingsSafe, resolveHomeSeo } from "@/lib/seo-settings";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const content = getLiveSiteContent();
+  const content = await getLiveSiteContent();
   const seoSettings = getSeoSettingsSafe();
   const resolvedSeo = resolveHomeSeo(content, seoSettings);
 

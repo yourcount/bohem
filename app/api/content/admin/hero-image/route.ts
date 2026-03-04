@@ -86,14 +86,14 @@ export async function POST(request: Request) {
   try {
     const updatedLegacy = updatePublicContentPatch({ hero_image_url: publicUrl }, session.email);
 
-    const fullRecord = readFullSiteContent();
+    const fullRecord = await readFullSiteContent();
     let updatedAt = updatedLegacy?.updated_at ?? "";
     let updatedBy = updatedLegacy?.updated_by ?? session.email;
 
     if (fullRecord) {
       const nextContent = structuredClone(fullRecord.content);
       nextContent.hero.image.src = publicUrl;
-      const updatedFull = updateFullSiteContent(nextContent, session.email);
+      const updatedFull = await updateFullSiteContent(nextContent, session.email);
       if (!updatedFull) {
         safeDeleteManagedHeroImageByUrl(publicUrl);
         return NextResponse.json({ error: "Database-update mislukt.", code: "DB_WRITE_FAILED" }, { status: 500 });

@@ -30,7 +30,7 @@ export async function GET() {
   }
 
   try {
-    const record = readFullSiteContent();
+    const record = await readFullSiteContent();
     if (!record) {
       return NextResponse.json({ error: "Geen content gevonden.", code: "CONTENT_NOT_FOUND" }, { status: 404 });
     }
@@ -81,7 +81,7 @@ export async function PATCH(request: Request) {
   }
 
   try {
-    const current = readFullSiteContent();
+    const current = await readFullSiteContent();
     if (!current) {
       return NextResponse.json({ error: "Geen content gevonden.", code: "CONTENT_NOT_FOUND" }, { status: 404 });
     }
@@ -101,7 +101,7 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const updated = updateFullSiteContent(fullValidation.value, session.email);
+    const updated = await updateFullSiteContent(fullValidation.value, session.email);
     if (!updated) {
       return NextResponse.json({ error: "Opslaan mislukt.", code: "DB_WRITE_FAILED" }, { status: 500 });
     }

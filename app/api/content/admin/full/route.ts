@@ -16,7 +16,7 @@ export async function GET() {
   }
 
   try {
-    const record = readFullSiteContent();
+    const record = await readFullSiteContent();
     if (!record) {
       return NextResponse.json({ error: "Geen content gevonden.", code: "CONTENT_NOT_FOUND" }, { status: 404 });
     }
@@ -66,7 +66,7 @@ export async function PATCH(request: Request) {
   }
 
   try {
-    const updated = updateFullSiteContent(parsed.value, session.email);
+    const updated = await updateFullSiteContent(parsed.value, session.email);
     if (!updated) {
       return NextResponse.json({ error: "Geen content gevonden.", code: "CONTENT_NOT_FOUND" }, { status: 404 });
     }

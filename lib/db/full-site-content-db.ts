@@ -1,6 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 
+import { list, put } from "@vercel/blob";
 import Database from "better-sqlite3";
 
 import { siteContent } from "@/lib/content";
@@ -12,6 +13,55 @@ export type FullSiteContentRecord = {
   updated_at: string;
   updated_by: string;
 };
+
+type BlobPayload = FullSiteContentRecord;
+
+const FULL_CONTENT_BLOB_PATH = "cms/site-content-full-v1.json";
+
+function shouldUseBlobStorage() {
+  return Boolean(process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN);
+}
+
+async function readBlobPayload(): Promise<BlobPayload | null> {
+  const { blobs } = await list({
+    prefix: FULL_CONTENT_BLOB_PATH,
+    limit: 20
+  });
+
+  const exact = blobs.find((blob) => blob.pathname === FULL_CONTENT_BLOB_PATH) ?? blobs[0];
+  if (!exact) return null;
+
+  const response = await fetch(exact.url, { cache: "no-store" });
+  if (!response.ok) return null;
+
+  const parsed = (await response.json()) as Partial<BlobPayload>;
+  if (!parsed || typeof parsed !== "object" || !parsed.content || !parsed.updated_at || !parsed.updated_by) {
+    return null;
+  }
+
+  return {
+    content: parsed.content as SiteContent,
+    updated_at: String(parsed.updated_at),
+    updated_by: String(parsed.updated_by)
+  };
+}
+
+async function writeBlobPayload(content: SiteContent, updatedBy: string): Promise<BlobPayload> {
+  const payload: BlobPayload = {
+    content,
+    updated_at: new Date().toISOString(),
+    updated_by: updatedBy
+  };
+
+  await put(FULL_CONTENT_BLOB_PATH, JSON.stringify(payload), {
+    access: "public",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: "application/json; charset=utf-8"
+  });
+
+  return payload;
+}
 
 function openDb() {
   const dbPath = getDbPath();
@@ -53,7 +103,17 @@ function ensureSeedRow(db: Database.Database) {
   });
 }
 
-export function readFullSiteContent(): FullSiteContentRecord | null {
+export async function readFullSiteContent(): Promise<FullSiteContentRecord | null> {
+  if (shouldUseBlobStorage()) {
+    try {
+      const existing = await readBlobPayload();
+      if (existing) return existing;
+      return await writeBlobPayload(siteContent, "system@vercel");
+    } catch {
+      // fall back to sqlite behavior if Blob is temporarily unavailable
+    }
+  }
+
   const db = openDb();
 
   try {
@@ -78,7 +138,15 @@ export function readFullSiteContent(): FullSiteContentRecord | null {
   }
 }
 
-export function updateFullSiteContent(content: SiteContent, updatedBy: string): FullSiteContentRecord | null {
+export async function updateFullSiteContent(content: SiteContent, updatedBy: string): Promise<FullSiteContentRecord | null> {
+  if (shouldUseBlobStorage()) {
+    try {
+      return await writeBlobPayload(content, updatedBy);
+    } catch {
+      return null;
+    }
+  }
+
   const db = openDb();
 
   try {

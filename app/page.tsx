@@ -18,8 +18,8 @@ import { getFeatureFlagsSafe } from "@/lib/system/feature-flags";
 
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
-  const siteContent = getLiveSiteContent();
+export default async function HomePage() {
+  const siteContent = await getLiveSiteContent();
   const flags = getFeatureFlagsSafe();
   const seoSettings = getSeoSettingsSafe();
   const jsonLd = resolveHomeJsonLd(siteContent, seoSettings);

@@ -573,7 +573,7 @@ export function ContentEditorForm() {
   const removeRelease = (index: number) => {
     setContent((prev) => {
       if (!prev) return prev;
-      if (prev.discography.releases.length <= 1) return prev;
+      if (prev.discography.releases.length === 0) return prev;
       const next = structuredClone(prev);
       next.discography.releases.splice(index, 1);
       return next;
@@ -795,7 +795,6 @@ export function ContentEditorForm() {
                   <button
                     type="button"
                     onClick={() => removeRelease(index)}
-                    disabled={releases.length <= 1}
                     className="rounded-full border border-[var(--color-line-muted)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Verwijderen

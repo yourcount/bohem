@@ -148,8 +148,10 @@ export function ensureAdminAuthSchema() {
     }
 
     const existing = db
-      .prepare("SELECT id, role, mfa_enabled, mfa_secret_enc FROM admin_users WHERE email = ?")
-      .get(seed.email) as Pick<AdminUserRecord, "id" | "role" | "mfa_enabled" | "mfa_secret_enc"> | undefined;
+      .prepare("SELECT id, role, status, password_hash, mfa_enabled, mfa_secret_enc FROM admin_users WHERE email = ?")
+      .get(seed.email) as
+      | Pick<AdminUserRecord, "id" | "role" | "status" | "password_hash" | "mfa_enabled" | "mfa_secret_enc">
+      | undefined;
 
     const role: AdminRole = seed.role ?? "SUPER_ADMIN";
     const status: AccountStatus = seed.status ?? "active";
@@ -176,10 +178,18 @@ export function ensureAdminAuthSchema() {
       return;
     }
 
-    if (existing.role !== role || existing.mfa_enabled !== (shouldEnableMfa ? 1 : 0) || (!existing.mfa_secret_enc && mfaSecretEnc)) {
+    if (
+      existing.role !== role ||
+      existing.status !== status ||
+      existing.password_hash !== seed.passwordHash ||
+      existing.mfa_enabled !== (shouldEnableMfa ? 1 : 0) ||
+      (!existing.mfa_secret_enc && mfaSecretEnc)
+    ) {
       db.prepare(
         `UPDATE admin_users
          SET role = @role,
+             status = @status,
+             password_hash = @password_hash,
              mfa_enabled = @mfa_enabled,
              mfa_secret_enc = COALESCE(@mfa_secret_enc, mfa_secret_enc),
              updated_at = CURRENT_TIMESTAMP
@@ -187,6 +197,8 @@ export function ensureAdminAuthSchema() {
       ).run({
         email: seed.email,
         role,
+        status,
+        password_hash: seed.passwordHash,
         mfa_enabled: shouldEnableMfa ? 1 : 0,
         mfa_secret_enc: mfaSecretEnc
       });

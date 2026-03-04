@@ -47,6 +47,20 @@ const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][numbe
   "Live Session",
   "Album"
 ];
+const DUTCH_MONTH_MAP: Record<string, number> = {
+  jan: 0,
+  feb: 1,
+  mrt: 2,
+  apr: 3,
+  mei: 4,
+  jun: 5,
+  jul: 6,
+  aug: 7,
+  sep: 8,
+  okt: 9,
+  nov: 10,
+  dec: 11
+};
 
 const sectionLabels: Record<string, string> = {
   brand: "Merk",
@@ -222,6 +236,32 @@ function sectionToId(sectionTitle: string) {
   return `editor-section-${sectionTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 }
 
+function parseDutchDateLabelToEpoch(input: string) {
+  const value = input.trim().toLowerCase().replace(/\./g, "");
+  const match = value.match(/^(\d{1,2})\s+([a-z]{3})\s+(\d{4})$/);
+  if (!match) return Number.MAX_SAFE_INTEGER;
+
+  const [, dayRaw, monthRaw, yearRaw] = match;
+  const month = DUTCH_MONTH_MAP[monthRaw];
+  if (month === undefined) return Number.MAX_SAFE_INTEGER;
+
+  const day = Number(dayRaw);
+  const year = Number(yearRaw);
+  if (!Number.isFinite(day) || !Number.isFinite(year)) return Number.MAX_SAFE_INTEGER;
+
+  return new Date(year, month, day).getTime();
+}
+
+function sortShowsByDate(shows: NonNullable<SiteContent["bookings"]["upcomingShows"]>) {
+  return [...shows].sort((a, b) => parseDutchDateLabelToEpoch(a.date) - parseDutchDateLabelToEpoch(b.date));
+}
+
+function normalizeEditorContent(content: EditorManagedContent): EditorManagedContent {
+  const next = structuredClone(content);
+  next.bookings.upcomingShows = sortShowsByDate(next.bookings.upcomingShows ?? []);
+  return next;
+}
+
 export function ContentEditorForm() {
   const [content, setContent] = useState<EditorManagedContent | null>(null);
   const [initialContent, setInitialContent] = useState<EditorManagedContent | null>(null);
@@ -250,6 +290,24 @@ export function ContentEditorForm() {
   const fieldRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const mediaUploadInputRef = useRef<HTMLInputElement | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDetailsElement | null>>({});
+  const releaseItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
+  const showItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
+
+  const scrollReleaseIntoView = (index: number) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        releaseItemRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
+  };
+
+  const scrollShowIntoView = (index: number) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        showItemRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -268,8 +326,9 @@ export function ContentEditorForm() {
           return;
         }
 
-        setContent(payload.content);
-        setInitialContent(payload.content);
+        const normalizedContent = normalizeEditorContent(payload.content);
+        setContent(normalizedContent);
+        setInitialContent(normalizedContent);
         setLastSavedAt(payload.updated_at);
         setLastSavedBy(payload.updated_by);
       } catch {
@@ -389,8 +448,9 @@ export function ContentEditorForm() {
       }
 
       if ("content" in payload) {
-        setContent(payload.content);
-        setInitialContent(payload.content);
+        const normalizedContent = normalizeEditorContent(payload.content);
+        setContent(normalizedContent);
+        setInitialContent(normalizedContent);
         setLastSavedAt(payload.updated_at);
         setLastSavedBy(payload.updated_by);
       }
@@ -500,6 +560,7 @@ export function ContentEditorForm() {
   };
 
   const addRelease = () => {
+    let nextIndex = -1;
     setContent((prev) => {
       if (!prev) return prev;
       const next = structuredClone(prev);
@@ -510,12 +571,17 @@ export function ContentEditorForm() {
         note: "",
         links: [{ label: "Luister op Spotify", href: "https://" }]
       });
+      nextIndex = next.discography.releases.length - 1;
       return next;
     });
+    if (nextIndex >= 0) {
+      scrollReleaseIntoView(nextIndex);
+    }
     setDirty();
   };
 
   const addShow = () => {
+    let nextIndex = -1;
     setContent((prev) => {
       if (!prev) return prev;
       const next = structuredClone(prev);
@@ -526,15 +592,21 @@ export function ContentEditorForm() {
       const firstCtaLabel = next.bookings.upcomingShows[0]?.ctaLabel || "Tickets";
       const nextDate = new Date();
       const month = nextDate.toLocaleDateString("nl-NL", { month: "short" }).replace(".", "");
-      next.bookings.upcomingShows.push({
+      const newShow: UpcomingShow = {
         date: `${String(nextDate.getDate()).padStart(2, "0")} ${month} ${nextDate.getFullYear()}`,
         venue: "Nieuwe locatie",
         city: "Plaats",
         ctaLabel: firstCtaLabel,
         ctaHref: firstCtaHref
-      });
+      };
+      next.bookings.upcomingShows.push(newShow);
+      next.bookings.upcomingShows = sortShowsByDate(next.bookings.upcomingShows);
+      nextIndex = next.bookings.upcomingShows.indexOf(newShow);
       return next;
     });
+    if (nextIndex >= 0) {
+      scrollShowIntoView(nextIndex);
+    }
     setDirty();
   };
 
@@ -554,6 +626,7 @@ export function ContentEditorForm() {
     key: keyof UpcomingShow,
     value: string
   ) => {
+    let nextIndex = showIndex;
     setContent((prev) => {
       if (!prev) return prev;
       const next = structuredClone(prev);
@@ -561,12 +634,41 @@ export function ContentEditorForm() {
       const show = next.bookings.upcomingShows[showIndex];
       if (!show) return prev;
       show[key] = value;
+      if (key === "date") {
+        next.bookings.upcomingShows = sortShowsByDate(next.bookings.upcomingShows);
+        nextIndex = next.bookings.upcomingShows.indexOf(show);
+      }
       return next;
     });
-    setFieldErrors((prev) => ({
-      ...prev,
-      [`bookings.upcomingShows.${showIndex}.${key}`]: []
-    }));
+    if (key === "date" && nextIndex >= 0) {
+      scrollShowIntoView(nextIndex);
+    }
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      Object.keys(next).forEach((fieldKey) => {
+        if (fieldKey.startsWith(`bookings.upcomingShows.${showIndex}.`)) {
+          delete next[fieldKey];
+        }
+      });
+      if (nextIndex >= 0) {
+        next[`bookings.upcomingShows.${nextIndex}.${key}`] = [];
+      }
+      return next;
+    });
+    setDirty();
+  };
+
+  const moveRelease = (releaseIndex: number, direction: "up" | "down") => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const next = structuredClone(prev);
+      const toIndex = direction === "up" ? releaseIndex - 1 : releaseIndex + 1;
+      if (toIndex < 0 || toIndex >= next.discography.releases.length) return prev;
+      const [item] = next.discography.releases.splice(releaseIndex, 1);
+      next.discography.releases.splice(toIndex, 0, item);
+      return next;
+    });
+    scrollReleaseIntoView(direction === "up" ? releaseIndex - 1 : releaseIndex + 1);
     setDirty();
   };
 
@@ -779,12 +881,34 @@ export function ContentEditorForm() {
         </div>
         <ul className="mt-3 space-y-3">
           {releases.map((release, index) => (
-            <li key={`${release.title}-${index}`} className="rounded-lg border border-[var(--color-line-muted)] px-3 py-3 text-sm">
+            <li
+              key={`${release.title}-${index}`}
+              ref={(node) => {
+                releaseItemRefs.current[index] = node;
+              }}
+              className="rounded-lg border border-[var(--color-line-muted)] px-3 py-3 text-sm"
+            >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-semibold text-[#f8f5f1]">
                   {index + 1}. {release.title || "Nieuwe release"}
                 </span>
                 <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => moveRelease(index, "up")}
+                    disabled={index === 0}
+                    className="rounded-full border border-[var(--color-line-muted)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Omhoog
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveRelease(index, "down")}
+                    disabled={index === releases.length - 1}
+                    className="rounded-full border border-[var(--color-line-muted)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Omlaag
+                  </button>
                   <button
                     type="button"
                     onClick={() => addReleaseLink(index)}
@@ -917,7 +1041,13 @@ export function ContentEditorForm() {
         </div>
         <ul className="mt-3 space-y-3">
           {shows.map((show, index) => (
-            <li key={`${show.date}-${show.venue}-${index}`} className="rounded-lg border border-[var(--color-line-muted)] px-3 py-3 text-sm">
+            <li
+              key={`${show.date}-${show.venue}-${index}`}
+              ref={(node) => {
+                showItemRefs.current[index] = node;
+              }}
+              className="rounded-lg border border-[var(--color-line-muted)] px-3 py-3 text-sm"
+            >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-semibold text-[#f8f5f1]">
                   {index + 1}. {show.venue || "Nieuwe show"}

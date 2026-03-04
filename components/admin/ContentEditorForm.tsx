@@ -9,6 +9,7 @@ type EditorManagedContent = Pick<
   SiteContent,
   "brand" | "navigation" | "hero" | "about" | "discography" | "musicExperience" | "kampvuur" | "bookings" | "contact" | "footer"
 >;
+type UpcomingShow = NonNullable<SiteContent["bookings"]["upcomingShows"]>[number];
 
 type ApiError = {
   error?: string;
@@ -284,7 +285,11 @@ export function ContentEditorForm() {
 
   const editableFields = useMemo(() => {
     if (!content) return [];
-    return flattenEditableFields(content).filter((field) => !field.path.startsWith("discography.releases."));
+    return flattenEditableFields(content).filter(
+      (field) =>
+        !field.path.startsWith("discography.releases.") &&
+        !field.path.startsWith("bookings.upcomingShows.")
+    );
   }, [content]);
 
   const groupedFields = useMemo(() => {
@@ -317,6 +322,7 @@ export function ContentEditorForm() {
   }, [content, initialContent]);
 
   const releases = content?.discography.releases ?? [];
+  const shows = content?.bookings.upcomingShows ?? [];
 
   const setDirty = () => {
     if (statusTone !== "error") {
@@ -506,6 +512,62 @@ export function ContentEditorForm() {
       });
       return next;
     });
+    setDirty();
+  };
+
+  const addShow = () => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const next = structuredClone(prev);
+      if (!next.bookings.upcomingShows) {
+        next.bookings.upcomingShows = [];
+      }
+      const firstCtaHref = next.bookings.upcomingShows[0]?.ctaHref || "#contact";
+      const firstCtaLabel = next.bookings.upcomingShows[0]?.ctaLabel || "Tickets";
+      const nextDate = new Date();
+      const month = nextDate.toLocaleDateString("nl-NL", { month: "short" }).replace(".", "");
+      next.bookings.upcomingShows.push({
+        date: `${String(nextDate.getDate()).padStart(2, "0")} ${month} ${nextDate.getFullYear()}`,
+        venue: "Nieuwe locatie",
+        city: "Plaats",
+        ctaLabel: firstCtaLabel,
+        ctaHref: firstCtaHref
+      });
+      return next;
+    });
+    setDirty();
+  };
+
+  const removeShow = (index: number) => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const next = structuredClone(prev);
+      if (!next.bookings.upcomingShows || next.bookings.upcomingShows.length === 0) return prev;
+      if (next.bookings.upcomingShows.length <= 1) return prev;
+      next.bookings.upcomingShows.splice(index, 1);
+      return next;
+    });
+    setDirty();
+  };
+
+  const updateShowField = (
+    showIndex: number,
+    key: keyof UpcomingShow,
+    value: string
+  ) => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const next = structuredClone(prev);
+      if (!next.bookings.upcomingShows) return prev;
+      const show = next.bookings.upcomingShows[showIndex];
+      if (!show) return prev;
+      show[key] = value;
+      return next;
+    });
+    setFieldErrors((prev) => ({
+      ...prev,
+      [`bookings.upcomingShows.${showIndex}.${key}`]: []
+    }));
     setDirty();
   };
 
@@ -836,6 +898,104 @@ export function ContentEditorForm() {
                   </div>
                 ))}
               </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="mb-6 rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.52)] p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-[#f8f5f1]">Volgende shows beheren</p>
+            <p className="text-xs text-[#d9c6ac]">Voeg shows toe, bewerk ze direct en bepaal per show de CTA.</p>
+          </div>
+          <button
+            type="button"
+            onClick={addShow}
+            className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2 text-sm font-semibold text-[var(--color-bg-deep)] hover:bg-[var(--color-accent-copper)]"
+          >
+            Show toevoegen
+          </button>
+        </div>
+        <ul className="mt-3 space-y-3">
+          {shows.map((show, index) => (
+            <li key={`${show.date}-${show.venue}-${index}`} className="rounded-lg border border-[var(--color-line-muted)] px-3 py-3 text-sm">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-semibold text-[#f8f5f1]">
+                  {index + 1}. {show.venue || "Nieuwe show"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeShow(index)}
+                  disabled={shows.length <= 1}
+                  className="rounded-full border border-[var(--color-line-muted)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Verwijderen
+                </button>
+              </div>
+
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                <label className="text-xs font-semibold text-[#d9c6ac]">
+                  Datum
+                  <input
+                    value={show.date}
+                    onChange={(event) => updateShowField(index, "date", event.target.value)}
+                    className={editorInputClass}
+                  />
+                  {fieldErrors[`bookings.upcomingShows.${index}.date`]?.[0] ? (
+                    <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`bookings.upcomingShows.${index}.date`]?.[0]}</span>
+                  ) : null}
+                </label>
+
+                <label className="text-xs font-semibold text-[#d9c6ac]">
+                  Locatie
+                  <input
+                    value={show.venue}
+                    onChange={(event) => updateShowField(index, "venue", event.target.value)}
+                    className={editorInputClass}
+                  />
+                  {fieldErrors[`bookings.upcomingShows.${index}.venue`]?.[0] ? (
+                    <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`bookings.upcomingShows.${index}.venue`]?.[0]}</span>
+                  ) : null}
+                </label>
+
+                <label className="text-xs font-semibold text-[#d9c6ac]">
+                  Plaats
+                  <input
+                    value={show.city}
+                    onChange={(event) => updateShowField(index, "city", event.target.value)}
+                    className={editorInputClass}
+                  />
+                  {fieldErrors[`bookings.upcomingShows.${index}.city`]?.[0] ? (
+                    <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`bookings.upcomingShows.${index}.city`]?.[0]}</span>
+                  ) : null}
+                </label>
+
+                <label className="text-xs font-semibold text-[#d9c6ac]">
+                  CTA tekst
+                  <input
+                    value={show.ctaLabel}
+                    onChange={(event) => updateShowField(index, "ctaLabel", event.target.value)}
+                    className={editorInputClass}
+                  />
+                  {fieldErrors[`bookings.upcomingShows.${index}.ctaLabel`]?.[0] ? (
+                    <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`bookings.upcomingShows.${index}.ctaLabel`]?.[0]}</span>
+                  ) : null}
+                </label>
+              </div>
+
+              <label className="mt-3 block text-xs font-semibold text-[#d9c6ac]">
+                CTA link
+                <input
+                  value={show.ctaHref}
+                  onChange={(event) => updateShowField(index, "ctaHref", event.target.value)}
+                  className={editorInputClass}
+                />
+                <p className="mt-1 text-xs text-[#d9c6ac]">Gebruik bijvoorbeeld `#contact` of een ticket URL.</p>
+                {fieldErrors[`bookings.upcomingShows.${index}.ctaHref`]?.[0] ? (
+                  <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`bookings.upcomingShows.${index}.ctaHref`]?.[0]}</span>
+                ) : null}
+              </label>
             </li>
           ))}
         </ul>

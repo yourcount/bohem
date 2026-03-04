@@ -12,6 +12,7 @@
     "db:seed:content": "node scripts/seed-content-db.mjs"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.6.1",
     "@vercel/blob": "^2.3.1",
     "better-sqlite3": "^12.6.2",
     "next": "^16.1.6",

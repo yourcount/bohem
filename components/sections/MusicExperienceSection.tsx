@@ -39,6 +39,8 @@ export function MusicExperienceSection({ musicExperience }: MusicExperienceSecti
               height={musicExperience.image.height}
               className="h-full w-full object-cover object-[center_30%] contrast-[1.12] saturate-[1.04] aspect-[4/5] md:aspect-[16/10]"
               loading="lazy"
+              quality={78}
+              sizes="(max-width: 767px) 92vw, (max-width: 1279px) 44vw, 460px"
             />
           </figure>
         </Reveal>

@@ -117,6 +117,8 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
             height={84}
             className="logo-intro h-10 w-auto sm:h-11"
             priority
+            sizes="(max-width: 640px) 160px, 220px"
+            quality={78}
           />
         </Link>
 

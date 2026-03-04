@@ -75,6 +75,8 @@ export function KampvuurSection({ kampvuur }: KampvuurSectionProps) {
                   height={kampvuur.image.height}
                   className="h-full w-full object-cover object-center contrast-[1.08] saturate-[1.14]"
                   loading="lazy"
+                  quality={78}
+                  sizes="(max-width: 767px) 92vw, (max-width: 1279px) 44vw, 460px"
                 />
               </figure>
             </Reveal>

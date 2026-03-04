@@ -34,6 +34,8 @@ export function AboutSection({ about }: AboutSectionProps) {
                     height={photo.height}
                     className="h-full w-full object-cover object-center"
                     loading="lazy"
+                    quality={78}
+                    sizes="(max-width: 767px) 92vw, (max-width: 1279px) 46vw, 520px"
                   />
                 </figure>
               </Reveal>

@@ -78,6 +78,8 @@ export function StickyListenBar({
               height={148}
               className="h-full w-full object-cover"
               loading="lazy"
+              sizes="148px"
+              quality={76}
             />
           </figure>
           <Link

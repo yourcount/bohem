@@ -85,7 +85,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
           fill
           className="hero-mobile-zoom object-cover object-top"
           priority
-          quality={92}
+          quality={84}
           sizes="(max-width: 767px) 100vw, 100vw"
         />
       </div>
@@ -97,6 +97,8 @@ export function HeroSection({ hero }: HeroSectionProps) {
         width={420}
         height={420}
         className="pointer-events-none absolute bottom-8 right-6 hidden h-auto w-[190px] opacity-[0.2] md:block lg:right-8 lg:w-[230px] xl:w-[275px] 2xl:right-10 2xl:w-[320px] 2xl:opacity-[0.22]"
+        quality={72}
+        sizes="(min-width: 1536px) 320px, (min-width: 1280px) 275px, (min-width: 1024px) 230px, 190px"
         style={{ transform: `translateY(${parallaxY * 0.08}px)` }}
         aria-hidden="true"
       />

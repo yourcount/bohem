@@ -5,9 +5,12 @@ import type { SiteContent } from "@/lib/types";
 
 type ShowsSectionProps = {
   shows: NonNullable<SiteContent["bookings"]["upcomingShows"]>;
+  eyebrow?: string;
+  title?: string;
+  badgeLabel?: string;
 };
 
-export function ShowsSection({ shows }: ShowsSectionProps) {
+export function ShowsSection({ shows, eyebrow, title, badgeLabel }: ShowsSectionProps) {
   if (!shows || shows.length === 0) return null;
 
   return (
@@ -25,13 +28,15 @@ export function ShowsSection({ shows }: ShowsSectionProps) {
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,rgba(242,139,14,0)_0%,rgba(242,139,14,0.72)_50%,rgba(242,139,14,0)_100%)]" />
             <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Live agenda</p>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">
+                  {eyebrow ?? "Live agenda"}
+                </p>
                 <h2 id="shows-title" className="font-display text-3xl text-[#f8f1e5] sm:text-4xl">
-                  Volgende shows
+                  {title ?? "Volgende shows"}
                 </h2>
               </div>
               <span className="rounded-full border border-[rgba(242,139,14,0.45)] bg-[rgba(242,139,14,0.14)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[#f3d7b0]">
-                Actueel
+                {badgeLabel ?? "Actueel"}
               </span>
             </div>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

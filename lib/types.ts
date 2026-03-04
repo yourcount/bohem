@@ -61,16 +61,20 @@ export type SiteContent = {
   discography: {
     title: string;
     intro: string;
+    featuredSingleEyebrow?: string;
     featuredSingle: {
       title: string;
       description: string;
       href: string;
       embedUrl: string;
+      ctaLabel?: string;
     };
+    artistEyebrow?: string;
     artist: {
       title: string;
       description: string;
       href: string;
+      ctaLabel?: string;
     };
     productionTitle?: string;
     productionItems?: string[];
@@ -133,6 +137,7 @@ export type SiteContent = {
       href: string;
     }>;
     coverKoffer?: {
+      eyebrow?: string;
       title: string;
       body: string;
       image?: {
@@ -142,6 +147,10 @@ export type SiteContent = {
         height: number;
       };
     };
+    quickFactsTitle?: string;
+    showsEyebrow?: string;
+    showsTitle?: string;
+    showsBadgeLabel?: string;
     socialProofTitle?: string;
     socialProof?: Array<{
       quote: string;

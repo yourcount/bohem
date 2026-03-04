@@ -69,7 +69,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
             </div>
             {bookings.bookabilityItems && bookings.bookabilityItems.length > 0 ? (
               <article className="mt-5 flex flex-col justify-center rounded-2xl border border-[rgba(242,139,14,0.42)] bg-[rgba(242,139,14,0.08)] p-5 md:flex-1">
-                <h3 className="mb-3 font-display text-2xl text-[var(--color-text-primary)]">In 20 sec geregeld</h3>
+                <h3 className="mb-3 font-display text-2xl text-[var(--color-text-primary)]">{bookings.quickFactsTitle ?? "In 20 sec geregeld"}</h3>
                 <ul className="space-y-2 text-sm text-[#f1deca]">
                   {bookings.bookabilityItems.slice(0, 4).map((item) => (
                     <li key={item}>• {item}</li>
@@ -135,13 +135,15 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
               aria-label="Coverkoffer"
               className="overflow-hidden rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(145deg,rgba(38,24,20,0.82)_0%,rgba(25,20,27,0.86)_100%)] shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
             >
-              <div className="grid gap-0 md:min-h-[360px] md:grid-cols-[1fr_1fr]">
-                <div className="flex items-center p-6 sm:p-8">
-                  <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.1em] text-[#f3d7b0]">Extra live-set</p>
-                    <h3 className="mb-4 font-display text-3xl text-[var(--color-text-primary)] sm:text-4xl">
-                      {bookings.coverKoffer.title}
-                    </h3>
+                <div className="grid gap-0 md:min-h-[360px] md:grid-cols-[1fr_1fr]">
+                  <div className="flex items-center p-6 sm:p-8">
+                    <div>
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.1em] text-[#f3d7b0]">
+                        {bookings.coverKoffer.eyebrow ?? "Extra live-set"}
+                      </p>
+                      <h3 className="mb-4 font-display text-3xl text-[var(--color-text-primary)] sm:text-4xl">
+                        {bookings.coverKoffer.title}
+                      </h3>
                     <p className="max-w-[62ch] text-[var(--color-text-primary)]">{bookings.coverKoffer.body}</p>
                   </div>
                 </div>

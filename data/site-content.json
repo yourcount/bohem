@@ -67,16 +67,20 @@
   "discography": {
     "title": "Discografie",
     "intro": "Van eerste songs tot nieuw repertoire: luister naar Bohèm op Spotify en ontdek de lijn van Vroeger naar Wolkentranen.",
+    "featuredSingleEyebrow": "Nieuw uitgelicht",
     "featuredSingle": {
       "title": "Nieuwe single: Vroeger",
       "description": "Vroeger zet direct de toon: samen zijn, maar elkaar niet meer kunnen bereiken als het stil wordt tussen twee mensen.",
       "href": "https://open.spotify.com/track/2TaHQl5PVOSHIs1xCjbD1W?si=117282ba1c4740b1",
-      "embedUrl": "https://open.spotify.com/embed/track/2TaHQl5PVOSHIs1xCjbD1W?utm_source=generator"
+      "embedUrl": "https://open.spotify.com/embed/track/2TaHQl5PVOSHIs1xCjbD1W?utm_source=generator",
+      "ctaLabel": "Luister op Spotify"
     },
+    "artistEyebrow": "Streaming",
     "artist": {
       "title": "Artiestprofiel",
       "description": "Volg Bohèm op Spotify voor nieuwe releases, updates en live materiaal.",
-      "href": "https://open.spotify.com/artist/7MZs9HjZfvICRqVXENFcoa?si=OykX8uRmQcawyF4woCaciQ"
+      "href": "https://open.spotify.com/artist/7MZs9HjZfvICRqVXENFcoa?si=OykX8uRmQcawyF4woCaciQ",
+      "ctaLabel": "Open Spotify-profiel"
     },
     "productionTitle": "Productie & Opname",
     "productionItems": [
@@ -171,6 +175,10 @@
   "bookings": {
     "title": "Live & Boekingen",
     "body": "Bohèm speelt als Reizigers in theaters, intieme concerten en bijzondere gelegenheden zoals culturele seizoensopeningen, community-events en huiskamerconcerten.",
+    "quickFactsTitle": "In 20 sec geregeld",
+    "showsEyebrow": "Live agenda",
+    "showsTitle": "Volgende shows",
+    "showsBadgeLabel": "Actueel",
     "fitTitle": "Past goed bij",
     "fitItems": [
       "Theateravonden en vlakkevloerprogramma's",
@@ -178,6 +186,7 @@
       "Intieme concerten en storytelling-sets"
     ],
     "coverKoffer": {
+      "eyebrow": "Extra live-set",
       "title": "Coverkoffer",
       "body": "Bohèm is ook te horen op live avonden en in muziekcafés. De coverkoffer staat garant voor verrassende en soms hilarische muziek, waarbij naast eigen werk ook interpretaties van iconische songs klinken.",
       "image": {
@@ -195,16 +204,16 @@
     "socialProofTitle": "Wat organisatoren zeggen",
     "socialProof": [
       {
-        "quote": "Intiem, stijlvol en muzikaal sterk. Het publiek bleef nog lang napraten.",
-        "source": "Programmeur, kleinschalig theater (Nijmegen, 2025)"
+        "quote": "Het optreden heeft me echt geraakt, vooral dat liedje over geboorte en kwetsbaarheid.",
+        "source": "Heemskerk"
       },
       {
-        "quote": "De combinatie van storytelling, humor en muzikaliteit werkte direct in de zaal.",
-        "source": "Organisator culturele avond (Utrecht, 2025)"
+        "quote": "Deze liedjes zitten heel goed in elkaar, zijn toegankelijk met een erg frisse presentatie... daar zijn er niet zoveel van.",
+        "source": "Beverwijk"
       },
       {
-        "quote": "Professioneel in voorbereiding en warm op het podium.",
-        "source": "Podiumcoördinator (Eindhoven, 2024)"
+        "quote": "Quote Frederique (aan te vullen).",
+        "source": "Frederique"
       }
     ],
     "miniCases": [

@@ -124,7 +124,14 @@ export default async function HomePage() {
             <SectionMotifDivider />
           </>
         ) : null}
-        {hasShows ? <ShowsSection shows={siteContent.bookings.upcomingShows ?? []} /> : null}
+        {hasShows ? (
+          <ShowsSection
+            shows={siteContent.bookings.upcomingShows ?? []}
+            eyebrow={siteContent.bookings.showsEyebrow}
+            title={siteContent.bookings.showsTitle}
+            badgeLabel={siteContent.bookings.showsBadgeLabel}
+          />
+        ) : null}
         {hasShows ? <SectionMotifDivider /> : null}
         {hasKampvuurSection ? <KampvuurSection kampvuur={siteContent.kampvuur} /> : null}
         {hasKampvuurSection ? <SectionMotifDivider /> : null}

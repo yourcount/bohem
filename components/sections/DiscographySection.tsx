@@ -43,7 +43,9 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
         <div className="mb-6 grid gap-6 md:grid-cols-[1.3fr_1fr] md:items-stretch">
           <Reveal className="h-full">
             <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(165deg,rgba(244,233,220,0.12)_0%,rgba(244,233,220,0.04)_100%)] p-6">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Nieuw uitgelicht</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">
+                {discography.featuredSingleEyebrow ?? "Nieuw uitgelicht"}
+              </p>
               <h3 className="mb-2 font-display text-2xl sm:text-3xl">{discography.featuredSingle.title}</h3>
               <p className="mb-4 text-[#e7d6c1]">{discography.featuredSingle.description}</p>
               <iframe
@@ -67,14 +69,16 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
                   <span />
                   <span />
                 </span>
-                Luister op Spotify
+                {discography.featuredSingle.ctaLabel ?? "Luister op Spotify"}
               </Link>
             </article>
           </Reveal>
 
           <Reveal delayMs={120} className="h-full">
             <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Streaming</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">
+                {discography.artistEyebrow ?? "Streaming"}
+              </p>
               <h3 className="mb-2 font-display text-2xl sm:text-3xl">{discography.artist.title}</h3>
               <p className="mb-4 text-[#e7d6c1]">{discography.artist.description}</p>
               <Link
@@ -84,7 +88,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
                 data-cta="discography_artist_profile"
                 className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-bold transition-colors hover:border-[#c8873e] hover:bg-[rgba(200,135,62,0.16)]"
               >
-                Open Spotify-profiel
+                {discography.artist.ctaLabel ?? "Open Spotify-profiel"}
               </Link>
 
               {discography.productionItems && discography.productionItems.length > 0 ? (

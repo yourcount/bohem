@@ -127,6 +127,22 @@ function ensureSeedRow(db: Database.Database) {
   });
 }
 
+function upsertDefaultRow(db: Database.Database, updatedBy: string) {
+  db.prepare(
+    `
+      INSERT INTO site_content_full_v1 (id, content_json, updated_by, updated_at)
+      VALUES (1, @content_json, @updated_by, CURRENT_TIMESTAMP)
+      ON CONFLICT(id) DO UPDATE SET
+        content_json = excluded.content_json,
+        updated_by = excluded.updated_by,
+        updated_at = CURRENT_TIMESTAMP
+    `
+  ).run({
+    content_json: JSON.stringify(siteContent),
+    updated_by: updatedBy
+  });
+}
+
 export async function readFullSiteContent(): Promise<FullSiteContentRecord | null> {
   if (isVercelRuntime()) {
     assertVercelBlobConfigured();
@@ -153,9 +169,23 @@ export async function readFullSiteContent(): Promise<FullSiteContentRecord | nul
       .prepare("SELECT content_json, updated_at, updated_by FROM site_content_full_v1 WHERE id = 1")
       .get() as { content_json: string; updated_at: string; updated_by: string } | undefined;
 
-    if (!row) return null;
+    if (!row) {
+      upsertDefaultRow(db, "system@local");
+      return {
+        content: structuredClone(siteContent),
+        updated_at: new Date().toISOString(),
+        updated_by: "system@local"
+      };
+    }
     const content = parseContent(row.content_json);
-    if (!content) return null;
+    if (!content) {
+      upsertDefaultRow(db, "system@local");
+      return {
+        content: structuredClone(siteContent),
+        updated_at: new Date().toISOString(),
+        updated_by: "system@local"
+      };
+    }
 
     return {
       content,

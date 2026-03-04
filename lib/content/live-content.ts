@@ -11,6 +11,10 @@ function cloneBaseContent(): SiteContent {
   return JSON.parse(JSON.stringify(siteContent)) as SiteContent;
 }
 
+function shouldUseRuntimeCache() {
+  return !process.env.VERCEL;
+}
+
 function applyCmsOverrides(base: SiteContent) {
   if (!contentDbExists()) return base;
 
@@ -53,9 +57,11 @@ function applyCmsOverrides(base: SiteContent) {
 }
 
 export async function getLiveSiteContent(): Promise<SiteContent> {
-  const cached = readRuntimeCache<SiteContent>("site_content");
-  if (cached) {
-    return cached;
+  if (shouldUseRuntimeCache()) {
+    const cached = readRuntimeCache<SiteContent>("site_content");
+    if (cached) {
+      return cached;
+    }
   }
 
   const policy = getCachePolicySafe();
@@ -64,7 +70,9 @@ export async function getLiveSiteContent(): Promise<SiteContent> {
     const fullRecord = await readFullSiteContent();
     if (fullRecord) {
       const sanitized = sanitizeSiteContent(fullRecord.content);
-      writeRuntimeCache("site_content", sanitized, policy.publicContentTtlSeconds);
+      if (shouldUseRuntimeCache()) {
+        writeRuntimeCache("site_content", sanitized, policy.publicContentTtlSeconds);
+      }
       return sanitized;
     }
   } catch {
@@ -74,10 +82,14 @@ export async function getLiveSiteContent(): Promise<SiteContent> {
   const base = cloneBaseContent();
   try {
     const resolved = sanitizeSiteContent(applyCmsOverrides(base));
-    writeRuntimeCache("site_content", resolved, policy.publicContentTtlSeconds);
+    if (shouldUseRuntimeCache()) {
+      writeRuntimeCache("site_content", resolved, policy.publicContentTtlSeconds);
+    }
     return resolved;
   } catch {
-    writeRuntimeCache("site_content", base, policy.publicContentTtlSeconds);
+    if (shouldUseRuntimeCache()) {
+      writeRuntimeCache("site_content", base, policy.publicContentTtlSeconds);
+    }
     return base;
   }
 }

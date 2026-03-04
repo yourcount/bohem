@@ -46,10 +46,28 @@ function assertVercelBlobConfigured() {
   );
 }
 
+function isAccessModeError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  const normalized = message.toLowerCase();
+  return normalized.includes("cannot use public access on a private store") || normalized.includes("cannot use private access on a public store");
+}
+
 async function readBlobPayload(): Promise<BlobPayload | null> {
-  const blob =
-    (await get(FULL_CONTENT_BLOB_PATH, { access: "public", useCache: false })) ??
-    (await get(FULL_CONTENT_BLOB_PATH, { access: "private", useCache: false }));
+  let blob: Awaited<ReturnType<typeof get>> | null = null;
+  try {
+    blob = await get(FULL_CONTENT_BLOB_PATH, { access: "private", useCache: false });
+  } catch (error) {
+    if (!isAccessModeError(error)) throw error;
+  }
+
+  if (!blob) {
+    try {
+      blob = await get(FULL_CONTENT_BLOB_PATH, { access: "public", useCache: false });
+    } catch (error) {
+      if (!isAccessModeError(error)) throw error;
+      blob = null;
+    }
+  }
   if (!blob || blob.statusCode !== 200 || !blob.stream) return null;
 
   let parsed: Partial<BlobPayload>;
@@ -77,12 +95,23 @@ async function writeBlobPayload(content: SiteContent, updatedBy: string): Promis
     updated_by: updatedBy
   };
 
-  await put(FULL_CONTENT_BLOB_PATH, JSON.stringify(payload), {
-    access: "public",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    contentType: "application/json; charset=utf-8"
-  });
+  const body = JSON.stringify(payload);
+  try {
+    await put(FULL_CONTENT_BLOB_PATH, body, {
+      access: "private",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      contentType: "application/json; charset=utf-8"
+    });
+  } catch (error) {
+    if (!isAccessModeError(error)) throw error;
+    await put(FULL_CONTENT_BLOB_PATH, body, {
+      access: "public",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      contentType: "application/json; charset=utf-8"
+    });
+  }
 
   return payload;
 }

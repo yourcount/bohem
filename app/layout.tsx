@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 
 import { CookieConsentProvider } from "@/components/cookies/CookieConsentProvider";
 import { getLiveSiteContent } from "@/lib/content/live-content";
@@ -74,11 +75,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const cookieStore = await cookies();
+  const consentCookie = cookieStore.get("bohem_cookie_consent_v1")?.value ?? null;
+
   return (
     <html lang="nl">
       <body>
-        <CookieConsentProvider>{children}</CookieConsentProvider>
+        <CookieConsentProvider initialCookieValue={consentCookie}>{children}</CookieConsentProvider>
       </body>
     </html>
   );

@@ -36,7 +36,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 
   try {
-    const ok = forceLogoutUserSessions(userId);
+    const ok = await forceLogoutUserSessions(userId);
     if (!ok) {
       return NextResponse.json({ error: "Gebruiker niet gevonden.", code: "USER_NOT_FOUND" }, { status: 404 });
     }

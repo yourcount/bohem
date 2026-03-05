@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useSyncExternalStore } from "react";
 
 type ConsentCategory = "necessary" | "preferences" | "statistics" | "marketing" | "externalMedia";
 
@@ -38,16 +38,29 @@ const DEFAULT_CONSENT: ConsentMap = {
 
 const CookieConsentContext = createContext<CookieConsentContextValue | null>(null);
 
-function getInitialConsentSnapshot() {
+function parseCookiePayload(raw: string | null | undefined): StoredConsent | null {
+  if (!raw) return null;
+  const direct = parseStoredConsent(raw);
+  if (direct) return direct;
+  try {
+    return parseStoredConsent(decodeURIComponent(raw));
+  } catch {
+    return null;
+  }
+}
+
+function getInitialConsentSnapshot(initialCookieValue?: string | null) {
+  const fromProvidedCookie = parseCookiePayload(initialCookieValue);
+
   if (typeof window === "undefined") {
     return {
-      hasDecision: false,
-      consent: DEFAULT_CONSENT
+      hasDecision: Boolean(fromProvidedCookie),
+      consent: fromProvidedCookie?.categories ?? DEFAULT_CONSENT
     };
   }
 
   const fromLocalStorage = parseStoredConsent(window.localStorage.getItem(LOCAL_STORAGE_KEY));
-  const fromCookie = readConsentFromCookie();
+  const fromCookie = readConsentFromCookie() ?? fromProvidedCookie;
   const restored = fromLocalStorage ?? fromCookie;
 
   if (restored) {
@@ -107,8 +120,19 @@ function persistConsent(next: StoredConsent) {
   document.cookie = `${COOKIE_KEY}=${encodeURIComponent(encoded)}; Max-Age=${COOKIE_MAX_AGE_SECONDS}; Path=/; SameSite=Lax`;
 }
 
-export function CookieConsentProvider({ children }: { children: React.ReactNode }) {
-  const [initialSnapshot] = useState(getInitialConsentSnapshot);
+export function CookieConsentProvider({
+  children,
+  initialCookieValue
+}: {
+  children: React.ReactNode;
+  initialCookieValue?: string | null;
+}) {
+  const isReady = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false
+  );
+  const [initialSnapshot] = useState(() => getInitialConsentSnapshot(initialCookieValue));
   const [hasDecision, setHasDecision] = useState(initialSnapshot.hasDecision);
   const [consent, setConsent] = useState<ConsentMap>(initialSnapshot.consent);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -152,7 +176,7 @@ export function CookieConsentProvider({ children }: { children: React.ReactNode 
   };
 
   const value: CookieConsentContextValue = {
-    isReady: true,
+    isReady,
     hasDecision,
     consent,
     hasConsentFor: (category) => Boolean(consent[category]),
@@ -191,7 +215,7 @@ export function CookieConsentProvider({ children }: { children: React.ReactNode 
     <CookieConsentContext.Provider value={value}>
       {children}
 
-      {!shouldShowBanner ? (
+      {isReady && !shouldShowBanner ? (
         <button
           type="button"
           onClick={() => value.openPreferences()}
@@ -203,7 +227,7 @@ export function CookieConsentProvider({ children }: { children: React.ReactNode 
         </button>
       ) : null}
 
-      {shouldShowBanner ? (
+      {isReady && shouldShowBanner ? (
         <aside className="cookie-banner" role="dialog" aria-modal="true" aria-label="Cookievoorkeuren">
           <div className="cookie-banner-inner">
             <h2 className="cookie-title">Cookies op deze website</h2>

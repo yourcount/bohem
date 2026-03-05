@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
+import { del, get, list, put } from "@vercel/blob";
 import Database from "better-sqlite3";
 
 import { ADMIN_DATA_PATH } from "@/lib/auth/constants";
@@ -16,6 +17,80 @@ type AdminSeed = {
   mfaEnabled?: boolean;
   mfaSecretEnc?: string;
 };
+
+type BlobAdminSessionRecord = {
+  session_id: string;
+  user_id: number;
+  email: string;
+  role: AdminRole;
+  mfa_verified: number;
+  issued_at: number;
+  expires_at: number;
+  revoked_at: string | null;
+  last_seen_at: string | null;
+  ip_address: string | null;
+  user_agent: string | null;
+};
+
+const ADMIN_SESSION_BLOB_PREFIX = "cms/admin-sessions";
+
+function shouldUseBlobSessionStore() {
+  return Boolean(process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN);
+}
+
+function adminSessionBlobPath(userId: number, sessionId: string) {
+  return `${ADMIN_SESSION_BLOB_PREFIX}/u-${userId}/s-${sessionId}.json`;
+}
+
+async function readBlobAdminSession(userId: number, sessionId: string): Promise<BlobAdminSessionRecord | null> {
+  const blob = await get(adminSessionBlobPath(userId, sessionId), { access: "private", useCache: false });
+  if (!blob || blob.statusCode !== 200 || !blob.stream) return null;
+
+  try {
+    const parsed = (await new Response(blob.stream).json()) as Partial<BlobAdminSessionRecord>;
+    if (!parsed || parsed.session_id !== sessionId || Number(parsed.user_id) !== userId) return null;
+    return {
+      session_id: String(parsed.session_id),
+      user_id: Number(parsed.user_id),
+      email: String(parsed.email ?? ""),
+      role: String(parsed.role ?? "EDITOR") as AdminRole,
+      mfa_verified: Number(parsed.mfa_verified ?? 0),
+      issued_at: Number(parsed.issued_at ?? 0),
+      expires_at: Number(parsed.expires_at ?? 0),
+      revoked_at: parsed.revoked_at ? String(parsed.revoked_at) : null,
+      last_seen_at: parsed.last_seen_at ? String(parsed.last_seen_at) : null,
+      ip_address: parsed.ip_address ? String(parsed.ip_address) : null,
+      user_agent: parsed.user_agent ? String(parsed.user_agent) : null
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function writeBlobAdminSession(record: BlobAdminSessionRecord) {
+  await put(adminSessionBlobPath(record.user_id, record.session_id), JSON.stringify(record), {
+    access: "private",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: "application/json; charset=utf-8"
+  });
+}
+
+async function listAllUserSessionBlobPaths(userId: number) {
+  const prefix = `${ADMIN_SESSION_BLOB_PREFIX}/u-${userId}/`;
+  const paths: string[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const page = await list({ prefix, limit: 1000, cursor });
+    for (const blob of page.blobs) {
+      paths.push(blob.pathname);
+    }
+    cursor = page.hasMore ? page.cursor : undefined;
+  } while (cursor);
+
+  return paths;
+}
 
 export type AdminUserRecord = {
   id: number;
@@ -249,7 +324,7 @@ export function markUserLoginSuccess(userId: number) {
   }
 }
 
-export function createAdminSessionRecord(input: {
+export async function createAdminSessionRecord(input: {
   sessionId: string;
   userId: number;
   email: string;
@@ -260,6 +335,23 @@ export function createAdminSessionRecord(input: {
   ipAddress?: string;
   userAgent?: string;
 }) {
+  if (shouldUseBlobSessionStore()) {
+    await writeBlobAdminSession({
+      session_id: input.sessionId,
+      user_id: input.userId,
+      email: input.email,
+      role: input.role,
+      mfa_verified: input.mfaVerified ? 1 : 0,
+      issued_at: input.issuedAt,
+      expires_at: input.expiresAt,
+      revoked_at: null,
+      last_seen_at: null,
+      ip_address: input.ipAddress ?? null,
+      user_agent: input.userAgent ?? null
+    });
+    return;
+  }
+
   ensureAdminAuthSchema();
   const db = openDb();
   try {
@@ -285,7 +377,20 @@ export function createAdminSessionRecord(input: {
   }
 }
 
-export function isSessionActive(sessionId: string): boolean {
+export async function isSessionActive(sessionId: string, userId?: number): Promise<boolean> {
+  if (shouldUseBlobSessionStore() && userId) {
+    const record = await readBlobAdminSession(userId, sessionId);
+    if (!record) return false;
+    if (record.revoked_at) return false;
+    if (record.expires_at < Math.floor(Date.now() / 1000)) return false;
+
+    await writeBlobAdminSession({
+      ...record,
+      last_seen_at: new Date().toISOString()
+    });
+    return true;
+  }
+
   ensureAdminAuthSchema();
   const db = openDb();
   try {
@@ -304,7 +409,17 @@ export function isSessionActive(sessionId: string): boolean {
   }
 }
 
-export function revokeSessionById(sessionId: string) {
+export async function revokeSessionById(sessionId: string, userId?: number) {
+  if (shouldUseBlobSessionStore() && userId) {
+    const record = await readBlobAdminSession(userId, sessionId);
+    if (!record) return;
+    await writeBlobAdminSession({
+      ...record,
+      revoked_at: new Date().toISOString()
+    });
+    return;
+  }
+
   ensureAdminAuthSchema();
   const db = openDb();
   try {
@@ -526,7 +641,16 @@ export function softDeleteAdminUser(userId: number) {
   }
 }
 
-export function forceLogoutUserSessions(userId: number) {
+export async function forceLogoutUserSessions(userId: number) {
+  if (shouldUseBlobSessionStore()) {
+    try {
+      const paths = await listAllUserSessionBlobPaths(userId);
+      await Promise.all(paths.map((pathname) => del(pathname)));
+    } catch {
+      // continue and still force logout by timestamp below
+    }
+  }
+
   ensureAdminAuthSchema();
   const db = openDb();
   try {

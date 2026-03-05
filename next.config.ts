@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
     qualities: [75, 92]
   },
   async headers() {
+    const isDev = process.env.NODE_ENV !== "production";
+    const scriptSrc = isDev ? "'self' 'unsafe-inline' 'unsafe-eval'" : "'self' 'unsafe-inline'";
+    const connectSrc = isDev ? "'self' https: ws: wss:" : "'self' https:";
     const csp = [
       "default-src 'self'",
       "base-uri 'self'",
@@ -15,9 +18,11 @@ const nextConfig: NextConfig = {
       "img-src 'self' data: blob: https:",
       "media-src 'self' https:",
       "font-src 'self' data: https:",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
-      "style-src 'self' 'unsafe-inline' https:",
-      "connect-src 'self' https:",
+      `script-src ${scriptSrc}`,
+      "style-src 'self' 'unsafe-inline'",
+      `connect-src ${connectSrc}`,
+      "worker-src 'self' blob:",
+      "manifest-src 'self'",
       "frame-src https://open.spotify.com https://*.spotify.com",
       "upgrade-insecure-requests"
     ].join("; ");

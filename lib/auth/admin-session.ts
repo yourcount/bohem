@@ -10,20 +10,20 @@ export async function getAdminSession() {
   const parsed = verifySessionToken(token);
   if (!parsed) return null;
 
-  // Vercel serverless uses ephemeral /tmp storage. The session table is not durable
-  // across invocations, so rely on signed token validation for auth continuity.
-  if (process.env.VERCEL) {
-    return parsed;
-  }
-
   try {
-    if (!isSessionActive(parsed.sid)) return null;
+    if (!(await isSessionActive(parsed.sid, parsed.uid))) return null;
     const user = findAdminUserById(parsed.uid);
-    if (!user || user.status !== "active") return null;
+    if (!user) {
+      if (process.env.VERCEL) {
+        return parsed;
+      }
+      return null;
+    }
+    if (user.status !== "active") return null;
     if (user.force_logout_after) {
       const forcedAfterEpoch = Math.floor(new Date(user.force_logout_after).getTime() / 1000);
       if (Number.isFinite(forcedAfterEpoch) && parsed.iat <= forcedAfterEpoch) {
-        revokeSessionById(parsed.sid);
+        await revokeSessionById(parsed.sid, parsed.uid);
         return null;
       }
     }
@@ -31,7 +31,7 @@ export async function getAdminSession() {
     return parsed;
   } catch {
     try {
-      revokeSessionById(parsed.sid);
+      await revokeSessionById(parsed.sid, parsed.uid);
     } catch {
       // ignore cleanup failures
     }

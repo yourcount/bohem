@@ -14,6 +14,7 @@ import { assertSameOrigin, getRequestMeta } from "@/lib/security/request";
 const ALLOWED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const MAX_INPUT_PIXELS = 40_000_000;
 const MANAGED_UPLOAD_PREFIX = "/uploads/library/";
 
 type ListedMediaFile = {
@@ -131,13 +132,25 @@ function listMediaFiles(filter: { query?: string; tag?: string; kind?: "all" | "
 
 async function convertToOptimizedWebp(file: File) {
   const input = Buffer.from(await file.arrayBuffer());
-  const output = await sharp(input)
+  const instance = sharp(input, { failOn: "error", limitInputPixels: MAX_INPUT_PIXELS });
+  const metadata = await instance.metadata();
+  const format = metadata.format?.toLowerCase() ?? "";
+
+  if (!["jpeg", "jpg", "png", "webp", "avif"].includes(format)) {
+    throw new Error("UNSUPPORTED_IMAGE_FORMAT");
+  }
+
+  if (!metadata.width || !metadata.height || metadata.width < 120 || metadata.height < 120) {
+    throw new Error("IMAGE_DIMENSIONS_INVALID");
+  }
+
+  const output = await instance
     .rotate()
-    .resize({ width: 2200, withoutEnlargement: true })
+    .resize({ width: 2200, withoutEnlargement: true, fit: "inside" })
     .webp({ quality: 82, effort: 5 })
     .toBuffer();
 
-  return output;
+  return { buffer: output, metadata };
 }
 
 export async function GET(request: Request) {
@@ -207,31 +220,53 @@ export async function POST(request: Request) {
   const absolutePath = join(uploadDir, filename);
   const publicUrl = `/uploads/library/${filename}`;
   const requestedTags = parseTagInput(formData.get("tags"));
-
-  try {
-    const buffer = await convertToOptimizedWebp(file);
-    writeFileSync(absolutePath, buffer, { flag: "wx" });
-  } catch {
-    return NextResponse.json({ error: "Afbeelding opslaan mislukt.", code: "FILE_SAVE_FAILED" }, { status: 500 });
+  const ext = extname(file.name).toLowerCase();
+  if (ext && !ALLOWED_EXTENSIONS.has(ext)) {
+    return NextResponse.json({ error: "Bestandsextensie niet toegestaan.", code: "UNSUPPORTED_EXTENSION" }, { status: 415 });
   }
 
-  const indexEntry = upsertMediaIndexEntry(publicUrl, {
-    tags: requestedTags,
-    originalName: file.name
-  });
+  try {
+    const { buffer, metadata } = await convertToOptimizedWebp(file);
+    writeFileSync(absolutePath, buffer, { flag: "wx" });
 
-  logAuditEvent({
-    actorUserId: session.uid,
-    actorEmail: session.email,
-    action: "CONTENT_MEDIA_UPLOADED",
-    targetType: "media",
-    targetId: publicUrl,
-    metadata: { mime: file.type, size: file.size, tags: indexEntry.tags, optimizedTo: "webp" },
-    ipAddress: ip,
-    userAgent
-  });
+    const indexEntry = upsertMediaIndexEntry(publicUrl, {
+      tags: requestedTags,
+      originalName: file.name
+    });
 
-  return NextResponse.json({ ok: true, file: { src: publicUrl, name: filename, tags: indexEntry.tags } }, { status: 201 });
+    logAuditEvent({
+      actorUserId: session.uid,
+      actorEmail: session.email,
+      action: "CONTENT_MEDIA_UPLOADED",
+      targetType: "media",
+      targetId: publicUrl,
+      metadata: {
+        mime: file.type,
+        size: file.size,
+        tags: indexEntry.tags,
+        optimizedTo: "webp",
+        sourceFormat: metadata.format ?? "unknown",
+        sourceWidth: metadata.width ?? null,
+        sourceHeight: metadata.height ?? null
+      },
+      ipAddress: ip,
+      userAgent
+    });
+
+    return NextResponse.json({ ok: true, file: { src: publicUrl, name: filename, tags: indexEntry.tags } }, { status: 201 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "FILE_SAVE_FAILED";
+    if (message === "UNSUPPORTED_IMAGE_FORMAT") {
+      return NextResponse.json({ error: "Afbeeldingsformaat niet toegestaan.", code: "UNSUPPORTED_FILE_TYPE" }, { status: 415 });
+    }
+    if (message === "IMAGE_DIMENSIONS_INVALID") {
+      return NextResponse.json(
+        { error: "Afbeelding is te klein of beschadigd. Minimaal 120x120 pixels.", code: "INVALID_IMAGE_DIMENSIONS" },
+        { status: 422 }
+      );
+    }
+    return NextResponse.json({ error: "Afbeelding opslaan mislukt.", code: "FILE_SAVE_FAILED" }, { status: 500 });
+  }
 }
 
 export async function DELETE(request: Request) {

@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
   const session = verifySessionToken(token);
   if (session) {
-    revokeSessionById(session.sid);
+    await revokeSessionById(session.sid, session.uid);
     logAuditEvent({
       actorUserId: session.uid,
       actorEmail: session.email,

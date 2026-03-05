@@ -83,7 +83,7 @@ export async function POST(request: Request) {
   }
 
   const session = createSessionToken({ userId: user.id, email: user.email, role: user.role });
-  createAdminSessionRecord({
+  await createAdminSessionRecord({
     sessionId: session.payload.sid,
     userId: user.id,
     email: user.email,

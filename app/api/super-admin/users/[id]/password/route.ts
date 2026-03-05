@@ -57,7 +57,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Gebruiker niet gevonden.", code: "USER_NOT_FOUND" }, { status: 404 });
     }
 
-    forceLogoutUserSessions(userId);
+    await forceLogoutUserSessions(userId);
 
     logAuditEvent({
       actorUserId: auth.session.uid,

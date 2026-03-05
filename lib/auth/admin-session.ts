@@ -10,6 +10,12 @@ export async function getAdminSession() {
   const parsed = verifySessionToken(token);
   if (!parsed) return null;
 
+  // Vercel serverless uses ephemeral /tmp storage. The session table is not durable
+  // across invocations, so rely on signed token validation for auth continuity.
+  if (process.env.VERCEL) {
+    return parsed;
+  }
+
   try {
     if (!isSessionActive(parsed.sid)) return null;
     const user = findAdminUserById(parsed.uid);

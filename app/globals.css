@@ -372,15 +372,38 @@ body {
   }
 
   .cookie-banner {
-    padding: 10px;
+    padding: 8px;
   }
 
   .cookie-banner-inner {
-    padding: 12px;
+    padding: 10px;
   }
 
   .cookie-title {
-    font-size: 1.4rem;
+    font-size: 1.22rem;
+    line-height: 1.1;
+  }
+
+  .cookie-copy {
+    margin-top: 0.3rem;
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  .cookie-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 8px;
+    align-items: stretch;
+  }
+
+  .cookie-btn {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 10px;
+    font-size: 0.8rem;
+    line-height: 1.2;
   }
 
   .cookie-manage-btn {

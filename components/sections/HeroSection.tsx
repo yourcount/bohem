@@ -87,7 +87,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
           className="hero-mobile-zoom object-cover object-top"
           style={{ objectPosition: getImageObjectPosition(hero.image, 50, 12) }}
           priority
-          quality={75}
+          quality={68}
           sizes="(max-width: 767px) 100vw, 100vw"
         />
       </div>

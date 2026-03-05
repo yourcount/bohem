@@ -42,7 +42,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     );
   }
 
-  const target = findAdminUserById(userId);
+  const target = await findAdminUserById(userId);
   if (!target) {
     return NextResponse.json({ error: "Gebruiker niet gevonden.", code: "USER_NOT_FOUND" }, { status: 404 });
   }
@@ -52,14 +52,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 
   try {
-    const updated = updateAdminUserPassword(userId, hashPassword(validated.value.newPassword));
+    const updated = await updateAdminUserPassword(userId, hashPassword(validated.value.newPassword));
     if (!updated) {
       return NextResponse.json({ error: "Gebruiker niet gevonden.", code: "USER_NOT_FOUND" }, { status: 404 });
     }
 
     await forceLogoutUserSessions(userId);
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: auth.session.uid,
       actorEmail: auth.session.email,
       action: "ADMIN_USER_PASSWORD_RESET",

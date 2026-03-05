@@ -3,7 +3,13 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
-    qualities: [75, 92]
+    qualities: [72, 75, 76, 78, 80, 85, 92],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com"
+      }
+    ]
   },
   async headers() {
     const isDev = process.env.NODE_ENV !== "production";
@@ -27,17 +33,21 @@ const nextConfig: NextConfig = {
       "upgrade-insecure-requests"
     ].join("; ");
 
+    const baseHeaders = [
+      { key: "Content-Security-Policy", value: csp },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "X-Frame-Options", value: "DENY" },
+      { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" }
+    ];
+    if (!isDev) {
+      baseHeaders.push({ key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains; preload" });
+    }
+
     return [
       {
         source: "/:path*",
-        headers: [
-          { key: "Content-Security-Policy", value: csp },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "X-Frame-Options", value: "DENY" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-          { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains; preload" }
-        ]
+        headers: baseHeaders
       }
     ];
   }

@@ -108,7 +108,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "SEO instellingen opslaan mislukt.", code: "SEO_SETTINGS_WRITE_FAILED" }, { status: 500 });
     }
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: auth.session.uid,
       actorEmail: auth.session.email,
       action: "SEO_SETTINGS_UPDATED",

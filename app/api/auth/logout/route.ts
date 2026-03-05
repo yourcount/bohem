@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   const session = verifySessionToken(token);
   if (session) {
     await revokeSessionById(session.sid, session.uid);
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: session.uid,
       actorEmail: session.email,
       action: "AUTH_LOGOUT",

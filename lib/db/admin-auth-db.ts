@@ -33,9 +33,39 @@ type BlobAdminSessionRecord = {
 };
 
 const ADMIN_SESSION_BLOB_PREFIX = "cms/admin-sessions";
+const ADMIN_USERS_BLOB_PATH = "cms/admin-users-v1.json";
+const ADMIN_AUDIT_BLOB_PATH = "cms/admin-audit-v1.json";
+const ADMIN_AUDIT_MAX_ENTRIES = 2000;
+
+type BlobAdminUsersStore = {
+  next_id: number;
+  users: AdminUserRecord[];
+};
+
+type BlobAuditEntry = {
+  id: number;
+  actor_user_id: number | null;
+  actor_email: string;
+  action: string;
+  target_type: string;
+  target_id: string;
+  metadata_json: string | null;
+  ip_address: string | null;
+  user_agent: string | null;
+  created_at: string;
+};
+
+type BlobAdminAuditStore = {
+  next_id: number;
+  logs: BlobAuditEntry[];
+};
 
 function shouldUseBlobSessionStore() {
   return Boolean(process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN);
+}
+
+function nowIso() {
+  return new Date().toISOString();
 }
 
 function adminSessionBlobPath(userId: number, sessionId: string) {
@@ -92,6 +122,25 @@ async function listAllUserSessionBlobPaths(userId: number) {
   return paths;
 }
 
+async function readBlobJson<T>(pathname: string): Promise<T | null> {
+  const blob = await get(pathname, { access: "private", useCache: false });
+  if (!blob || blob.statusCode !== 200 || !blob.stream) return null;
+  try {
+    return (await new Response(blob.stream).json()) as T;
+  } catch {
+    return null;
+  }
+}
+
+async function writeBlobJson(pathname: string, payload: unknown) {
+  await put(pathname, JSON.stringify(payload), {
+    access: "private",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: "application/json; charset=utf-8"
+  });
+}
+
 export type AdminUserRecord = {
   id: number;
   email: string;
@@ -130,6 +179,149 @@ export type AuditEventInput = {
   userAgent?: string;
 };
 
+async function readBlobUsersStore(): Promise<BlobAdminUsersStore> {
+  const parsed = await readBlobJson<Partial<BlobAdminUsersStore>>(ADMIN_USERS_BLOB_PATH);
+  if (!parsed || !Array.isArray(parsed.users)) {
+    return { next_id: 1, users: [] };
+  }
+
+  const users = parsed.users
+    .filter((user): user is AdminUserRecord => Boolean(user && typeof user.email === "string"))
+    .map((user) => ({
+      ...user,
+      id: Number(user.id),
+      email: String(user.email).toLowerCase(),
+      role: user.role,
+      status: user.status,
+      mfa_enabled: Number(user.mfa_enabled ?? 0),
+      mfa_secret_enc: user.mfa_secret_enc ?? null,
+      force_logout_after: user.force_logout_after ?? null,
+      deleted_at: user.deleted_at ?? null,
+      created_at: user.created_at ?? nowIso(),
+      updated_at: user.updated_at ?? nowIso(),
+      last_login_at: user.last_login_at ?? null
+    }));
+
+  const nextId = Number(parsed.next_id);
+  return {
+    next_id: Number.isFinite(nextId) && nextId > 0 ? nextId : users.reduce((max, user) => Math.max(max, user.id), 0) + 1,
+    users
+  };
+}
+
+async function writeBlobUsersStore(store: BlobAdminUsersStore) {
+  await writeBlobJson(ADMIN_USERS_BLOB_PATH, store);
+}
+
+async function ensureBlobUsersSeed() {
+  const seed = loadLegacySeed();
+  const store = await readBlobUsersStore();
+  const now = nowIso();
+
+  if (!seed.email || !seed.passwordHash) {
+    if (store.users.length === 0) {
+      await writeBlobUsersStore(store);
+    }
+    return;
+  }
+
+  const existing = store.users.find((user) => user.email === seed.email?.toLowerCase() && !user.deleted_at);
+  const role: AdminRole = seed.role ?? "SUPER_ADMIN";
+  const status: AccountStatus = seed.status ?? "active";
+  const shouldEnableMfa = seed.mfaEnabled ?? role === "SUPER_ADMIN";
+  const envSecret = process.env.SUPER_ADMIN_MFA_SECRET?.trim();
+  const finalSecret = envSecret || (process.env.NODE_ENV === "production" ? "" : getDefaultDevMfaSecret());
+  const mfaSecretEnc = seed.mfaSecretEnc ?? (shouldEnableMfa && finalSecret ? encryptMfaSecret(finalSecret) : null);
+
+  if (!existing) {
+    store.users.push({
+      id: store.next_id++,
+      email: seed.email.toLowerCase(),
+      password_hash: seed.passwordHash,
+      role,
+      status,
+      mfa_enabled: shouldEnableMfa ? 1 : 0,
+      mfa_secret_enc: mfaSecretEnc,
+      force_logout_after: null,
+      deleted_at: null,
+      created_at: now,
+      updated_at: now,
+      last_login_at: null
+    });
+    await writeBlobUsersStore(store);
+    return;
+  }
+
+  const changed =
+    existing.role !== role ||
+    existing.status !== status ||
+    existing.password_hash !== seed.passwordHash ||
+    existing.mfa_enabled !== (shouldEnableMfa ? 1 : 0) ||
+    (!existing.mfa_secret_enc && mfaSecretEnc);
+
+  if (changed) {
+    existing.role = role;
+    existing.status = status;
+    existing.password_hash = seed.passwordHash;
+    existing.mfa_enabled = shouldEnableMfa ? 1 : 0;
+    existing.mfa_secret_enc = existing.mfa_secret_enc ?? mfaSecretEnc;
+    existing.updated_at = now;
+    await writeBlobUsersStore(store);
+  }
+}
+
+async function readBlobAuditStore(): Promise<BlobAdminAuditStore> {
+  const parsed = await readBlobJson<Partial<BlobAdminAuditStore>>(ADMIN_AUDIT_BLOB_PATH);
+  if (!parsed || !Array.isArray(parsed.logs)) {
+    return { next_id: 1, logs: [] };
+  }
+  const logs = parsed.logs
+    .filter((entry): entry is BlobAuditEntry => Boolean(entry && typeof entry.action === "string"))
+    .map((entry) => ({
+      ...entry,
+      id: Number(entry.id),
+      actor_user_id: entry.actor_user_id ?? null,
+      actor_email: String(entry.actor_email ?? ""),
+      action: String(entry.action ?? ""),
+      target_type: String(entry.target_type ?? ""),
+      target_id: String(entry.target_id ?? ""),
+      metadata_json: entry.metadata_json ?? null,
+      ip_address: entry.ip_address ?? null,
+      user_agent: entry.user_agent ?? null,
+      created_at: entry.created_at ?? nowIso()
+    }));
+  const nextId = Number(parsed.next_id);
+  return {
+    next_id: Number.isFinite(nextId) && nextId > 0 ? nextId : logs.reduce((max, row) => Math.max(max, row.id), 0) + 1,
+    logs
+  };
+}
+
+async function writeBlobAuditStore(store: BlobAdminAuditStore) {
+  await writeBlobJson(ADMIN_AUDIT_BLOB_PATH, store);
+}
+
+async function countActiveBlobSessionsForUser(userId: number) {
+  const prefix = `${ADMIN_SESSION_BLOB_PREFIX}/u-${userId}/`;
+  const nowEpoch = Math.floor(Date.now() / 1000);
+  let cursor: string | undefined;
+  let total = 0;
+
+  do {
+    const page = await list({ prefix, limit: 500, cursor });
+    for (const item of page.blobs) {
+      const parsed = await readBlobJson<BlobAdminSessionRecord>(item.pathname);
+      if (!parsed) continue;
+      if (parsed.revoked_at) continue;
+      if (parsed.expires_at < nowEpoch) continue;
+      total += 1;
+    }
+    cursor = page.hasMore ? page.cursor : undefined;
+  } while (cursor);
+
+  return total;
+}
+
 function openDb() {
   const dbPath = getDbPath();
   mkdirSync(dirname(dbPath), { recursive: true });
@@ -163,7 +355,12 @@ function loadLegacySeed(): AdminSeed {
   }
 }
 
-export function ensureAdminAuthSchema() {
+export async function ensureAdminAuthSchema() {
+  if (shouldUseBlobSessionStore()) {
+    await ensureBlobUsersSeed();
+    return;
+  }
+
   const db = openDb();
 
   try {
@@ -283,8 +480,15 @@ export function ensureAdminAuthSchema() {
   }
 }
 
-export function findAdminUserByEmail(email: string): AdminUserRecord | null {
-  ensureAdminAuthSchema();
+export async function findAdminUserByEmail(email: string): Promise<AdminUserRecord | null> {
+  if (shouldUseBlobSessionStore()) {
+    await ensureAdminAuthSchema();
+    const store = await readBlobUsersStore();
+    const normalizedEmail = email.toLowerCase();
+    return store.users.find((user) => user.email === normalizedEmail && !user.deleted_at) ?? null;
+  }
+
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     const row = db
@@ -296,8 +500,14 @@ export function findAdminUserByEmail(email: string): AdminUserRecord | null {
   }
 }
 
-export function findAdminUserById(userId: number): AdminUserRecord | null {
-  ensureAdminAuthSchema();
+export async function findAdminUserById(userId: number): Promise<AdminUserRecord | null> {
+  if (shouldUseBlobSessionStore()) {
+    await ensureAdminAuthSchema();
+    const store = await readBlobUsersStore();
+    return store.users.find((user) => user.id === userId && !user.deleted_at) ?? null;
+  }
+
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     const row = db
@@ -314,8 +524,19 @@ export function getUserMfaSecret(user: AdminUserRecord): string | null {
   return decryptMfaSecret(user.mfa_secret_enc);
 }
 
-export function markUserLoginSuccess(userId: number) {
-  ensureAdminAuthSchema();
+export async function markUserLoginSuccess(userId: number) {
+  if (shouldUseBlobSessionStore()) {
+    await ensureAdminAuthSchema();
+    const store = await readBlobUsersStore();
+    const user = store.users.find((entry) => entry.id === userId && !entry.deleted_at);
+    if (!user) return;
+    user.last_login_at = nowIso();
+    user.updated_at = nowIso();
+    await writeBlobUsersStore(store);
+    return;
+  }
+
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     db.prepare("UPDATE admin_users SET last_login_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(userId);
@@ -352,7 +573,7 @@ export async function createAdminSessionRecord(input: {
     return;
   }
 
-  ensureAdminAuthSchema();
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     db.prepare(
@@ -391,7 +612,7 @@ export async function isSessionActive(sessionId: string, userId?: number): Promi
     return true;
   }
 
-  ensureAdminAuthSchema();
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     const row = db
@@ -420,7 +641,7 @@ export async function revokeSessionById(sessionId: string, userId?: number) {
     return;
   }
 
-  ensureAdminAuthSchema();
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     db.prepare("UPDATE admin_sessions SET revoked_at = CURRENT_TIMESTAMP WHERE session_id = ?").run(sessionId);
@@ -429,8 +650,31 @@ export async function revokeSessionById(sessionId: string, userId?: number) {
   }
 }
 
-export function logAuditEvent(event: AuditEventInput) {
-  ensureAdminAuthSchema();
+export async function logAuditEvent(event: AuditEventInput) {
+  if (shouldUseBlobSessionStore()) {
+    await ensureAdminAuthSchema();
+    const store = await readBlobAuditStore();
+    const row: BlobAuditEntry = {
+      id: store.next_id++,
+      actor_user_id: event.actorUserId ?? null,
+      actor_email: event.actorEmail,
+      action: event.action,
+      target_type: event.targetType,
+      target_id: event.targetId,
+      metadata_json: event.metadata ? JSON.stringify(event.metadata) : null,
+      ip_address: event.ipAddress ?? null,
+      user_agent: event.userAgent ?? null,
+      created_at: nowIso()
+    };
+    store.logs.push(row);
+    if (store.logs.length > ADMIN_AUDIT_MAX_ENTRIES) {
+      store.logs = store.logs.slice(-ADMIN_AUDIT_MAX_ENTRIES);
+    }
+    await writeBlobAuditStore(store);
+    return;
+  }
+
+  await ensureAdminAuthSchema();
   const db = openDb();
 
   try {
@@ -455,8 +699,16 @@ export function logAuditEvent(event: AuditEventInput) {
   }
 }
 
-export function readRecentAuditEvents(limit = 30) {
-  ensureAdminAuthSchema();
+export async function readRecentAuditEvents(limit = 30) {
+  if (shouldUseBlobSessionStore()) {
+    await ensureAdminAuthSchema();
+    const store = await readBlobAuditStore();
+    return [...store.logs]
+      .sort((a, b) => (a.created_at > b.created_at ? -1 : 1))
+      .slice(0, Math.max(1, limit));
+  }
+
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     return db
@@ -483,8 +735,33 @@ export function readRecentAuditEvents(limit = 30) {
   }
 }
 
-export function listAdminUsers() {
-  ensureAdminAuthSchema();
+export async function listAdminUsers() {
+  if (shouldUseBlobSessionStore()) {
+    await ensureAdminAuthSchema();
+    const store = await readBlobUsersStore();
+    const activeUsers = store.users.filter((user) => !user.deleted_at);
+    const withSessions = await Promise.all(
+      activeUsers.map(async (user) => ({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+        force_logout_after: user.force_logout_after,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+        last_login_at: user.last_login_at,
+        active_sessions: await countActiveBlobSessionsForUser(user.id)
+      }))
+    );
+    return withSessions.sort((a, b) => {
+      const rank = (role: AdminRole) => (role === "SUPER_ADMIN" ? 0 : role === "ADMIN" ? 1 : 2);
+      const roleDiff = rank(a.role) - rank(b.role);
+      if (roleDiff !== 0) return roleDiff;
+      return a.email.localeCompare(b.email);
+    }) as AdminUserListItem[];
+  }
+
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     const nowEpoch = Math.floor(Date.now() / 1000);
@@ -516,13 +793,41 @@ export function listAdminUsers() {
   }
 }
 
-export function createAdminUser(input: {
+export async function createAdminUser(input: {
   email: string;
   passwordHash: string;
   role: AdminRole;
   status: AccountStatus;
 }) {
-  ensureAdminAuthSchema();
+  if (shouldUseBlobSessionStore()) {
+    await ensureAdminAuthSchema();
+    const store = await readBlobUsersStore();
+    const normalizedEmail = input.email.toLowerCase();
+    if (store.users.some((user) => user.email === normalizedEmail && !user.deleted_at)) {
+      throw new Error("USER_ALREADY_EXISTS");
+    }
+
+    const now = nowIso();
+    const id = store.next_id++;
+    store.users.push({
+      id,
+      email: normalizedEmail,
+      password_hash: input.passwordHash,
+      role: input.role,
+      status: input.status,
+      mfa_enabled: 0,
+      mfa_secret_enc: null,
+      force_logout_after: null,
+      deleted_at: null,
+      created_at: now,
+      updated_at: now,
+      last_login_at: null
+    });
+    await writeBlobUsersStore(store);
+    return id;
+  }
+
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     const result = db
@@ -546,12 +851,24 @@ export function createAdminUser(input: {
   }
 }
 
-export function updateAdminUser(input: {
+export async function updateAdminUser(input: {
   userId: number;
   role?: AdminRole;
   status?: AccountStatus;
 }) {
-  ensureAdminAuthSchema();
+  if (shouldUseBlobSessionStore()) {
+    await ensureAdminAuthSchema();
+    const store = await readBlobUsersStore();
+    const user = store.users.find((entry) => entry.id === input.userId && !entry.deleted_at);
+    if (!user) return null;
+    if (input.role) user.role = input.role;
+    if (input.status) user.status = input.status;
+    user.updated_at = nowIso();
+    await writeBlobUsersStore(store);
+    return user;
+  }
+
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     const updateParts: string[] = [];
@@ -568,7 +885,7 @@ export function updateAdminUser(input: {
     }
 
     if (updateParts.length === 0) {
-      return findAdminUserById(input.userId);
+      return await findAdminUserById(input.userId);
     }
 
     db.prepare(
@@ -585,8 +902,19 @@ export function updateAdminUser(input: {
   }
 }
 
-export function updateAdminUserPassword(userId: number, passwordHash: string) {
-  ensureAdminAuthSchema();
+export async function updateAdminUserPassword(userId: number, passwordHash: string) {
+  if (shouldUseBlobSessionStore()) {
+    await ensureAdminAuthSchema();
+    const store = await readBlobUsersStore();
+    const user = store.users.find((entry) => entry.id === userId && !entry.deleted_at);
+    if (!user) return false;
+    user.password_hash = passwordHash;
+    user.updated_at = nowIso();
+    await writeBlobUsersStore(store);
+    return true;
+  }
+
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     const result = db
@@ -606,8 +934,14 @@ export function updateAdminUserPassword(userId: number, passwordHash: string) {
   }
 }
 
-export function countActiveSuperAdmins() {
-  ensureAdminAuthSchema();
+export async function countActiveSuperAdmins() {
+  if (shouldUseBlobSessionStore()) {
+    await ensureAdminAuthSchema();
+    const store = await readBlobUsersStore();
+    return store.users.filter((user) => !user.deleted_at && user.role === "SUPER_ADMIN").length;
+  }
+
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     const row = db
@@ -619,8 +953,26 @@ export function countActiveSuperAdmins() {
   }
 }
 
-export function softDeleteAdminUser(userId: number) {
-  ensureAdminAuthSchema();
+export async function softDeleteAdminUser(userId: number) {
+  if (shouldUseBlobSessionStore()) {
+    await ensureAdminAuthSchema();
+    const store = await readBlobUsersStore();
+    const user = store.users.find((entry) => entry.id === userId && !entry.deleted_at);
+    if (!user) return false;
+    user.status = "suspended";
+    user.deleted_at = nowIso();
+    user.updated_at = nowIso();
+    await writeBlobUsersStore(store);
+    try {
+      const paths = await listAllUserSessionBlobPaths(userId);
+      await Promise.all(paths.map((pathname) => del(pathname)));
+    } catch {
+      // ignore cleanup failures
+    }
+    return true;
+  }
+
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     const transaction = db.transaction(() => {
@@ -651,7 +1003,7 @@ export async function forceLogoutUserSessions(userId: number) {
     }
   }
 
-  ensureAdminAuthSchema();
+  await ensureAdminAuthSchema();
   const db = openDb();
   try {
     db.prepare("UPDATE admin_sessions SET revoked_at = CURRENT_TIMESTAMP WHERE user_id = ? AND revoked_at IS NULL").run(userId);

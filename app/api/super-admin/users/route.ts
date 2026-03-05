@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 
 import { requireBackendAdmin } from "@/lib/auth/guards";
 import { hashPassword } from "@/lib/auth/password";
-import { createAdminUser, listAdminUsers, logAuditEvent } from "@/lib/db/admin-auth-db";
+import { createAdminUser, listAdminUsers, logAuditEvent, type AdminUserListItem } from "@/lib/db/admin-auth-db";
 import { consumeRateLimit } from "@/lib/security/rate-limit";
 import { assertSameOrigin, getRequestMeta } from "@/lib/security/request";
 import { validateCreateUserBody } from "@/lib/super-admin/users";
 
-function toApiUser(row: ReturnType<typeof listAdminUsers>[number]) {
+function toApiUser(row: AdminUserListItem) {
   return {
     id: row.id,
     email: row.email,
@@ -26,7 +26,7 @@ export async function GET() {
   if (auth.response) return auth.response;
 
   try {
-    const users = listAdminUsers().map(toApiUser);
+    const users = (await listAdminUsers()).map(toApiUser);
     return NextResponse.json({ ok: true, users }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Gebruikers laden mislukt.", code: "USERS_READ_FAILED" }, { status: 500 });
@@ -67,14 +67,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    const newUserId = createAdminUser({
+    const newUserId = await createAdminUser({
       email: validated.value.email,
       passwordHash: hashPassword(validated.value.password),
       role: validated.value.role,
       status: validated.value.status
     });
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: auth.session.uid,
       actorEmail: auth.session.email,
       action: "ADMIN_USER_CREATED",
@@ -85,10 +85,10 @@ export async function POST(request: Request) {
       userAgent
     });
 
-    const users = listAdminUsers().map(toApiUser);
+    const users = (await listAdminUsers()).map(toApiUser);
     return NextResponse.json({ ok: true, users }, { status: 201 });
   } catch (error) {
-    if (error instanceof Error && /UNIQUE constraint failed: admin_users.email/.test(error.message)) {
+    if (error instanceof Error && (/UNIQUE constraint failed: admin_users.email/.test(error.message) || error.message === "USER_ALREADY_EXISTS")) {
       return NextResponse.json(
         {
           error: "Er bestaat al een account met dit e-mailadres.",

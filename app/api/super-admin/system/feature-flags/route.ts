@@ -62,7 +62,7 @@ export async function PATCH(request: Request) {
   try {
     updateFeatureFlagsPatch(validated.patch, auth.session.email);
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: auth.session.uid,
       actorEmail: auth.session.email,
       action: "SYSTEM_FEATURE_FLAGS_UPDATED",

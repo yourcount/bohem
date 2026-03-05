@@ -117,7 +117,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Opslaan mislukt.", code: "DB_WRITE_FAILED" }, { status: 500 });
     }
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: session.uid,
       actorEmail: session.email,
       action: "CONTENT_EDITOR_UPDATED",

@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "seed:admin": "node scripts/seed-admin.mjs",
     "db:migrate:content": "node scripts/migrate-content-db.mjs",
-    "db:seed:content": "node scripts/seed-content-db.mjs"
+    "db:seed:content": "node scripts/seed-content-db.mjs",
+    "test:smoke": "playwright test tests/smoke.spec.ts"
   },
   "dependencies": {
     "@vercel/blob": "^2.3.1",
@@ -20,6 +21,7 @@
     "sharp": "^0.34.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.53.1",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",

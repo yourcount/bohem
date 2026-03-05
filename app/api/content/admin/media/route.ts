@@ -2,6 +2,7 @@ import { mkdirSync, readdirSync, statSync, unlinkSync, writeFileSync } from "nod
 import { extname, join } from "node:path";
 import { randomBytes } from "node:crypto";
 
+import { del, put } from "@vercel/blob";
 import sharp from "sharp";
 import { NextResponse } from "next/server";
 
@@ -16,6 +17,7 @@ const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/av
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const MAX_INPUT_PIXELS = 40_000_000;
 const MANAGED_UPLOAD_PREFIX = "/uploads/library/";
+const BLOB_UPLOAD_PREFIX = "uploads/library";
 
 type ListedMediaFile = {
   src: string;
@@ -23,6 +25,10 @@ type ListedMediaFile = {
   tags: string[];
   kind: "photo" | "asset";
 };
+
+function shouldUseBlobMediaStorage() {
+  return Boolean(process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN);
+}
 
 function inferTagsFromPath(src: string) {
   const tags = new Set<string>();
@@ -67,10 +73,11 @@ function walkPublicImages(baseDir: string, baseUrl: string, depth = 0): Array<{ 
 function classifyMediaKind(src: string): "photo" | "asset" {
   if (src.startsWith("/images/")) return "photo";
   if (src.startsWith("/uploads/library/")) return "photo";
+  if (src.startsWith("http://") || src.startsWith("https://")) return "photo";
   return "asset";
 }
 
-function listMediaFiles(filter: { query?: string; tag?: string; kind?: "all" | "photo" }): ListedMediaFile[] {
+async function listMediaFiles(filter: { query?: string; tag?: string; kind?: "all" | "photo" }): Promise<ListedMediaFile[]> {
   const publicRoot = join(process.cwd(), "public");
   const candidates = [
     { dir: join(publicRoot, "images"), url: "/images" },
@@ -95,10 +102,19 @@ function listMediaFiles(filter: { query?: string; tag?: string; kind?: "all" | "
     deduped.set(file.src, file);
   }
 
-  const index = readMediaIndex();
+  const index = await readMediaIndex();
   const query = (filter.query ?? "").trim().toLowerCase();
   const tag = (filter.tag ?? "").trim().toLowerCase();
   const kind = filter.kind ?? "all";
+
+  for (const entry of Object.values(index.files)) {
+    if (!deduped.has(entry.src)) {
+      deduped.set(entry.src, {
+        src: entry.src,
+        name: entry.originalName ?? entry.src.split("/").pop() ?? entry.src
+      });
+    }
+  }
 
   const list = Array.from(deduped.values()).map((file) => {
     const indexed = index.files[file.src];
@@ -161,7 +177,7 @@ export async function GET(request: Request) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const files = listMediaFiles({
+    const files = await listMediaFiles({
       query: searchParams.get("q") ?? "",
       tag: searchParams.get("tag") ?? "",
       kind: searchParams.get("kind") === "photo" ? "photo" : "all"
@@ -215,10 +231,9 @@ export async function POST(request: Request) {
 
   const filename = `media-${Date.now()}-${randomBytes(6).toString("hex")}.webp`;
   const uploadDir = join(process.cwd(), "public", "uploads", "library");
-  mkdirSync(uploadDir, { recursive: true });
-
   const absolutePath = join(uploadDir, filename);
-  const publicUrl = `/uploads/library/${filename}`;
+  let publicUrl = `/uploads/library/${filename}`;
+  let blobPath: string | undefined;
   const requestedTags = parseTagInput(formData.get("tags"));
   const ext = extname(file.name).toLowerCase();
   if (ext && !ALLOWED_EXTENSIONS.has(ext)) {
@@ -227,14 +242,27 @@ export async function POST(request: Request) {
 
   try {
     const { buffer, metadata } = await convertToOptimizedWebp(file);
-    writeFileSync(absolutePath, buffer, { flag: "wx" });
+    if (shouldUseBlobMediaStorage()) {
+      const uploaded = await put(`${BLOB_UPLOAD_PREFIX}/${filename}`, buffer, {
+        access: "public",
+        addRandomSuffix: false,
+        allowOverwrite: false,
+        contentType: "image/webp"
+      });
+      publicUrl = uploaded.url;
+      blobPath = uploaded.pathname;
+    } else {
+      mkdirSync(uploadDir, { recursive: true });
+      writeFileSync(absolutePath, buffer, { flag: "wx" });
+    }
 
-    const indexEntry = upsertMediaIndexEntry(publicUrl, {
+    const indexEntry = await upsertMediaIndexEntry(publicUrl, {
       tags: requestedTags,
-      originalName: file.name
+      originalName: file.name,
+      blobPath
     });
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: session.uid,
       actorEmail: session.email,
       action: "CONTENT_MEDIA_UPLOADED",
@@ -296,28 +324,51 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Geen afbeeldingpad opgegeven.", code: "SRC_REQUIRED" }, { status: 400 });
   }
 
-  if (!src.startsWith(MANAGED_UPLOAD_PREFIX)) {
-    return NextResponse.json(
-      { error: "Alleen afbeeldingen uit de fotobibliotheek kunnen verwijderd worden.", code: "FORBIDDEN_TARGET" },
-      { status: 403 }
-    );
+  const index = await readMediaIndex();
+  const indexed = index.files[src];
+
+  if (shouldUseBlobMediaStorage()) {
+    let pathname = indexed?.blobPath;
+    if (!pathname) {
+      try {
+        const parsed = new URL(src);
+        pathname = parsed.pathname.replace(/^\/+/, "");
+      } catch {
+        pathname = undefined;
+      }
+    }
+    if (!pathname) {
+      return NextResponse.json({ error: "Ongeldig afbeeldingpad.", code: "INVALID_SRC" }, { status: 400 });
+    }
+    try {
+      await del(pathname);
+    } catch {
+      return NextResponse.json({ error: "Afbeelding kon niet verwijderd worden.", code: "FILE_DELETE_FAILED" }, { status: 404 });
+    }
+  } else {
+    if (!src.startsWith(MANAGED_UPLOAD_PREFIX)) {
+      return NextResponse.json(
+        { error: "Alleen afbeeldingen uit de fotobibliotheek kunnen verwijderd worden.", code: "FORBIDDEN_TARGET" },
+        { status: 403 }
+      );
+    }
+
+    const filename = src.slice(MANAGED_UPLOAD_PREFIX.length);
+    if (!filename || filename.includes("..") || filename.includes("/")) {
+      return NextResponse.json({ error: "Ongeldig afbeeldingpad.", code: "INVALID_SRC" }, { status: 400 });
+    }
+
+    const absolutePath = join(process.cwd(), "public", "uploads", "library", filename);
+    try {
+      unlinkSync(absolutePath);
+    } catch {
+      return NextResponse.json({ error: "Afbeelding kon niet verwijderd worden.", code: "FILE_DELETE_FAILED" }, { status: 404 });
+    }
   }
 
-  const filename = src.slice(MANAGED_UPLOAD_PREFIX.length);
-  if (!filename || filename.includes("..") || filename.includes("/")) {
-    return NextResponse.json({ error: "Ongeldig afbeeldingpad.", code: "INVALID_SRC" }, { status: 400 });
-  }
+  await removeMediaIndexEntry(src);
 
-  const absolutePath = join(process.cwd(), "public", "uploads", "library", filename);
-  try {
-    unlinkSync(absolutePath);
-  } catch {
-    return NextResponse.json({ error: "Afbeelding kon niet verwijderd worden.", code: "FILE_DELETE_FAILED" }, { status: 404 });
-  }
-
-  removeMediaIndexEntry(src);
-
-  logAuditEvent({
+  await logAuditEvent({
     actorUserId: session.uid,
     actorEmail: session.email,
     action: "CONTENT_MEDIA_DELETED",

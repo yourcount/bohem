@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   }
 
   const { ip, userAgent } = getRequestMeta(request);
-  ensureAdminAuthSchema();
+  await ensureAdminAuthSchema();
 
   let body: LoginBody;
   try {
@@ -50,11 +50,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const user = findAdminUserByEmail(email);
+  const user = await findAdminUserByEmail(email);
   const passwordMatches = user ? verifyPassword(password, user.password_hash) : false;
 
   if (!user || !passwordMatches) {
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: user?.id ?? null,
       actorEmail: email,
       action: "AUTH_LOGIN_FAILED",
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
   }
 
   if (user.status !== "active") {
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: user.id,
       actorEmail: user.email,
       action: "AUTH_LOGIN_BLOCKED",
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     ipAddress: ip,
     userAgent
   });
-  markUserLoginSuccess(user.id);
+  await markUserLoginSuccess(user.id);
 
   const nextPath = user.role === "ADMIN" || user.role === "SUPER_ADMIN" ? "/admin/backend" : "/admin";
   const response = NextResponse.json({ ok: true, nextPath });
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
     path: "/",
     maxAge: SESSION_TTL_SECONDS
   });
-  logAuditEvent({
+  await logAuditEvent({
     actorUserId: user.id,
     actorEmail: user.email,
     action: "AUTH_LOGIN_SUCCESS",

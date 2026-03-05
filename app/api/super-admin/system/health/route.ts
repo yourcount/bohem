@@ -15,8 +15,8 @@ export async function GET() {
   const checks: Array<{ name: string; status: "ok" | "fail"; detail: string }> = [];
 
   try {
-    ensureAdminAuthSchema();
-    const currentUser = findAdminUserById(auth.session.uid);
+    await ensureAdminAuthSchema();
+    const currentUser = await findAdminUserById(auth.session.uid);
     checks.push({
       name: "auth-db",
       status: currentUser ? "ok" : "fail",

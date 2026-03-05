@@ -354,6 +354,23 @@ body {
 }
 
 @media (max-width: 767px) {
+  .scroll-tint-overlay {
+    display: none;
+  }
+
+  .reveal {
+    transition-duration: 360ms;
+    transform: translateY(10px);
+  }
+
+  .kampvuur-embers,
+  .kampvuur-section::after,
+  .hero-scroll-indicator,
+  .sticky-listen-bar,
+  .sticky-listen-launcher {
+    animation: none !important;
+  }
+
   .cookie-banner {
     padding: 10px;
   }

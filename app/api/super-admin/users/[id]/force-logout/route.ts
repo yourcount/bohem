@@ -26,7 +26,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Te veel verzoeken. Probeer later opnieuw.", code: "RATE_LIMITED" }, { status: 429 });
   }
 
-  const target = findAdminUserById(userId);
+  const target = await findAdminUserById(userId);
   if (!target) {
     return NextResponse.json({ error: "Gebruiker niet gevonden.", code: "USER_NOT_FOUND" }, { status: 404 });
   }
@@ -41,7 +41,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Gebruiker niet gevonden.", code: "USER_NOT_FOUND" }, { status: 404 });
     }
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: auth.session.uid,
       actorEmail: auth.session.email,
       action: "ADMIN_USER_FORCE_LOGOUT",

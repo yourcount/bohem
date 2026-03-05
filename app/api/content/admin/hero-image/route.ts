@@ -121,7 +121,7 @@ export async function POST(request: Request) {
       }
     }
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: session.uid,
       actorEmail: session.email,
       action: "CONTENT_HERO_IMAGE_UPDATED",

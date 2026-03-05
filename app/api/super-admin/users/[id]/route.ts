@@ -41,7 +41,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     );
   }
 
-  const target = findAdminUserById(userId);
+  const target = await findAdminUserById(userId);
   if (!target) {
     return NextResponse.json({ error: "Gebruiker niet gevonden.", code: "USER_NOT_FOUND" }, { status: 404 });
   }
@@ -65,12 +65,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   try {
-    const updated = updateAdminUser({ userId, role: validated.value.role, status: validated.value.status });
+    const updated = await updateAdminUser({ userId, role: validated.value.role, status: validated.value.status });
     if (!updated) {
       return NextResponse.json({ error: "Gebruiker niet gevonden.", code: "USER_NOT_FOUND" }, { status: 404 });
     }
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: auth.session.uid,
       actorEmail: auth.session.email,
       action: "ADMIN_USER_UPDATED",
@@ -120,7 +120,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     return NextResponse.json({ error: "Je kunt je eigen account niet verwijderen.", code: "SELF_DELETE_BLOCKED" }, { status: 403 });
   }
 
-  const target = findAdminUserById(userId);
+  const target = await findAdminUserById(userId);
   if (!target) {
     return NextResponse.json({ error: "Gebruiker niet gevonden.", code: "USER_NOT_FOUND" }, { status: 404 });
   }
@@ -130,7 +130,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
   }
 
   if (target.role === "SUPER_ADMIN") {
-    const superAdminCount = countActiveSuperAdmins();
+    const superAdminCount = await countActiveSuperAdmins();
     if (superAdminCount <= 1) {
       return NextResponse.json({ error: "Laatste SUPER_ADMIN account kan niet verwijderd worden.", code: "LAST_SUPER_ADMIN_BLOCKED" }, { status: 403 });
     }
@@ -143,12 +143,12 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
   }
 
   try {
-    const deleted = softDeleteAdminUser(userId);
+    const deleted = await softDeleteAdminUser(userId);
     if (!deleted) {
       return NextResponse.json({ error: "Gebruiker niet gevonden.", code: "USER_NOT_FOUND" }, { status: 404 });
     }
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: auth.session.uid,
       actorEmail: auth.session.email,
       action: "ADMIN_USER_DELETED",

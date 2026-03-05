@@ -71,7 +71,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Cache instellingen niet gevonden.", code: "CACHE_SETTINGS_NOT_FOUND" }, { status: 404 });
     }
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: auth.session.uid,
       actorEmail: auth.session.email,
       action: "CACHE_SETTINGS_UPDATED",

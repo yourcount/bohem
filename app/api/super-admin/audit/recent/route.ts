@@ -8,7 +8,7 @@ export async function GET() {
   if (auth.response) return auth.response;
 
   try {
-    const events = readRecentAuditEvents(40).map((event) => ({
+    const events = (await readRecentAuditEvents(40)).map((event) => ({
       id: event.id,
       actorEmail: event.actor_email,
       action: event.action,

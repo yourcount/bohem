@@ -82,7 +82,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Geen content gevonden.", code: "CONTENT_NOT_FOUND" }, { status: 404 });
     }
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: session.uid,
       actorEmail: session.email,
       action: "CONTENT_FULL_UPDATED",

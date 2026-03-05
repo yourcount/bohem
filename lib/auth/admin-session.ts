@@ -12,13 +12,8 @@ export async function getAdminSession() {
 
   try {
     if (!(await isSessionActive(parsed.sid, parsed.uid))) return null;
-    const user = findAdminUserById(parsed.uid);
-    if (!user) {
-      if (process.env.VERCEL) {
-        return parsed;
-      }
-      return null;
-    }
+    const user = await findAdminUserById(parsed.uid);
+    if (!user) return null;
     if (user.status !== "active") return null;
     if (user.force_logout_after) {
       const forcedAfterEpoch = Math.floor(new Date(user.force_logout_after).getTime() / 1000);

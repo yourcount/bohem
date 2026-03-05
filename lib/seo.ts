@@ -39,6 +39,10 @@ function parseShowDate(dateLabel: string): string | null {
 export function buildHomeJsonLd(content: SiteContent) {
   const url = getSiteUrl();
   const heroImage = absoluteUrl(content.hero.image.src);
+  const artistProfileUrls = [
+    content.discography.artist.href,
+    ...content.about.bios.map((bio) => bio.website).filter((value): value is string => Boolean(value))
+  ].filter((value, index, array) => array.indexOf(value) === index);
 
   const events =
     content.bookings.upcomingShows
@@ -96,7 +100,7 @@ export function buildHomeJsonLd(content: SiteContent) {
           { "@type": "Person", name: "Arthur Bont" },
           { "@type": "Person", name: "Bettina Kraaieveld" }
         ],
-        sameAs: [content.discography.artist.href],
+        sameAs: artistProfileUrls,
         contactPoint: [
           {
             "@type": "ContactPoint",
@@ -127,6 +131,12 @@ export function buildHomeJsonLd(content: SiteContent) {
         datePublished: "2026",
         url: content.discography.artist.href
       },
+      ...content.about.bios.map((bio) => ({
+        "@type": "Person",
+        name: bio.name,
+        ...(bio.website ? { url: bio.website, sameAs: [bio.website] } : {}),
+        memberOf: { "@id": `${url}/#musicgroup` }
+      })),
       ...events
     ]
   };

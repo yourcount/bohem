@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       triggeredBy: auth.session.email
     });
 
-    logAuditEvent({
+    await logAuditEvent({
       actorUserId: auth.session.uid,
       actorEmail: auth.session.email,
       action: "CACHE_INVALIDATED",

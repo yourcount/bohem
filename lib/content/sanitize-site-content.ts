@@ -67,6 +67,20 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
           }
         : {})
     },
+    about: {
+      ...content.about,
+      bios: content.about.bios.map((bio, index) => ({
+        ...bio,
+        ...(bio.website
+          ? {
+              website: sanitizeHref(
+                bio.website,
+                siteContent.about.bios[index]?.website ?? siteContent.about.bios[0]?.website ?? "/"
+              )
+            }
+          : {})
+      }))
+    },
     discography: {
       ...content.discography,
       featuredSingle: {

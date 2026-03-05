@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "E-mailadres en wachtwoord zijn verplicht." }, { status: 400 });
   }
 
-  const limiter = consumeRateLimit(`login:${ip}:${email}`, 6, 15 * 60 * 1000);
+  const limiter = await consumeRateLimit(`login:${ip}:${email}`, 6, 15 * 60 * 1000);
   if (!limiter.allowed) {
     return NextResponse.json(
       {

@@ -10,20 +10,25 @@ export async function getAdminSession() {
   const parsed = verifySessionToken(token);
   if (!parsed) return null;
 
-  if (process.env.VERCEL) {
-    return parsed;
-  }
-
-  if (!isSessionActive(parsed.sid)) return null;
-  const user = findAdminUserById(parsed.uid);
-  if (!user || user.status !== "active") return null;
-  if (user.force_logout_after) {
-    const forcedAfterEpoch = Math.floor(new Date(user.force_logout_after).getTime() / 1000);
-    if (Number.isFinite(forcedAfterEpoch) && parsed.iat <= forcedAfterEpoch) {
-      revokeSessionById(parsed.sid);
-      return null;
+  try {
+    if (!isSessionActive(parsed.sid)) return null;
+    const user = findAdminUserById(parsed.uid);
+    if (!user || user.status !== "active") return null;
+    if (user.force_logout_after) {
+      const forcedAfterEpoch = Math.floor(new Date(user.force_logout_after).getTime() / 1000);
+      if (Number.isFinite(forcedAfterEpoch) && parsed.iat <= forcedAfterEpoch) {
+        revokeSessionById(parsed.sid);
+        return null;
+      }
     }
-  }
 
-  return parsed;
+    return parsed;
+  } catch {
+    try {
+      revokeSessionById(parsed.sid);
+    } catch {
+      // ignore cleanup failures
+    }
+    return null;
+  }
 }

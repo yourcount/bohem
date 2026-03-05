@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   }
 
   const { ip } = getRequestMeta(request);
-  const limiter = consumeRateLimit(`contact-submit:${ip}`, 8, 10 * 60 * 1000);
+  const limiter = await consumeRateLimit(`contact-submit:${ip}`, 8, 10 * 60 * 1000);
   if (!limiter.allowed) {
     return NextResponse.json({ error: "Te veel aanvragen. Probeer over enkele minuten opnieuw.", code: "RATE_LIMITED" }, { status: 429 });
   }

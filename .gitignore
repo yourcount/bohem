@@ -25,3 +25,4 @@ data/admin-user.json
 
 # local tooling artifacts
 .playwright-cli/
+.vercel

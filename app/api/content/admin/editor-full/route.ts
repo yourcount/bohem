@@ -11,7 +11,7 @@ import {
 import { validateAndSanitizeFullSiteContent } from "@/lib/content/full-content-contract";
 import { FullContentStorageError, readFullSiteContent, updateFullSiteContent } from "@/lib/db/full-site-content-db";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
-import { getRequestMeta } from "@/lib/security/request";
+import { assertSameOrigin, getRequestMeta } from "@/lib/security/request";
 import { shouldAutoInvalidateCacheOnUpdate } from "@/lib/system/technical-settings";
 
 function buildValidationSummary(fieldErrors: Record<string, string[]>, limit = 6) {
@@ -60,6 +60,9 @@ export async function PATCH(request: Request) {
   const session = await getAdminSession();
   if (!session) {
     return NextResponse.json({ error: "Niet geautoriseerd.", code: "UNAUTHORIZED" }, { status: 401 });
+  }
+  if (!assertSameOrigin(request)) {
+    return NextResponse.json({ error: "Ongeldige herkomst van aanvraag.", code: "CSRF_BLOCKED" }, { status: 403 });
   }
 
   const { ip, userAgent } = getRequestMeta(request);

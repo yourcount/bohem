@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { SpotifyEmbedWithConsent } from "@/components/cookies/SpotifyEmbedWithConsent";
 import { Reveal } from "@/components/ui/Reveal";
 import type { SiteContent } from "@/lib/types";
 
@@ -48,13 +49,8 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
               </p>
               <h3 className="mb-2 font-display text-2xl sm:text-3xl">{discography.featuredSingle.title}</h3>
               <p className="mb-4 text-[#e7d6c1]">{discography.featuredSingle.description}</p>
-              <iframe
-                style={{ borderRadius: "12px" }}
-                src={discography.featuredSingle.embedUrl}
-                width="100%"
-                height="152"
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
+              <SpotifyEmbedWithConsent
+                embedUrl={discography.featuredSingle.embedUrl}
                 title="Spotify player eerste nieuwe single Bohèm"
               />
               <Link

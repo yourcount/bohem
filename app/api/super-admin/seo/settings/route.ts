@@ -11,7 +11,7 @@ import {
   validateResolvedSeoSettings,
   validateSeoSettingsPatch
 } from "@/lib/seo-settings";
-import { getRequestMeta } from "@/lib/security/request";
+import { assertSameOrigin, getRequestMeta } from "@/lib/security/request";
 import { shouldAutoInvalidateCacheOnUpdate } from "@/lib/system/technical-settings";
 
 export async function GET() {
@@ -43,6 +43,9 @@ export async function GET() {
 export async function PATCH(request: Request) {
   const auth = await requireBackendAdmin();
   if (auth.response) return auth.response;
+  if (!assertSameOrigin(request)) {
+    return NextResponse.json({ error: "Ongeldige herkomst van aanvraag.", code: "CSRF_BLOCKED" }, { status: 403 });
+  }
 
   const { ip, userAgent } = getRequestMeta(request);
 

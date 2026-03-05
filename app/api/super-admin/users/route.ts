@@ -42,7 +42,7 @@ export async function POST(request: Request) {
   }
 
   const { ip, userAgent } = getRequestMeta(request);
-  const limiter = consumeRateLimit(`super-admin:create-user:${ip}`, 12, 15 * 60 * 1000);
+  const limiter = await consumeRateLimit(`super-admin:create-user:${ip}`, 12, 15 * 60 * 1000);
   if (!limiter.allowed) {
     return NextResponse.json({ error: "Te veel verzoeken. Probeer later opnieuw.", code: "RATE_LIMITED" }, { status: 429 });
   }

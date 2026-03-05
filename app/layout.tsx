@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { CookieConsentProvider } from "@/components/cookies/CookieConsentProvider";
 import { getLiveSiteContent } from "@/lib/content/live-content";
 import { getSiteUrl } from "@/lib/seo";
 import { getSeoSettingsSafe, resolveHomeSeo } from "@/lib/seo-settings";
@@ -76,11 +77,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="nl">
-      <head>
-        <link rel="preconnect" href="https://open.spotify.com" crossOrigin="" />
-        <link rel="preconnect" href="https://i.scdn.co" crossOrigin="" />
-      </head>
-      <body>{children}</body>
+      <body>
+        <CookieConsentProvider>{children}</CookieConsentProvider>
+      </body>
     </html>
   );
 }

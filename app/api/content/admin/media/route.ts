@@ -9,7 +9,7 @@ import { getAdminSession } from "@/lib/auth/admin-session";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
 import { parseTagInput, readMediaIndex, removeMediaIndexEntry, upsertMediaIndexEntry } from "@/lib/media/library-index";
 import { consumeRateLimit } from "@/lib/security/rate-limit";
-import { getRequestMeta } from "@/lib/security/request";
+import { assertSameOrigin, getRequestMeta } from "@/lib/security/request";
 
 const ALLOWED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
@@ -166,9 +166,12 @@ export async function POST(request: Request) {
   if (!session) {
     return NextResponse.json({ error: "Niet geautoriseerd.", code: "UNAUTHORIZED" }, { status: 401 });
   }
+  if (!assertSameOrigin(request)) {
+    return NextResponse.json({ error: "Ongeldige herkomst van aanvraag.", code: "CSRF_BLOCKED" }, { status: 403 });
+  }
 
   const { ip, userAgent } = getRequestMeta(request);
-  const limiter = consumeRateLimit(`admin-media-upload:${ip}:${session.uid}`, 25, 15 * 60 * 1000);
+  const limiter = await consumeRateLimit(`admin-media-upload:${ip}:${session.uid}`, 25, 15 * 60 * 1000);
   if (!limiter.allowed) {
     return NextResponse.json({ error: "Te veel uploads. Probeer later opnieuw.", code: "RATE_LIMITED" }, { status: 429 });
   }
@@ -236,9 +239,12 @@ export async function DELETE(request: Request) {
   if (!session) {
     return NextResponse.json({ error: "Niet geautoriseerd.", code: "UNAUTHORIZED" }, { status: 401 });
   }
+  if (!assertSameOrigin(request)) {
+    return NextResponse.json({ error: "Ongeldige herkomst van aanvraag.", code: "CSRF_BLOCKED" }, { status: 403 });
+  }
 
   const { ip, userAgent } = getRequestMeta(request);
-  const limiter = consumeRateLimit(`admin-media-delete:${ip}:${session.uid}`, 30, 15 * 60 * 1000);
+  const limiter = await consumeRateLimit(`admin-media-delete:${ip}:${session.uid}`, 30, 15 * 60 * 1000);
   if (!limiter.allowed) {
     return NextResponse.json({ error: "Te veel verwijderacties. Probeer later opnieuw.", code: "RATE_LIMITED" }, { status: 429 });
   }

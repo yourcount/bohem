@@ -3,9 +3,13 @@ import { NextResponse } from "next/server";
 import { AUTH_COOKIE_NAME } from "@/lib/auth/constants";
 import { verifySessionToken } from "@/lib/auth/session";
 import { logAuditEvent, revokeSessionById } from "@/lib/db/admin-auth-db";
-import { getRequestMeta } from "@/lib/security/request";
+import { assertSameOrigin, getRequestMeta } from "@/lib/security/request";
 
 export async function POST(request: Request) {
+  if (!assertSameOrigin(request)) {
+    return NextResponse.json({ error: "Ongeldige herkomst van aanvraag.", code: "CSRF_BLOCKED" }, { status: 403 });
+  }
+
   const { ip, userAgent } = getRequestMeta(request);
 
   const cookieHeader = request.headers.get("cookie") ?? "";

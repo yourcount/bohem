@@ -22,7 +22,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 
   const { ip, userAgent } = getRequestMeta(request);
-  const limiter = consumeRateLimit(`super-admin:reset-password:${ip}:${userId}`, 10, 15 * 60 * 1000);
+  const limiter = await consumeRateLimit(`super-admin:reset-password:${ip}:${userId}`, 10, 15 * 60 * 1000);
   if (!limiter.allowed) {
     return NextResponse.json({ error: "Te veel verzoeken. Probeer later opnieuw.", code: "RATE_LIMITED" }, { status: 429 });
   }

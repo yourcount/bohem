@@ -7,7 +7,7 @@ import { CONTENT_FIELD_KEYS, type ContentFields } from "@/lib/content/content-co
 import { validatePatchPayload, validateFullContent } from "@/lib/content/content-contract";
 import { contentDbExists, getDbPath, readPublicContent, updatePublicContentPatch } from "@/lib/db/content-db";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
-import { getRequestMeta } from "@/lib/security/request";
+import { assertSameOrigin, getRequestMeta } from "@/lib/security/request";
 import { shouldAutoInvalidateCacheOnUpdate } from "@/lib/system/technical-settings";
 
 function toContentFields(input: Record<string, unknown>): ContentFields {
@@ -44,6 +44,9 @@ export async function PATCH(request: Request) {
   const session = await getAdminSession();
   if (!session) {
     return NextResponse.json({ error: "Niet geautoriseerd.", code: "UNAUTHORIZED" }, { status: 401 });
+  }
+  if (!assertSameOrigin(request)) {
+    return NextResponse.json({ error: "Ongeldige herkomst van aanvraag.", code: "CSRF_BLOCKED" }, { status: 403 });
   }
 
   if (!contentDbExists()) {

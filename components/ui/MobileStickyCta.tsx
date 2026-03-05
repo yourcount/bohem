@@ -14,6 +14,7 @@ type MobileStickyCtaProps = {
 export function MobileStickyCta({ href, label, visibleSectionIds }: MobileStickyCtaProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [hasScrolledIntoFlow, setHasScrolledIntoFlow] = useState(false);
+  const isCtaVisible = isVisible && hasScrolledIntoFlow;
 
   useEffect(() => {
     const updateVisibility = () => {
@@ -45,6 +46,19 @@ export function MobileStickyCta({ href, label, visibleSectionIds }: MobileSticky
     };
   }, [visibleSectionIds]);
 
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const className = "has-mobile-sticky-cta";
+    if (isCtaVisible) {
+      document.body.classList.add(className);
+    } else {
+      document.body.classList.remove(className);
+    }
+    return () => {
+      document.body.classList.remove(className);
+    };
+  }, [isCtaVisible]);
+
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (!href.startsWith("#")) return;
 
@@ -54,7 +68,7 @@ export function MobileStickyCta({ href, label, visibleSectionIds }: MobileSticky
 
   return (
     <div
-      className={`mobile-sticky-cta md:hidden ${isVisible && hasScrolledIntoFlow ? "is-visible opacity-100" : "pointer-events-none opacity-0"}`}
+      className={`mobile-sticky-cta md:hidden ${isCtaVisible ? "is-visible opacity-100" : "pointer-events-none opacity-0"}`}
     >
       <Link
         href={href}

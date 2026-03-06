@@ -1,8 +1,7 @@
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { requireBackendAdmin } from "@/lib/auth/guards";
-import { invalidateSiteRuntimeCache } from "@/lib/cache/runtime-cache";
+import { revalidatePublicSiteCaches } from "@/lib/cache/revalidate-site";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
 import { ensureSeoSettingsSchema, readSeoSettings, updateSeoSettingsPatch } from "@/lib/db/seo-settings-db";
 import {
@@ -119,8 +118,7 @@ export async function PATCH(request: Request) {
       userAgent
     });
     if (shouldAutoInvalidateCacheOnUpdate()) {
-      invalidateSiteRuntimeCache();
-      revalidatePath("/");
+      revalidatePublicSiteCaches("/");
     }
 
     return NextResponse.json(

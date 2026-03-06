@@ -1,7 +1,7 @@
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { requireBackendAdmin } from "@/lib/auth/guards";
+import { revalidatePublicSiteCaches } from "@/lib/cache/revalidate-site";
 import { invalidateRuntimeCacheByRoute, invalidateSiteRuntimeCache, readRuntimeCacheStatus } from "@/lib/cache/runtime-cache";
 import { createCacheInvalidationLog, listRecentCacheInvalidations } from "@/lib/db/cache-management-db";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         ? invalidateSiteRuntimeCache()
         : invalidateRuntimeCacheByRoute(validated.value.routePath || "/");
 
-    revalidatePath(validated.value.scope === "sitewide" ? "/" : validated.value.routePath || "/");
+    revalidatePublicSiteCaches(validated.value.scope === "sitewide" ? "/" : validated.value.routePath || "/");
 
     createCacheInvalidationLog({
       scope: validated.value.scope,

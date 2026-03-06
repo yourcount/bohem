@@ -2,10 +2,12 @@ import { siteContent } from "@/lib/content";
 import { sanitizeSiteContent } from "@/lib/content/sanitize-site-content";
 import { validatePublicContent } from "@/lib/content/public-content";
 import { getCachePolicySafe } from "@/lib/cache/policy";
+import { CACHE_REVALIDATE_SECONDS, CACHE_TAGS } from "@/lib/cache/tags";
 import { readRuntimeCache, writeRuntimeCache } from "@/lib/cache/runtime-cache";
 import { contentDbExists, readPublicContent } from "@/lib/db/content-db";
 import { readFullSiteContent } from "@/lib/db/full-site-content-db";
 import type { SiteContent } from "@/lib/types";
+import { unstable_cache } from "next/cache";
 
 function cloneBaseContent(): SiteContent {
   return JSON.parse(JSON.stringify(siteContent)) as SiteContent;
@@ -57,6 +59,10 @@ function applyCmsOverrides(base: SiteContent) {
 }
 
 export async function getLiveSiteContent(): Promise<SiteContent> {
+  if (process.env.VERCEL) {
+    return getLiveSiteContentCached();
+  }
+
   if (shouldUseRuntimeCache()) {
     const cached = readRuntimeCache<SiteContent>("site_content");
     if (cached) {
@@ -93,3 +99,29 @@ export async function getLiveSiteContent(): Promise<SiteContent> {
     return base;
   }
 }
+
+const getLiveSiteContentCached = unstable_cache(
+  async () => {
+    const base = cloneBaseContent();
+
+    try {
+      const fullRecord = await readFullSiteContent();
+      if (fullRecord) {
+        return sanitizeSiteContent(fullRecord.content);
+      }
+    } catch {
+      // fall through to legacy/local fallback
+    }
+
+    try {
+      return sanitizeSiteContent(applyCmsOverrides(base));
+    } catch {
+      return base;
+    }
+  },
+  ["site-content-v1"],
+  {
+    tags: [CACHE_TAGS.siteContent],
+    revalidate: CACHE_REVALIDATE_SECONDS.siteContent
+  }
+);

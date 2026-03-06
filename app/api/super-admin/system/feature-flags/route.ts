@@ -1,8 +1,7 @@
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { requireBackendAdmin } from "@/lib/auth/guards";
-import { invalidateSiteRuntimeCache } from "@/lib/cache/runtime-cache";
+import { revalidatePublicSiteCaches } from "@/lib/cache/revalidate-site";
 import { listFeatureFlags, updateFeatureFlagsPatch } from "@/lib/db/system-controls-db";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
 import { consumeRateLimit } from "@/lib/security/rate-limit";
@@ -73,8 +72,7 @@ export async function PATCH(request: Request) {
       userAgent
     });
 
-    invalidateSiteRuntimeCache();
-    revalidatePath("/");
+    revalidatePublicSiteCaches("/");
 
     return NextResponse.json({ ok: true, flags: toApiFlags() }, { status: 200 });
   } catch {

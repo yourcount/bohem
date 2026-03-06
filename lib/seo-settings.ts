@@ -1,8 +1,10 @@
 import type { SiteContent } from "@/lib/types";
 import { getCachePolicySafe } from "@/lib/cache/policy";
+import { CACHE_REVALIDATE_SECONDS, CACHE_TAGS } from "@/lib/cache/tags";
 import { hasRuntimeCacheKey, readRuntimeCache, writeRuntimeCache } from "@/lib/cache/runtime-cache";
 import { buildHomeJsonLd } from "@/lib/seo";
 import { readSeoSettings, type SeoSettingsPatchDb, type SeoSettingsRow } from "@/lib/db/seo-settings-db";
+import { unstable_cache } from "next/cache";
 
 type FieldErrors = Record<string, string[]>;
 
@@ -222,7 +224,11 @@ export function validateResolvedSeoSettings(settings: SeoSettings) {
   };
 }
 
-export function getSeoSettingsSafe(): SeoSettings | null {
+export async function getSeoSettingsSafe(): Promise<SeoSettings | null> {
+  if (process.env.VERCEL) {
+    return getSeoSettingsCached();
+  }
+
   if (hasRuntimeCacheKey("seo_settings")) {
     const cached = readRuntimeCache<SeoSettings | null>("seo_settings");
     return cached;
@@ -238,6 +244,22 @@ export function getSeoSettingsSafe(): SeoSettings | null {
     return null;
   }
 }
+
+const getSeoSettingsCached = unstable_cache(
+  async (): Promise<SeoSettings | null> => {
+    try {
+      const row = readSeoSettings();
+      return row ? mapSeoRowToSettings(row) : null;
+    } catch {
+      return null;
+    }
+  },
+  ["seo-settings-v1"],
+  {
+    tags: [CACHE_TAGS.seoSettings],
+    revalidate: CACHE_REVALIDATE_SECONDS.seoSettings
+  }
+);
 
 export function resolveHomeSeo(content: SiteContent, settings: SeoSettings | null) {
   const baseTitle = settings?.home_title || content.meta.title;

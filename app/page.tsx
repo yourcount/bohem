@@ -16,7 +16,7 @@ import { getLiveSiteContent } from "@/lib/content/live-content";
 import { getSeoSettingsSafe, resolveHomeJsonLd } from "@/lib/seo-settings";
 import { getFeatureFlagsSafe } from "@/lib/system/feature-flags";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 90;
 
 const NON_CONTENT_KEYS = new Set(["href", "variant", "id", "type", "autoComplete", "required", "width", "height", "focusX", "focusY"]);
 
@@ -45,8 +45,8 @@ function hasSectionContent(value: unknown): boolean {
 
 export default async function HomePage() {
   const siteContent = await getLiveSiteContent();
-  const flags = getFeatureFlagsSafe();
-  const seoSettings = getSeoSettingsSafe();
+  const flags = await getFeatureFlagsSafe();
+  const seoSettings = await getSeoSettingsSafe();
   const jsonLd = resolveHomeJsonLd(siteContent, seoSettings);
   const hasAboutSection = hasSectionContent(siteContent.about);
   const hasDiscographySection = flags.enable_discography_section && hasSectionContent(siteContent.discography);

@@ -1,10 +1,9 @@
 import { writeFileSync } from "node:fs";
 
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { getAdminSession } from "@/lib/auth/admin-session";
-import { invalidateSiteRuntimeCache } from "@/lib/cache/runtime-cache";
+import { revalidatePublicSiteCaches } from "@/lib/cache/revalidate-site";
 import { contentDbExists, getDbPath, readPublicContent, updatePublicContentPatch } from "@/lib/db/content-db";
 import { FullContentStorageError, readFullSiteContent, updateFullSiteContent } from "@/lib/db/full-site-content-db";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
@@ -132,8 +131,7 @@ export async function POST(request: Request) {
       userAgent
     });
     if (shouldAutoInvalidateCacheOnUpdate()) {
-      invalidateSiteRuntimeCache();
-      revalidatePath("/");
+      revalidatePublicSiteCaches("/");
     }
 
     return NextResponse.json(

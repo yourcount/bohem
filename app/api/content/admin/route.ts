@@ -1,8 +1,7 @@
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { getAdminSession } from "@/lib/auth/admin-session";
-import { invalidateSiteRuntimeCache } from "@/lib/cache/runtime-cache";
+import { revalidatePublicSiteCaches } from "@/lib/cache/revalidate-site";
 import { CONTENT_FIELD_KEYS, type ContentFields } from "@/lib/content/content-contract";
 import { validatePatchPayload, validateFullContent } from "@/lib/content/content-contract";
 import { contentDbExists, getDbPath, readPublicContent, updatePublicContentPatch } from "@/lib/db/content-db";
@@ -134,8 +133,7 @@ export async function PATCH(request: Request) {
       userAgent
     });
     if (shouldAutoInvalidateCacheOnUpdate()) {
-      invalidateSiteRuntimeCache();
-      revalidatePath("/");
+      revalidatePublicSiteCaches("/");
     }
 
     return NextResponse.json(

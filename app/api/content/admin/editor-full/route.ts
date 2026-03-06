@@ -1,8 +1,7 @@
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { getAdminSession } from "@/lib/auth/admin-session";
-import { invalidateSiteRuntimeCache } from "@/lib/cache/runtime-cache";
+import { revalidatePublicSiteCaches } from "@/lib/cache/revalidate-site";
 import {
   mergeEditorContent,
   pickEditorContent,
@@ -129,8 +128,7 @@ export async function PATCH(request: Request) {
     });
 
     if (shouldAutoInvalidateCacheOnUpdate()) {
-      invalidateSiteRuntimeCache();
-      revalidatePath("/");
+      revalidatePublicSiteCaches("/");
     }
 
     return NextResponse.json(

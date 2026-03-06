@@ -77,7 +77,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
       ref={sectionRef}
       aria-labelledby="hero-title"
       onPointerMove={handlePointerMove}
-      className="hero-spotlight-shell relative grid min-h-[82svh] items-end overflow-clip pb-20 pt-10 sm:min-h-[85svh] sm:pb-24 sm:pt-12 md:min-h-[calc(100svh-4rem)]"
+      className="hero-spotlight-shell relative grid min-h-[90svh] items-end overflow-clip pb-20 pt-10 sm:min-h-[92svh] sm:pb-24 sm:pt-12 md:min-h-[calc(100svh-4rem)]"
     >
       <div className="absolute inset-0">
         <Image
@@ -87,7 +87,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
           className="hero-mobile-zoom object-cover object-top"
           style={{ objectPosition: getImageObjectPosition(hero.image, 50, 12) }}
           priority
-          quality={68}
+          quality={85}
           sizes="(max-width: 767px) 100vw, 100vw"
         />
       </div>

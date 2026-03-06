@@ -1386,14 +1386,19 @@ section.section-ambient + section.section-ambient {
 
   .hero-mobile-zoom {
     animation: heroMobileZoomIn 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    filter: contrast(1.08) saturate(1.1);
   }
 
   .hero-mask {
-    background: linear-gradient(160deg, rgba(14, 22, 34, 0.36) 0%, rgba(14, 22, 34, 0.08) 44%, rgba(14, 22, 34, 0.48) 100%);
+    background: linear-gradient(160deg, rgba(14, 22, 34, 0.26) 0%, rgba(14, 22, 34, 0.05) 44%, rgba(14, 22, 34, 0.4) 100%);
   }
 
   .hero-spotlight {
     display: none;
+  }
+
+  .cookie-manage-btn {
+    display: none !important;
   }
 
   .mobile-menu-panel {

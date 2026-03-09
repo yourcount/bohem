@@ -55,8 +55,9 @@ export function LoginForm() {
           required
           autoComplete="email"
           value={email}
+          disabled={isSubmitting}
           onChange={(event) => setEmail(event.target.value)}
-          className="w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-[var(--color-text-primary)]"
+          className="w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-[var(--color-text-primary)] disabled:cursor-not-allowed disabled:opacity-70"
         />
       </div>
       <div>
@@ -69,19 +70,33 @@ export function LoginForm() {
           required
           autoComplete="current-password"
           value={password}
+          disabled={isSubmitting}
           onChange={(event) => setPassword(event.target.value)}
-          className="w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-[var(--color-text-primary)]"
+          className="w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-[var(--color-text-primary)] disabled:cursor-not-allowed disabled:opacity-70"
         />
       </div>
 
       {error ? <p className="text-sm text-[#ffb4a8]">{error}</p> : null}
+      <p className="min-h-5 text-sm text-[#d9c6ac]" aria-live="polite">
+        {isSubmitting ? "Bezig met inloggen..." : ""}
+      </p>
 
       <button
         type="submit"
         disabled={isSubmitting}
         className="inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)] disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {isSubmitting ? "Bezig..." : "Inloggen"}
+        {isSubmitting ? (
+          <>
+            <span
+              aria-hidden="true"
+              className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--color-bg-deep)] border-t-transparent"
+            />
+            Bezig met inloggen...
+          </>
+        ) : (
+          "Inloggen"
+        )}
       </button>
     </form>
   );

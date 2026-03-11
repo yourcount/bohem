@@ -96,6 +96,10 @@ const keyLabels: Record<string, string> = {
 
 const helperByKey: Record<string, string> = {
   href: "Gebruik een volledige link (https://...) of een pagina-anker (#contact).",
+  ticketsHref: "Voorbeeld: https://ticketshop.nl/event of #contact. Laat leeg om de knop te verbergen.",
+  infoHref: "Voorbeeld: https://jouwsite.nl/meer-info of #contact. Laat leeg om de knop te verbergen.",
+  website: "Gebruik een volledige link, bijvoorbeeld https://arthurbont.nl.",
+  kitHref: "Gebruik een volledige link naar de perskit, bijvoorbeeld https://.../perskit.pdf.",
   email: "Gebruik een geldig e-mailadres.",
   contactEmail: "Gebruik een geldig e-mailadres.",
   contactPhone: "Gebruik internationaal formaat, bijvoorbeeld +31 6...",
@@ -344,6 +348,7 @@ export function ContentEditorForm() {
     if (!content) return [];
     return flattenEditableFields(content).filter(
       (field) =>
+        field.path !== "hero.eyebrow" &&
         !field.path.startsWith("discography.releases.") &&
         !field.path.startsWith("bookings.upcomingShows.")
     );
@@ -391,6 +396,41 @@ export function ContentEditorForm() {
     if (!content || !initialContent) return true;
     return JSON.stringify(content) === JSON.stringify(initialContent);
   }, [content, initialContent]);
+
+  useEffect(() => {
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isPristine) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    const onDocumentClick = (event: MouseEvent) => {
+      if (isPristine) return;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const anchor = target.closest("a[href]");
+      if (!anchor) return;
+      if (anchor.getAttribute("target") === "_blank") return;
+      if (anchor.hasAttribute("download")) return;
+      const href = anchor.getAttribute("href") ?? "";
+      if (href.startsWith("#")) return;
+      if (href.startsWith("javascript:")) return;
+
+      const confirmed = window.confirm("Je hebt niet-opgeslagen wijzigingen. Weet je zeker dat je deze pagina wilt verlaten?");
+      if (!confirmed) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+
+    window.addEventListener("beforeunload", onBeforeUnload);
+    document.addEventListener("click", onDocumentClick, true);
+    return () => {
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      document.removeEventListener("click", onDocumentClick, true);
+    };
+  }, [isPristine]);
 
   const releases = content?.discography.releases ?? [];
   const shows = content?.bookings.upcomingShows ?? [];
@@ -871,6 +911,18 @@ export function ContentEditorForm() {
       <p className="mb-4 text-sm text-[#d9c6ac]">
         Pas hier alle zichtbare website-inhoud aan. Technische instellingen staan bewust in de Admin Backend.
       </p>
+      <div className="mb-4 rounded-xl border border-[rgba(67,135,133,0.45)] bg-[rgba(18,30,46,0.55)] p-4 text-sm text-[#e7d7c1]">
+        <p className="font-semibold text-[#f8f5f1]">Inhoud wijzigen in 2 minuten</p>
+        <ol className="mt-2 list-decimal space-y-1 pl-5 text-xs sm:text-sm">
+          <li>Kies een sectie in het sectiemenu.</li>
+          <li>Pas tekst, links of foto&apos;s aan.</li>
+          <li>Klik onderaan op <strong>Opslaan</strong>.</li>
+          <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
+        </ol>
+        <p className="mt-2 text-xs text-[#d9c6ac]">
+          SEO, feature flags en systeeminstellingen beheer je in <a href="/admin/backend" className="underline underline-offset-2">Admin Backend</a>.
+        </p>
+      </div>
 
       <div
         ref={sectionMenuRef}
@@ -915,6 +967,11 @@ export function ContentEditorForm() {
               <li key={item}>{item}</li>
             ))}
           </ul>
+        ) : null}
+        {!isSectionMenuCompact && statusTone === "error" ? (
+          <p className="mt-2 text-xs text-[#ffd1c9]">
+            Wat nu? Controleer de gemarkeerde velden hieronder en klik daarna opnieuw op Opslaan.
+          </p>
         ) : null}
 
         <div className={isSectionMenuCompact ? "mt-2" : "mt-4"}>
@@ -1493,6 +1550,9 @@ export function ContentEditorForm() {
           {statusTone === "success" && statusMessage ? <span aria-hidden="true" className="success-pop">✓</span> : null}
           {statusMessage || "Geen openstaande wijzigingen."}
         </p>
+        {statusTone === "error" ? (
+          <p className="mt-1 text-xs text-[#ffd1c9]">Wat nu? Controleer de gemarkeerde velden en klik opnieuw op Opslaan.</p>
+        ) : null}
         {statusDetails.length > 0 ? (
           <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[#ffb4a8]">
             {statusDetails.map((item) => (

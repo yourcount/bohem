@@ -36,23 +36,23 @@ function validateAndSanitizeByTemplate(
 
   if (typeof template === "string") {
     if (typeof input !== "string") {
-      addFieldError(errors, path, "Moet tekst zijn.");
+      addFieldError(errors, path, "Vul hier tekst in.");
       return template;
     }
 
     const nextValue = sanitizeText(input);
     if (template.length > 0 && nextValue.length === 0) {
-      addFieldError(errors, path, "Dit veld mag niet leeg zijn.");
+      addFieldError(errors, path, "Dit veld is verplicht.");
     }
     if (nextValue.length > 8000) {
-      addFieldError(errors, path, "Tekst is te lang.");
+      addFieldError(errors, path, "Deze tekst is te lang.");
     }
     return nextValue;
   }
 
   if (typeof template === "number") {
     if (typeof input !== "number" || !Number.isFinite(input)) {
-      addFieldError(errors, path, "Moet een geldig getal zijn.");
+      addFieldError(errors, path, "Vul een geldig getal in.");
       return template;
     }
     return input;
@@ -60,7 +60,7 @@ function validateAndSanitizeByTemplate(
 
   if (typeof template === "boolean") {
     if (typeof input !== "boolean") {
-      addFieldError(errors, path, "Moet waar of onwaar zijn.");
+      addFieldError(errors, path, "Kies ja of nee.");
       return template;
     }
     return input;
@@ -68,7 +68,7 @@ function validateAndSanitizeByTemplate(
 
   if (Array.isArray(template)) {
     if (!Array.isArray(input)) {
-      addFieldError(errors, path, "Moet een lijst zijn.");
+      addFieldError(errors, path, "Gebruik een lijst met items.");
       return template;
     }
     if (template.length === 0) {
@@ -83,7 +83,7 @@ function validateAndSanitizeByTemplate(
 
   if (template && typeof template === "object") {
     if (!input || typeof input !== "object" || Array.isArray(input)) {
-      addFieldError(errors, path, "Moet een object zijn.");
+      addFieldError(errors, path, "Dit onderdeel heeft ongeldige gegevens.");
       return template;
     }
 

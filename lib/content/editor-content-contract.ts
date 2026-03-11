@@ -52,6 +52,39 @@ function sanitizeText(value: string) {
   return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
 }
 
+const OPTIONAL_EMPTY_TEXT_PATH_SUFFIXES = [".website", ".ticketsHref", ".infoHref"];
+
+function isOptionalEmptyTextPath(path: string) {
+  return OPTIONAL_EMPTY_TEXT_PATH_SUFFIXES.some((suffix) => path.endsWith(suffix));
+}
+
+const URL_FIELD_KEYS = new Set(["href", "website", "ticketsHref", "infoHref", "kitHref", "embedUrl"]);
+
+function getFieldKeyFromPath(path: string) {
+  const clean = path.replace(/^content\./, "");
+  const parts = clean.split(".");
+  return parts[parts.length - 1] ?? "";
+}
+
+function isValidAbsoluteHttpUrl(value: string) {
+  try {
+    const parsed = new URL(value);
+    return (parsed.protocol === "http:" || parsed.protocol === "https:") && parsed.hostname.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+function isValidEditorHref(value: string) {
+  const href = value.trim();
+  if (!href) return false;
+  if (href.startsWith("#")) return true;
+  if (href.startsWith("/")) return !href.startsWith("//");
+  if (href.startsWith("mailto:")) return href.length > "mailto:".length;
+  if (href.startsWith("tel:")) return href.length > "tel:".length;
+  return isValidAbsoluteHttpUrl(href);
+}
+
 function validateAndSanitizeByTemplate(input: unknown, template: unknown, path: string, errors: FieldErrors): unknown {
   if (typeof input === "undefined") {
     return structuredClone(template);
@@ -59,23 +92,29 @@ function validateAndSanitizeByTemplate(input: unknown, template: unknown, path: 
 
   if (typeof template === "string") {
     if (typeof input !== "string") {
-      addFieldError(errors, path, "Moet tekst zijn.");
+      addFieldError(errors, path, "Vul hier tekst in.");
       return template;
     }
 
     const nextValue = sanitizeText(input);
-    if (template.length > 0 && nextValue.length === 0) {
-      addFieldError(errors, path, "Dit veld mag niet leeg zijn.");
+    const isOptionalPath = isOptionalEmptyTextPath(path);
+    if (!isOptionalPath && template.length > 0 && nextValue.length === 0) {
+      addFieldError(errors, path, "Dit veld is verplicht.");
     }
     if (nextValue.length > 8000) {
-      addFieldError(errors, path, "Tekst is te lang.");
+      addFieldError(errors, path, "Deze tekst is te lang.");
+    }
+
+    const fieldKey = getFieldKeyFromPath(path);
+    if (URL_FIELD_KEYS.has(fieldKey) && nextValue.length > 0 && !isValidEditorHref(nextValue)) {
+      addFieldError(errors, path, "Gebruik een geldige link (https://..., /pad of #anker).");
     }
     return nextValue;
   }
 
   if (typeof template === "number") {
     if (typeof input !== "number" || !Number.isFinite(input)) {
-      addFieldError(errors, path, "Moet een geldig getal zijn.");
+      addFieldError(errors, path, "Vul een geldig getal in.");
       return template;
     }
     return input;
@@ -83,7 +122,7 @@ function validateAndSanitizeByTemplate(input: unknown, template: unknown, path: 
 
   if (typeof template === "boolean") {
     if (typeof input !== "boolean") {
-      addFieldError(errors, path, "Moet waar of onwaar zijn.");
+      addFieldError(errors, path, "Kies ja of nee.");
       return template;
     }
     return input;
@@ -91,7 +130,7 @@ function validateAndSanitizeByTemplate(input: unknown, template: unknown, path: 
 
   if (Array.isArray(template)) {
     if (!Array.isArray(input)) {
-      addFieldError(errors, path, "Moet een lijst zijn.");
+      addFieldError(errors, path, "Gebruik een lijst met items.");
       return template;
     }
 
@@ -107,7 +146,7 @@ function validateAndSanitizeByTemplate(input: unknown, template: unknown, path: 
 
   if (template && typeof template === "object") {
     if (!input || typeof input !== "object" || Array.isArray(input)) {
-      addFieldError(errors, path, "Moet een object zijn.");
+      addFieldError(errors, path, "Dit onderdeel heeft ongeldige gegevens.");
       return template;
     }
 

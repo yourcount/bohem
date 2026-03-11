@@ -67,7 +67,7 @@ export async function PATCH(request: Request) {
   if (!parsed.ok) {
     return NextResponse.json(
       {
-        error: "Validatie mislukt.",
+        error: "Deze wijziging is niet opgeslagen. Controleer de gemarkeerde velden.",
         code: "VALIDATION_ERROR",
         fieldErrors: parsed.fieldErrors
       },

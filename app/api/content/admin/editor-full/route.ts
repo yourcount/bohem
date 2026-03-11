@@ -81,7 +81,7 @@ export async function PATCH(request: Request) {
   if (!parsedEditor.ok) {
     return NextResponse.json(
       {
-        error: "Validatie mislukt.",
+        error: "Deze wijziging is niet opgeslagen. Controleer de gemarkeerde velden.",
         code: "VALIDATION_ERROR",
         fieldErrors: parsedEditor.fieldErrors,
         validationSummary: buildValidationSummary(parsedEditor.fieldErrors)
@@ -102,7 +102,7 @@ export async function PATCH(request: Request) {
     if (!fullValidation.ok) {
       return NextResponse.json(
         {
-          error: "Validatie op gecombineerde content mislukt.",
+          error: "Opslaan is gestopt omdat één of meer velden nog niet kloppen.",
           code: "VALIDATION_ERROR",
           fieldErrors: fullValidation.fieldErrors,
           validationSummary: buildValidationSummary(fullValidation.fieldErrors)

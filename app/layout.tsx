@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 
 import { CookieConsentProvider } from "@/components/cookies/CookieConsentProvider";
 import { getLiveSiteContent } from "@/lib/content/live-content";
@@ -62,6 +63,9 @@ export async function generateMetadata(): Promise<Metadata> {
       description: resolvedSeo.ogDescription,
       images: [content.hero.image.src]
     },
+    verification: {
+      google: "kratEAespNbD3M93NVF-AXEl4dwR7FbJq3M3qNgBCxU"
+    },
     manifest: "/site.webmanifest",
     icons: {
       icon: [
@@ -78,6 +82,15 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="nl">
       <body>
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-W2Z0GGDLDX" strategy="afterInteractive" />
+        <Script id="google-analytics-gtag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-W2Z0GGDLDX');
+          `}
+        </Script>
         <CookieConsentProvider>{children}</CookieConsentProvider>
       </body>
     </html>

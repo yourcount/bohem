@@ -47,20 +47,6 @@ const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][numbe
   "Live Session",
   "Album"
 ];
-const DUTCH_MONTH_MAP: Record<string, number> = {
-  jan: 0,
-  feb: 1,
-  mrt: 2,
-  apr: 3,
-  mei: 4,
-  jun: 5,
-  jul: 6,
-  aug: 7,
-  sep: 8,
-  okt: 9,
-  nov: 10,
-  dec: 11
-};
 const DISC_SECTION_TITLE = "Releases beheren";
 const SHOWS_SECTION_TITLE = "Volgende shows beheren";
 
@@ -267,30 +253,8 @@ function sectionToId(sectionTitle: string) {
   return `editor-section-${sectionTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 }
 
-function parseDutchDateLabelToEpoch(input: string) {
-  const value = input.trim().toLowerCase().replace(/\./g, "");
-  const match = value.match(/^(\d{1,2})\s+([a-z]{3})\s+(\d{4})$/);
-  if (!match) return Number.MAX_SAFE_INTEGER;
-
-  const [, dayRaw, monthRaw, yearRaw] = match;
-  const month = DUTCH_MONTH_MAP[monthRaw];
-  if (month === undefined) return Number.MAX_SAFE_INTEGER;
-
-  const day = Number(dayRaw);
-  const year = Number(yearRaw);
-  if (!Number.isFinite(day) || !Number.isFinite(year)) return Number.MAX_SAFE_INTEGER;
-
-  return new Date(year, month, day).getTime();
-}
-
-function sortShowsByDate(shows: NonNullable<SiteContent["bookings"]["upcomingShows"]>) {
-  return [...shows].sort((a, b) => parseDutchDateLabelToEpoch(a.date) - parseDutchDateLabelToEpoch(b.date));
-}
-
 function normalizeEditorContent(content: EditorManagedContent): EditorManagedContent {
-  const next = structuredClone(content);
-  next.bookings.upcomingShows = sortShowsByDate(next.bookings.upcomingShows ?? []);
-  return next;
+  return structuredClone(content);
 }
 
 export function ContentEditorForm() {
@@ -703,8 +667,7 @@ export function ContentEditorForm() {
         ctaHref: firstCtaHref
       };
       next.bookings.upcomingShows.push(newShow);
-      next.bookings.upcomingShows = sortShowsByDate(next.bookings.upcomingShows);
-      nextIndex = next.bookings.upcomingShows.indexOf(newShow);
+      nextIndex = next.bookings.upcomingShows.length - 1;
       return next;
     });
     if (nextIndex >= 0) {
@@ -724,12 +687,27 @@ export function ContentEditorForm() {
     setDirty();
   };
 
+  const moveShow = (showIndex: number, direction: "up" | "down") => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const next = structuredClone(prev);
+      const showsList = next.bookings.upcomingShows;
+      if (!showsList || showsList.length < 2) return prev;
+      const toIndex = direction === "up" ? showIndex - 1 : showIndex + 1;
+      if (toIndex < 0 || toIndex >= showsList.length) return prev;
+      const [item] = showsList.splice(showIndex, 1);
+      showsList.splice(toIndex, 0, item);
+      return next;
+    });
+    scrollShowIntoView(direction === "up" ? showIndex - 1 : showIndex + 1);
+    setDirty();
+  };
+
   const updateShowField = (
     showIndex: number,
     key: keyof UpcomingShow,
     value: string
   ) => {
-    let nextIndex = showIndex;
     setContent((prev) => {
       if (!prev) return prev;
       const next = structuredClone(prev);
@@ -737,15 +715,8 @@ export function ContentEditorForm() {
       const show = next.bookings.upcomingShows[showIndex];
       if (!show) return prev;
       show[key] = value;
-      if (key === "date") {
-        next.bookings.upcomingShows = sortShowsByDate(next.bookings.upcomingShows);
-        nextIndex = next.bookings.upcomingShows.indexOf(show);
-      }
       return next;
     });
-    if (key === "date" && nextIndex >= 0) {
-      scrollShowIntoView(nextIndex);
-    }
     setFieldErrors((prev) => {
       const next = { ...prev };
       Object.keys(next).forEach((fieldKey) => {
@@ -753,9 +724,7 @@ export function ContentEditorForm() {
           delete next[fieldKey];
         }
       });
-      if (nextIndex >= 0) {
-        next[`bookings.upcomingShows.${nextIndex}.${key}`] = [];
-      }
+      next[`bookings.upcomingShows.${showIndex}.${key}`] = [];
       return next;
     });
     setDirty();
@@ -994,7 +963,7 @@ export function ContentEditorForm() {
         <ul className="mt-4 space-y-3">
           {releases.map((release, index) => (
             <li
-              key={`${release.title}-${index}`}
+              key={`release-${index}`}
               ref={(node) => {
                 releaseItemRefs.current[index] = node;
               }}
@@ -1096,7 +1065,7 @@ export function ContentEditorForm() {
               <p className="mt-3 text-xs font-semibold text-[#d9c6ac]">Links in deze release: {release.links.length}</p>
               <div className="mt-2 space-y-2">
                 {release.links.map((link, linkIndex) => (
-                  <div key={`${link.label}-${linkIndex}`} className="rounded-lg border border-[var(--color-line-muted)] p-2">
+                  <div key={`release-link-${index}-${linkIndex}`} className="rounded-lg border border-[var(--color-line-muted)] p-2">
                     <div className="grid gap-2 md:grid-cols-[1fr_2fr_auto] md:items-end">
                       <label className="text-xs font-semibold text-[#d9c6ac]">
                         Linktekst
@@ -1163,7 +1132,7 @@ export function ContentEditorForm() {
         <ul className="mt-4 space-y-3">
           {shows.map((show, index) => (
             <li
-              key={`${show.date}-${show.venue}-${index}`}
+              key={`show-${index}`}
               ref={(node) => {
                 showItemRefs.current[index] = node;
               }}
@@ -1173,13 +1142,31 @@ export function ContentEditorForm() {
                 <span className="font-semibold text-[#f8f5f1]">
                   {index + 1}. {show.venue || "Nieuwe show"}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => removeShow(index)}
-                  className="rounded-full border border-[var(--color-line-muted)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  Verwijderen
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => moveShow(index, "up")}
+                    disabled={index === 0}
+                    className="rounded-full border border-[var(--color-line-muted)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Omhoog
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveShow(index, "down")}
+                    disabled={index === shows.length - 1}
+                    className="rounded-full border border-[var(--color-line-muted)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Omlaag
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeShow(index)}
+                    className="rounded-full border border-[var(--color-line-muted)] px-3 py-1 text-xs text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Verwijderen
+                  </button>
+                </div>
               </div>
 
               <div className="mt-3 grid gap-3 md:grid-cols-2">

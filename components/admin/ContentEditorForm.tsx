@@ -49,6 +49,16 @@ const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][numbe
 ];
 const DISC_SECTION_TITLE = "Releases beheren";
 const SHOWS_SECTION_TITLE = "Volgende shows beheren";
+const HIDDEN_EDITOR_SECTIONS = new Set(["footer", "brand"]);
+const HIDDEN_EDITOR_PATHS = new Set(["hero.eyebrow"]);
+const HIDDEN_EDITOR_PATH_PREFIXES = [
+  "discography.releases.",
+  "bookings.upcomingShows.",
+  "hero.listenNow.",
+  "hero.intentLinks.",
+  "bookings.miniCases.",
+  "bookings.highlightImage."
+];
 
 const sectionLabels: Record<string, string> = {
   brand: "Hero",
@@ -348,10 +358,9 @@ export function ContentEditorForm() {
     if (!content) return [];
     return flattenEditableFields(content).filter(
       (field) =>
-        field.section !== "footer" &&
-        field.path !== "hero.eyebrow" &&
-        !field.path.startsWith("discography.releases.") &&
-        !field.path.startsWith("bookings.upcomingShows.")
+        !HIDDEN_EDITOR_SECTIONS.has(field.section) &&
+        !HIDDEN_EDITOR_PATHS.has(field.path) &&
+        !HIDDEN_EDITOR_PATH_PREFIXES.some((prefix) => field.path.startsWith(prefix))
     );
   }, [content]);
 

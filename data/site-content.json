@@ -284,22 +284,22 @@
         "date": "12 apr 2026",
         "venue": "Theater het Nest",
         "city": "Nijmegen",
-        "ctaLabel": "Informatie",
-        "ctaHref": "#contact"
+        "ticketsHref": "",
+        "infoHref": "#contact"
       },
       {
         "date": "08 mei 2026",
         "venue": "Podium De Lantaarn",
         "city": "Utrecht",
-        "ctaLabel": "Tickets",
-        "ctaHref": "#contact"
+        "ticketsHref": "#contact",
+        "infoHref": ""
       },
       {
         "date": "29 mei 2026",
         "venue": "Cultuurhuis Zuid",
         "city": "Eindhoven",
-        "ctaLabel": "Boek direct",
-        "ctaHref": "#contact"
+        "ticketsHref": "#contact",
+        "infoHref": ""
       }
     ],
     "highlightImage": {

@@ -80,8 +80,8 @@ const keyLabels: Record<string, string> = {
   city: "Plaats",
   venue: "Locatie",
   date: "Datum",
-  ctaLabel: "Knoptekst",
-  ctaHref: "Knoplink",
+  ticketsHref: "Tickets link",
+  infoHref: "Extra info link",
   contactEmail: "E-mailadres",
   contactPhone: "Telefoon",
   email: "E-mailadres",
@@ -655,16 +655,16 @@ export function ContentEditorForm() {
       if (!next.bookings.upcomingShows) {
         next.bookings.upcomingShows = [];
       }
-      const firstCtaHref = next.bookings.upcomingShows[0]?.ctaHref || "#contact";
-      const firstCtaLabel = next.bookings.upcomingShows[0]?.ctaLabel || "Tickets";
+      const firstTicketsHref = next.bookings.upcomingShows[0]?.ticketsHref || "";
+      const firstInfoHref = next.bookings.upcomingShows[0]?.infoHref || "";
       const nextDate = new Date();
       const month = nextDate.toLocaleDateString("nl-NL", { month: "short" }).replace(".", "");
       const newShow: UpcomingShow = {
         date: `${String(nextDate.getDate()).padStart(2, "0")} ${month} ${nextDate.getFullYear()}`,
         venue: "Nieuwe locatie",
         city: "Plaats",
-        ctaLabel: firstCtaLabel,
-        ctaHref: firstCtaHref
+        ticketsHref: firstTicketsHref,
+        infoHref: firstInfoHref
       };
       next.bookings.upcomingShows.push(newShow);
       nextIndex = next.bookings.upcomingShows.length - 1;
@@ -1120,7 +1120,7 @@ export function ContentEditorForm() {
           <span aria-hidden="true" className="text-sm text-[#d9c6ac]">Open/dicht</span>
         </summary>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-[#d9c6ac]">Voeg shows toe, bewerk ze direct en bepaal per show de CTA.</p>
+          <p className="text-xs text-[#d9c6ac]">Voeg shows toe en beheer per show de Tickets-link en Extra info-link.</p>
           <button
             type="button"
             onClick={addShow}
@@ -1207,28 +1207,29 @@ export function ContentEditorForm() {
                 </label>
 
                 <label className="text-xs font-semibold text-[#d9c6ac]">
-                  CTA tekst
+                  Tickets link
                   <input
-                    value={show.ctaLabel}
-                    onChange={(event) => updateShowField(index, "ctaLabel", event.target.value)}
+                    value={show.ticketsHref ?? ""}
+                    onChange={(event) => updateShowField(index, "ticketsHref", event.target.value)}
                     className={editorInputClass}
                   />
-                  {fieldErrors[`bookings.upcomingShows.${index}.ctaLabel`]?.[0] ? (
-                    <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`bookings.upcomingShows.${index}.ctaLabel`]?.[0]}</span>
+                  <p className="mt-1 text-xs text-[#d9c6ac]">Laat leeg om geen Tickets-knop te tonen.</p>
+                  {fieldErrors[`bookings.upcomingShows.${index}.ticketsHref`]?.[0] ? (
+                    <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`bookings.upcomingShows.${index}.ticketsHref`]?.[0]}</span>
                   ) : null}
                 </label>
               </div>
 
               <label className="mt-3 block text-xs font-semibold text-[#d9c6ac]">
-                CTA link
+                Extra info link
                 <input
-                  value={show.ctaHref}
-                  onChange={(event) => updateShowField(index, "ctaHref", event.target.value)}
+                  value={show.infoHref ?? ""}
+                  onChange={(event) => updateShowField(index, "infoHref", event.target.value)}
                   className={editorInputClass}
                 />
-                <p className="mt-1 text-xs text-[#d9c6ac]">Gebruik bijvoorbeeld `#contact` of een ticket URL.</p>
-                {fieldErrors[`bookings.upcomingShows.${index}.ctaHref`]?.[0] ? (
-                  <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`bookings.upcomingShows.${index}.ctaHref`]?.[0]}</span>
+                <p className="mt-1 text-xs text-[#d9c6ac]">Laat leeg om geen Extra info-knop te tonen.</p>
+                {fieldErrors[`bookings.upcomingShows.${index}.infoHref`]?.[0] ? (
+                  <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`bookings.upcomingShows.${index}.infoHref`]?.[0]}</span>
                 ) : null}
               </label>
             </li>

@@ -169,8 +169,8 @@ export type SiteContent = {
       date: string;
       venue: string;
       city: string;
-      ctaLabel: string;
-      ctaHref: string;
+      ticketsHref?: string;
+      infoHref?: string;
     }>;
     highlightImage?: ImageAsset & {
       width: number;

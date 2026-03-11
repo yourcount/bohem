@@ -24,6 +24,13 @@ function sanitizeHref(href: string, fallback: string) {
   return isValidHref(href) ? href.trim() : fallback;
 }
 
+function sanitizeOptionalHref(href: string | undefined, fallback = "") {
+  if (typeof href !== "string") return fallback;
+  const value = href.trim();
+  if (!value) return "";
+  return isValidHref(value) ? value : fallback;
+}
+
 export function sanitizeNavigationItems(items: SiteContent["navigation"]): SiteContent["navigation"] {
   return items.map((item, index) => {
     const fallback = siteContent.navigation[index]?.href ?? "#contact";
@@ -138,8 +145,11 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
       ...(Array.isArray(content.bookings.upcomingShows) && content.bookings.upcomingShows.length > 0
         ? {
             upcomingShows: content.bookings.upcomingShows.map((show, index) => ({
-              ...show,
-              ctaHref: sanitizeHref(show.ctaHref, siteContent.bookings.upcomingShows?.[index]?.ctaHref ?? "#contact")
+              date: show.date,
+              venue: show.venue,
+              city: show.city,
+              ticketsHref: sanitizeOptionalHref(show.ticketsHref, siteContent.bookings.upcomingShows?.[index]?.ticketsHref ?? ""),
+              infoHref: sanitizeOptionalHref(show.infoHref, siteContent.bookings.upcomingShows?.[index]?.infoHref ?? "")
             }))
           }
         : {}),

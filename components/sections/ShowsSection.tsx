@@ -50,13 +50,26 @@ export function ShowsSection({ shows, eyebrow, title, badgeLabel }: ShowsSection
                     </p>
                     <p className="text-xl font-semibold text-[#f8f1e5]">{show.venue}</p>
                     <p className="mt-1 text-sm text-[#d9c4a8]">{show.city}</p>
-                    <Link
-                      href={show.ctaHref}
-                      data-cta={`show_${show.venue.toLowerCase().replace(/\s+/g, "_")}`}
-                      className="cta-glow ticket-burst mt-5 inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
-                    >
-                      <span className="ticket-burst-label">{show.ctaLabel || "Tickets"}</span>
-                    </Link>
+                    <div className="mt-5 flex flex-col gap-2">
+                      {show.ticketsHref?.trim() ? (
+                        <Link
+                          href={show.ticketsHref}
+                          data-cta={`show_tickets_${show.venue.toLowerCase().replace(/\s+/g, "_")}`}
+                          className="cta-glow ticket-burst inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+                        >
+                          <span className="ticket-burst-label">Tickets</span>
+                        </Link>
+                      ) : null}
+                      {show.infoHref?.trim() ? (
+                        <Link
+                          href={show.infoHref}
+                          data-cta={`show_info_${show.venue.toLowerCase().replace(/\s+/g, "_")}`}
+                          className="inline-flex w-full items-center justify-center rounded-full border border-[rgba(242,139,14,0.52)] bg-transparent px-4 py-2.5 text-sm font-bold text-[#f3d7b0] transition-colors hover:bg-[rgba(242,139,14,0.16)] hover:text-[#f8f1e5]"
+                        >
+                          Extra info
+                        </Link>
+                      ) : null}
+                    </div>
                   </article>
                 </Reveal>
               ))}

@@ -49,6 +49,7 @@ export function buildHomeJsonLd(content: SiteContent) {
       ?.map((show) => {
         const startDate = parseShowDate(show.date);
         if (!startDate) return null;
+        const primaryShowUrl = show.ticketsHref?.trim() || show.infoHref?.trim() || "";
         return {
           "@type": "MusicEvent",
           name: `Bohèm live — ${show.venue}`,
@@ -69,11 +70,15 @@ export function buildHomeJsonLd(content: SiteContent) {
             name: content.brand.name,
             url
           },
-          offers: {
-            "@type": "Offer",
-            url: absoluteUrl(show.ctaHref),
-            availability: "https://schema.org/InStock"
-          }
+          ...(primaryShowUrl
+            ? {
+                offers: {
+                  "@type": "Offer",
+                  url: absoluteUrl(primaryShowUrl),
+                  availability: "https://schema.org/InStock"
+                }
+              }
+            : {})
         };
       })
       .filter(Boolean) ?? [];

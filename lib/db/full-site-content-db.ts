@@ -40,6 +40,12 @@ function isVercelRuntime() {
   return Boolean(process.env.VERCEL);
 }
 
+function shouldUseProcessContentCache() {
+  // In Vercel/serverless meerdere instances kunnen verschillende procescaches hebben.
+  // Om stale content na opeenvolgende saves te voorkomen gebruiken we deze cache alleen lokaal.
+  return !isVercelRuntime();
+}
+
 function shouldUseBlobStorage() {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 }
@@ -77,6 +83,7 @@ async function readBlobPayload(): Promise<BlobPayload | null> {
 }
 
 function getBlobContentCache(): FullSiteContentRecord | null {
+  if (!shouldUseProcessContentCache()) return null;
   if (!blobContentCache) return null;
   if (blobContentCache.expiresAt <= Date.now()) {
     blobContentCache = null;
@@ -86,6 +93,7 @@ function getBlobContentCache(): FullSiteContentRecord | null {
 }
 
 function setBlobContentCache(value: FullSiteContentRecord) {
+  if (!shouldUseProcessContentCache()) return;
   blobContentCache = {
     value,
     expiresAt: Date.now() + BLOB_CONTENT_CACHE_TTL_MS

@@ -50,14 +50,17 @@ const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][numbe
 const DISC_SECTION_TITLE = "Releases beheren";
 const SHOWS_SECTION_TITLE = "Volgende shows beheren";
 const HIDDEN_EDITOR_SECTIONS = new Set(["footer", "brand"]);
-const HIDDEN_EDITOR_PATHS = new Set(["hero.eyebrow"]);
+const HIDDEN_EDITOR_PATHS = new Set(["hero.eyebrow", "bookings.cta.variant"]);
 const HIDDEN_EDITOR_PATH_PREFIXES = [
+  "meta.",
   "discography.releases.",
   "bookings.upcomingShows.",
   "hero.listenNow.",
   "hero.intentLinks.",
   "bookings.miniCases.",
-  "bookings.highlightImage."
+  "bookings.highlightImage.",
+  "kampvuur.packages.",
+  "kampvuur.packageCta."
 ];
 
 const sectionLabels: Record<string, string> = {

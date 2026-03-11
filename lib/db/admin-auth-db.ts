@@ -36,6 +36,9 @@ const ADMIN_SESSION_BLOB_PREFIX = "cms/admin-sessions";
 const ADMIN_USERS_BLOB_PATH = "cms/admin-users-v1.json";
 const ADMIN_AUDIT_BLOB_PATH = "cms/admin-audit-v1.json";
 const ADMIN_AUDIT_MAX_ENTRIES = 2000;
+const BLOB_USERS_CACHE_TTL_MS = 10_000;
+const SCHEMA_ENSURE_CACHE_TTL_MS = 60_000;
+const SESSION_LAST_SEEN_WRITE_INTERVAL_SECONDS = 300;
 
 type BlobAdminUsersStore = {
   next_id: number;
@@ -67,6 +70,15 @@ function shouldUseBlobSessionStore() {
 function nowIso() {
   return new Date().toISOString();
 }
+
+let schemaEnsuredAtMs = 0;
+let schemaEnsureInFlight: Promise<void> | null = null;
+let blobUsersStoreCache:
+  | {
+      value: BlobAdminUsersStore;
+      expiresAt: number;
+    }
+  | null = null;
 
 function adminSessionBlobPath(userId: number, sessionId: string) {
   return `${ADMIN_SESSION_BLOB_PREFIX}/u-${userId}/s-${sessionId}.json`;
@@ -209,8 +221,39 @@ async function readBlobUsersStore(): Promise<BlobAdminUsersStore> {
   };
 }
 
+function getBlobUsersStoreCache(): BlobAdminUsersStore | null {
+  if (!blobUsersStoreCache) return null;
+  if (blobUsersStoreCache.expiresAt <= Date.now()) {
+    blobUsersStoreCache = null;
+    return null;
+  }
+  return {
+    next_id: blobUsersStoreCache.value.next_id,
+    users: structuredClone(blobUsersStoreCache.value.users)
+  };
+}
+
+function setBlobUsersStoreCache(store: BlobAdminUsersStore) {
+  blobUsersStoreCache = {
+    value: {
+      next_id: store.next_id,
+      users: structuredClone(store.users)
+    },
+    expiresAt: Date.now() + BLOB_USERS_CACHE_TTL_MS
+  };
+}
+
+async function readBlobUsersStoreCached(): Promise<BlobAdminUsersStore> {
+  const cached = getBlobUsersStoreCache();
+  if (cached) return cached;
+  const store = await readBlobUsersStore();
+  setBlobUsersStoreCache(store);
+  return store;
+}
+
 async function writeBlobUsersStore(store: BlobAdminUsersStore) {
   await writeBlobJson(ADMIN_USERS_BLOB_PATH, store);
+  setBlobUsersStoreCache(store);
 }
 
 async function ensureBlobUsersSeed() {
@@ -357,7 +400,19 @@ function loadLegacySeed(): AdminSeed {
 
 export async function ensureAdminAuthSchema() {
   if (shouldUseBlobSessionStore()) {
-    await ensureBlobUsersSeed();
+    const now = Date.now();
+    if (schemaEnsuredAtMs && now - schemaEnsuredAtMs < SCHEMA_ENSURE_CACHE_TTL_MS) {
+      return;
+    }
+    if (!schemaEnsureInFlight) {
+      schemaEnsureInFlight = (async () => {
+        await ensureBlobUsersSeed();
+        schemaEnsuredAtMs = Date.now();
+      })().finally(() => {
+        schemaEnsureInFlight = null;
+      });
+    }
+    await schemaEnsureInFlight;
     return;
   }
 
@@ -483,7 +538,7 @@ export async function ensureAdminAuthSchema() {
 export async function findAdminUserByEmail(email: string): Promise<AdminUserRecord | null> {
   if (shouldUseBlobSessionStore()) {
     await ensureAdminAuthSchema();
-    const store = await readBlobUsersStore();
+    const store = await readBlobUsersStoreCached();
     const normalizedEmail = email.toLowerCase();
     return store.users.find((user) => user.email === normalizedEmail && !user.deleted_at) ?? null;
   }
@@ -503,7 +558,7 @@ export async function findAdminUserByEmail(email: string): Promise<AdminUserReco
 export async function findAdminUserById(userId: number): Promise<AdminUserRecord | null> {
   if (shouldUseBlobSessionStore()) {
     await ensureAdminAuthSchema();
-    const store = await readBlobUsersStore();
+    const store = await readBlobUsersStoreCached();
     return store.users.find((user) => user.id === userId && !user.deleted_at) ?? null;
   }
 
@@ -603,12 +658,16 @@ export async function isSessionActive(sessionId: string, userId?: number): Promi
     const record = await readBlobAdminSession(userId, sessionId);
     if (!record) return false;
     if (record.revoked_at) return false;
-    if (record.expires_at < Math.floor(Date.now() / 1000)) return false;
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    if (record.expires_at < nowSeconds) return false;
 
-    await writeBlobAdminSession({
-      ...record,
-      last_seen_at: new Date().toISOString()
-    });
+    const lastSeenEpoch = record.last_seen_at ? Math.floor(new Date(record.last_seen_at).getTime() / 1000) : 0;
+    if (!lastSeenEpoch || nowSeconds - lastSeenEpoch >= SESSION_LAST_SEEN_WRITE_INTERVAL_SECONDS) {
+      await writeBlobAdminSession({
+        ...record,
+        last_seen_at: new Date().toISOString()
+      });
+    }
     return true;
   }
 

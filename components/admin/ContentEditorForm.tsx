@@ -1237,7 +1237,7 @@ export function ContentEditorForm() {
         </ul>
       </details>
 
-      <form onSubmit={onSubmit} className="space-y-5 pb-28">
+      <form id="editor-content-form" onSubmit={onSubmit} className="space-y-5 pb-40">
         {groupedFields.map(([sectionTitle, fields]) => (
           <details
             key={sectionTitle}
@@ -1457,48 +1457,50 @@ export function ContentEditorForm() {
           </details>
         ))}
 
-        <div className="sticky bottom-3 z-10 rounded-xl border border-[var(--color-line-muted)] bg-[rgba(14,19,30,0.94)] p-3 backdrop-blur">
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="submit"
-              disabled={isSaving || isPristine}
-              className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-6 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)] disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {isSaving ? "Opslaan..." : "Opslaan"}
-            </button>
-            <button
-              type="button"
-              onClick={onReset}
-              disabled={isSaving || isPristine}
-              className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              Annuleren
-            </button>
-            <a
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-            >
-              Voorbeeld
-            </a>
-            <p className="text-xs text-[#d9c6ac]">
-              Laatst opgeslagen: {lastSavedAt || "onbekend"} {lastSavedBy ? `door ${lastSavedBy}` : ""}
-            </p>
-          </div>
-          <p aria-live="polite" className={`mt-2 text-sm ${statusColorClass}`}>
-            {statusTone === "success" && statusMessage ? <span aria-hidden="true" className="success-pop">✓</span> : null}
-            {statusMessage || "Geen openstaande wijzigingen."}
-          </p>
-          {statusDetails.length > 0 ? (
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[#ffb4a8]">
-              {statusDetails.map((item) => (
-                <li key={`bottom-${item}`}>{item}</li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
       </form>
+
+      <div className="fixed inset-x-3 bottom-3 z-40 mx-auto w-full max-w-[1120px] rounded-xl border border-[var(--color-line-muted)] bg-[rgba(14,19,30,0.94)] p-3 shadow-[0_10px_30px_rgba(0,0,0,0.36)] backdrop-blur supports-[padding:max(0px)]:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="submit"
+            form="editor-content-form"
+            disabled={isSaving || isPristine}
+            className="inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-6 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)] disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {isSaving ? "Opslaan..." : "Opslaan"}
+          </button>
+          <button
+            type="button"
+            onClick={onReset}
+            disabled={isSaving || isPristine}
+            className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            Annuleren
+          </button>
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+          >
+            Voorbeeld
+          </a>
+          <p className="text-xs text-[#d9c6ac]">
+            Laatst opgeslagen: {lastSavedAt || "onbekend"} {lastSavedBy ? `door ${lastSavedBy}` : ""}
+          </p>
+        </div>
+        <p aria-live="polite" className={`mt-2 text-sm ${statusColorClass}`}>
+          {statusTone === "success" && statusMessage ? <span aria-hidden="true" className="success-pop">✓</span> : null}
+          {statusMessage || "Geen openstaande wijzigingen."}
+        </p>
+        {statusDetails.length > 0 ? (
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[#ffb4a8]">
+            {statusDetails.map((item) => (
+              <li key={`bottom-${item}`}>{item}</li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
 
       {isMediaModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.72)] p-4" role="dialog" aria-modal="true" aria-label="Fotobibliotheek">

@@ -5,7 +5,6 @@ import { createSessionToken } from "@/lib/auth/session";
 import { verifyPassword } from "@/lib/auth/password";
 import {
   createAdminSessionRecord,
-  ensureAdminAuthSchema,
   findAdminUserByEmail,
   logAuditEvent,
   markUserLoginSuccess
@@ -24,7 +23,6 @@ export async function POST(request: Request) {
   }
 
   const { ip, userAgent } = getRequestMeta(request);
-  await ensureAdminAuthSchema();
 
   let body: LoginBody;
   try {

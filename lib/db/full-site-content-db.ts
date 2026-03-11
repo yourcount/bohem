@@ -17,6 +17,14 @@ export type FullSiteContentRecord = {
 type BlobPayload = FullSiteContentRecord;
 
 const FULL_CONTENT_BLOB_PATH = "cms/site-content-full-v1.json";
+const BLOB_CONTENT_CACHE_TTL_MS = 10_000;
+
+let blobContentCache:
+  | {
+      value: FullSiteContentRecord;
+      expiresAt: number;
+    }
+  | null = null;
 
 export class FullContentStorageError extends Error {
   code: "STORAGE_NOT_CONFIGURED" | "STORAGE_READ_FAILED" | "STORAGE_WRITE_FAILED";
@@ -68,6 +76,22 @@ async function readBlobPayload(): Promise<BlobPayload | null> {
   };
 }
 
+function getBlobContentCache(): FullSiteContentRecord | null {
+  if (!blobContentCache) return null;
+  if (blobContentCache.expiresAt <= Date.now()) {
+    blobContentCache = null;
+    return null;
+  }
+  return blobContentCache.value;
+}
+
+function setBlobContentCache(value: FullSiteContentRecord) {
+  blobContentCache = {
+    value,
+    expiresAt: Date.now() + BLOB_CONTENT_CACHE_TTL_MS
+  };
+}
+
 async function writeBlobPayload(content: SiteContent, updatedBy: string): Promise<BlobPayload> {
   const payload: BlobPayload = {
     content,
@@ -82,6 +106,7 @@ async function writeBlobPayload(content: SiteContent, updatedBy: string): Promis
     contentType: "application/json; charset=utf-8"
   });
 
+  setBlobContentCache(payload);
   return payload;
 }
 
@@ -145,8 +170,13 @@ export async function readFullSiteContent(): Promise<FullSiteContentRecord | nul
   if (isVercelRuntime()) {
     assertVercelBlobConfigured();
     try {
+      const cached = getBlobContentCache();
+      if (cached) return cached;
       const existing = await readBlobPayload();
-      if (existing) return existing;
+      if (existing) {
+        setBlobContentCache(existing);
+        return existing;
+      }
       return await writeBlobPayload(siteContent, "system@vercel");
     } catch (error) {
       console.error("readFullSiteContent blob failed:", error);

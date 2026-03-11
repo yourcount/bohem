@@ -122,9 +122,6 @@ export function HeroSection({ hero }: HeroSectionProps) {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-[1120px] px-4 sm:px-6 2xl:max-w-[1440px] 2xl:px-12">
-        <Reveal className="hero-intro" delayMs={20}>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#f3d7b0]">{hero.eyebrow}</p>
-        </Reveal>
         <Reveal className="hero-intro" delayMs={110}>
           <h1 id="hero-title" className="mb-4 max-w-[18ch] font-display text-4xl leading-[1.1] sm:text-5xl md:text-6xl 2xl:max-w-[22ch] 2xl:text-7xl">
             {hero.headline}

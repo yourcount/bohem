@@ -348,6 +348,7 @@ export function ContentEditorForm() {
     if (!content) return [];
     return flattenEditableFields(content).filter(
       (field) =>
+        field.section !== "footer" &&
         field.path !== "hero.eyebrow" &&
         !field.path.startsWith("discography.releases.") &&
         !field.path.startsWith("bookings.upcomingShows.")
@@ -908,9 +909,7 @@ export function ContentEditorForm() {
       <h2 id="content-editor-title" className="mb-2 font-display text-3xl">
         Website-inhoud
       </h2>
-      <p className="mb-4 text-sm text-[#d9c6ac]">
-        Pas hier alle zichtbare website-inhoud aan. Technische instellingen staan bewust in de Admin Backend.
-      </p>
+      <p className="mb-4 text-sm text-[#d9c6ac]">Pas hier alle zichtbare website-inhoud aan.</p>
       <div className="mb-4 rounded-xl border border-[rgba(67,135,133,0.45)] bg-[rgba(18,30,46,0.55)] p-4 text-sm text-[#e7d7c1]">
         <p className="font-semibold text-[#f8f5f1]">Inhoud wijzigen in 2 minuten</p>
         <ol className="mt-2 list-decimal space-y-1 pl-5 text-xs sm:text-sm">
@@ -919,9 +918,6 @@ export function ContentEditorForm() {
           <li>Klik onderaan op <strong>Opslaan</strong>.</li>
           <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
         </ol>
-        <p className="mt-2 text-xs text-[#d9c6ac]">
-          SEO, feature flags en systeeminstellingen beheer je in <a href="/admin/backend" className="underline underline-offset-2">Admin Backend</a>.
-        </p>
       </div>
 
       <div

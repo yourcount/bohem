@@ -38,7 +38,8 @@ export default async function AdminLoginPage() {
             />
           </Link>
           <h1 className="mb-3 font-display text-4xl">Admin Login</h1>
-          <p className="mb-6 text-sm text-[#d9c6ac]">Log in om Bohèm te beheren.</p>
+          <p className="mb-2 text-sm text-[#d9c6ac]">Log in om de Bohèm website-inhoud te beheren.</p>
+          <p className="mb-6 text-xs text-[#d9c6ac]">Inlogproblemen? Controleer eerst je e-mailadres en wachtwoord, of neem contact op met de beheerder.</p>
           <LoginForm />
         </div>
       </div>

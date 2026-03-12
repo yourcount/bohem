@@ -13,6 +13,7 @@ type ContactPayload = {
   email?: string;
   phone?: string;
   message?: string;
+  company_reference?: string;
   company_website?: string;
 };
 
@@ -256,6 +257,7 @@ async function sendContactMail(payload: {
   email: string;
   phone: string;
   message: string;
+  spamSignal?: string;
 }) {
   const config = getMailgunConfig();
   if (!config.apiKey || !config.domain || !config.fromEmail || !config.toEmail) {
@@ -310,7 +312,8 @@ async function sendContactMail(payload: {
     message: payload.message
   };
 
-  const adminSubject = tokenReplace(resolvedTemplates.admin.subject, tokens).slice(0, 180);
+  const adminSubjectPrefix = payload.spamSignal ? "[Controleer inzending] " : "";
+  const adminSubject = `${adminSubjectPrefix}${tokenReplace(resolvedTemplates.admin.subject, tokens)}`.slice(0, 180);
   const senderSubject = tokenReplace(resolvedTemplates.sender.subject, tokens).slice(0, 180);
 
   const adminText = [
@@ -357,6 +360,8 @@ async function sendContactMail(payload: {
       { label: "E-mail", value: payload.email },
       { label: "Telefoon", value: payload.phone },
       { label: "Bericht", value: payload.message }
+      ,
+      ...(payload.spamSignal ? [{ label: "Signaal", value: `Honeypot gevuld: ${payload.spamSignal}` }] : [])
     ]
   });
 
@@ -415,11 +420,8 @@ export async function POST(request: Request) {
   }
 
   const companyWebsite = sanitize(body.company_website);
-
-  // Honeypot: bots krijgen een succesvolle response zonder verwerking.
-  if (companyWebsite) {
-    return NextResponse.json({ ok: true }, { status: 200 });
-  }
+  const companyReference = sanitize(body.company_reference);
+  const spamSignal = companyReference || companyWebsite;
 
   const subject = sanitize(body.subject);
   const name = sanitize(body.name);
@@ -441,7 +443,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await sendContactMail({ subject, name, email, phone, message });
+    await sendContactMail({ subject, name, email, phone, message, spamSignal });
   } catch (error) {
     if (error instanceof Error && error.message === "MAILGUN_NOT_CONFIGURED") {
       return NextResponse.json(

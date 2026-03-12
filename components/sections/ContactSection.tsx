@@ -135,7 +135,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
       email: String(formData.get("email") ?? ""),
       phone: String(formData.get("phone") ?? ""),
       message: String(formData.get("message") ?? ""),
-      company_website: String(formData.get("company_website") ?? "")
+      company_reference: String(formData.get("company_reference") ?? "")
     };
 
     try {
@@ -230,7 +230,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
           <form className="hidden max-w-[820px] gap-3 md:grid md:grid-cols-2" action="#" method="post" onSubmit={handleSubmit}>
             <input
               type="text"
-              name="company_website"
+              name="company_reference"
               tabIndex={-1}
               autoComplete="off"
               className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden opacity-0"

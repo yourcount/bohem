@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
       `connect-src ${connectSrc}`,
       "worker-src 'self' blob:",
       "manifest-src 'self'",
-      "frame-src https://open.spotify.com https://*.spotify.com",
+      "frame-src https://open.spotify.com https://*.spotify.com https://vercel.live",
       "upgrade-insecure-requests"
     ].join("; ");
 

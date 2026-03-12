@@ -119,19 +119,20 @@ function renderEmailHtml(input: {
   footer: string;
   bannerTitle: string;
   bannerSubtitle: string;
+  bannerImageUrl?: string;
   ctas?: Array<{ label: string; href: string }>;
   details?: Array<{ label: string; value: string }>;
 }) {
   const detailsRows =
     input.details && input.details.length > 0
       ? `
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:16px 0;border-collapse:collapse;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:16px 0;border-collapse:separate;border-spacing:0 8px;">
         ${input.details
           .map(
             (item) => `
           <tr>
-            <td style="padding:8px 0;color:#d6be9f;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;">${escapeHtml(item.label)}</td>
-            <td style="padding:8px 0;color:#f8f1e5;font-size:14px;text-align:right;">${toHtmlParagraphs(item.value)}</td>
+            <td style="padding:10px 12px;background:#f1e6d6;border:1px solid #e2cfb4;border-radius:10px 0 0 10px;color:#7a5c3d;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;">${escapeHtml(item.label)}</td>
+            <td style="padding:10px 12px;background:#fffdf9;border:1px solid #e2cfb4;border-left:0;border-radius:0 10px 10px 0;color:#1f2937;font-size:14px;text-align:right;font-weight:600;">${toHtmlParagraphs(item.value)}</td>
           </tr>
         `
           )
@@ -168,6 +169,10 @@ function renderEmailHtml(input: {
     <meta charSet="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${escapeHtml(input.title)}</title>
+    <style>
+      a { color: #8f4f2b !important; }
+      a:hover { color: #6f3f24 !important; }
+    </style>
   </head>
   <body style="margin:0;padding:0;background:#f6efe6;color:#1f2937;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;">
     <span style="display:none;opacity:0;visibility:hidden;mso-hide:all;height:0;width:0;overflow:hidden;">${escapeHtml(input.preheader)}</span>
@@ -188,6 +193,17 @@ function renderEmailHtml(input: {
                 </table>
               </td>
             </tr>
+            ${
+              input.bannerImageUrl
+                ? `
+            <tr>
+              <td style="padding:0;background:#1f1b21;">
+                <img src="${escapeHtml(input.bannerImageUrl)}" alt="Bohèm sfeerbeeld" width="640" style="display:block;width:100%;height:auto;max-height:220px;object-fit:cover;border:0;" />
+              </td>
+            </tr>
+            `
+                : ""
+            }
             <tr>
               <td style="padding:24px 24px 10px;">
                 <h1 style="margin:0;color:#1f2937;font-size:30px;line-height:1.2;font-family:Georgia,'Times New Roman',serif;">${escapeHtml(input.title)}</h1>
@@ -241,6 +257,7 @@ async function sendContactMail(payload: {
   const liveContent = await getLiveSiteContent();
   const siteUrl = getSiteUrl();
   const showsUrl = `${siteUrl}/#shows`;
+  const bannerImageUrl = `${siteUrl}${liveContent.hero.image.src.startsWith("/") ? liveContent.hero.image.src : `/${liveContent.hero.image.src}`}`;
   const musicUrl = liveContent.discography?.featuredSingle?.href?.trim() || `${siteUrl}/#discografie`;
   const ctas = [
     { label: "Nieuwe muziek", href: musicUrl },
@@ -251,7 +268,7 @@ async function sendContactMail(payload: {
     admin: {
       subject: "Nieuwe website-aanvraag: {{subject}}",
       preheader: "Er is een nieuw bericht binnengekomen via het contactformulier.",
-      title: "Nieuwe aanvraag via musicbybohem.nl",
+      title: "Nieuwe aanvraag via de website",
       intro: "Je hebt een nieuw bericht ontvangen van {{name}}.",
       footer: "Reageer direct op deze e-mail om {{name}} terug te mailen."
     },
@@ -316,7 +333,8 @@ async function sendContactMail(payload: {
     body: "Overzicht van de aanvraag:",
     footer: tokenReplace(resolvedTemplates.admin.footer, tokens),
     bannerTitle: "Nieuwe aanvraag ontvangen",
-    bannerSubtitle: "Via het contactformulier op musicbybohem.nl",
+    bannerSubtitle: "Via het contactformulier op de website",
+    bannerImageUrl,
     ctas,
     details: [
       { label: "Onderwerp", value: payload.subject },
@@ -335,6 +353,7 @@ async function sendContactMail(payload: {
     footer: tokenReplace(resolvedTemplates.sender.footer, tokens),
     bannerTitle: "Dank voor je bericht",
     bannerSubtitle: "We komen zo snel mogelijk bij je terug.",
+    bannerImageUrl,
     ctas,
     details: [{ label: "Jouw bericht", value: payload.message }]
   });

@@ -14,11 +14,11 @@ const nextConfig: NextConfig = {
   async headers() {
     const isDev = process.env.NODE_ENV !== "production";
     const scriptSrc = isDev
-      ? "'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://vercel.live"
-      : "'self' 'unsafe-inline' https://www.googletagmanager.com https://vercel.live";
+      ? "'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://vercel.live https://challenges.cloudflare.com"
+      : "'self' 'unsafe-inline' https://www.googletagmanager.com https://vercel.live https://challenges.cloudflare.com";
     const connectSrc = isDev
-      ? "'self' https: ws: wss: https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com"
-      : "'self' https: https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com";
+      ? "'self' https: ws: wss: https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://challenges.cloudflare.com"
+      : "'self' https: https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://challenges.cloudflare.com";
     const csp = [
       "default-src 'self'",
       "base-uri 'self'",
@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
       `connect-src ${connectSrc}`,
       "worker-src 'self' blob:",
       "manifest-src 'self'",
-      "frame-src https://open.spotify.com https://*.spotify.com https://vercel.live",
+      "frame-src https://open.spotify.com https://*.spotify.com https://vercel.live https://challenges.cloudflare.com",
       "upgrade-insecure-requests"
     ].join("; ");
 

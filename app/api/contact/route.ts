@@ -15,6 +15,8 @@ type ContactPayload = {
   message?: string;
   company_reference?: string;
   company_website?: string;
+  turnstileToken?: string;
+  "cf-turnstile-response"?: string;
 };
 
 function sanitize(value: unknown) {
@@ -35,6 +37,54 @@ function getMailgunConfig() {
   const region = (process.env.MAILGUN_REGION?.trim().toLowerCase() ?? "eu") === "eu" ? "eu" : "us";
 
   return { apiKey, domain, fromEmail, fromName, toEmail, region };
+}
+
+function getTurnstileConfig() {
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? "";
+  const secretKey = process.env.TURNSTILE_SECRET_KEY?.trim() ?? "";
+  return {
+    siteKey,
+    secretKey,
+    enabled: siteKey.length > 0 && secretKey.length > 0
+  };
+}
+
+async function verifyTurnstileToken(token: string, remoteIp: string) {
+  const config = getTurnstileConfig();
+  if (!config.enabled) {
+    return { ok: true as const };
+  }
+
+  if (!token || token.trim().length === 0) {
+    return { ok: false as const, code: "missing-input-response" };
+  }
+
+  try {
+    const payload = new URLSearchParams();
+    payload.set("secret", config.secretKey);
+    payload.set("response", token.trim());
+    if (remoteIp) payload.set("remoteip", remoteIp);
+
+    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: payload.toString(),
+      cache: "no-store"
+    });
+
+    const result = (await response.json()) as {
+      success?: boolean;
+      "error-codes"?: string[];
+    };
+
+    if (!response.ok || !result.success) {
+      return { ok: false as const, code: result["error-codes"]?.[0] ?? "turnstile-verification-failed" };
+    }
+
+    return { ok: true as const };
+  } catch {
+    return { ok: false as const, code: "turnstile-request-failed" };
+  }
 }
 
 function escapeHtml(value: string) {
@@ -420,6 +470,7 @@ export async function POST(request: Request) {
   const companyWebsite = sanitize(body.company_website);
   const companyReference = sanitize(body.company_reference);
   const spamSignal = companyReference || companyWebsite;
+  const turnstileToken = sanitize(body.turnstileToken ?? body["cf-turnstile-response"]);
 
   const subject = sanitize(body.subject) || "Algemene aanvraag";
   const name = sanitize(body.name);
@@ -434,6 +485,11 @@ export async function POST(request: Request) {
   if (!phone || phone.length < 6) fieldErrors.phone = ["Vul een geldig telefoonnummer in."];
   if (!message || message.length < 8) fieldErrors.message = ["Bericht is te kort."];
   if (message.length > 2000) fieldErrors.message = ["Bericht is te lang (max 2000 tekens)."];
+
+  const turnstile = await verifyTurnstileToken(turnstileToken, ip);
+  if (!turnstile.ok) {
+    fieldErrors.turnstile = ["Beveiligingscheck mislukt. Vink de Turnstile-check aan en probeer opnieuw."];
+  }
 
   if (Object.keys(fieldErrors).length > 0) {
     return NextResponse.json({ error: "Controleer de velden en probeer opnieuw.", code: "VALIDATION_ERROR", fieldErrors }, { status: 422 });

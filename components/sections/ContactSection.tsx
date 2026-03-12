@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, type ChangeEvent, type FormEvent, type MouseEvent } from "react";
+import Script from "next/script";
 
 import { Reveal } from "@/components/ui/Reveal";
 import type { SiteContent } from "@/lib/types";
@@ -89,6 +90,8 @@ function FormField({
 }
 
 export function ContactSection({ contact }: ContactSectionProps) {
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? "";
+  const turnstileEnabled = turnstileSiteKey.length > 0;
   const [mobileStep, setMobileStep] = useState<1 | 2>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -159,7 +162,8 @@ export function ContactSection({ contact }: ContactSectionProps) {
             email: mobileFormValues.email,
             phone: mobileFormValues.phone,
             message: mobileFormValues.message,
-            company_reference: mobileFormValues.company_reference
+            company_reference: mobileFormValues.company_reference,
+            turnstileToken: String(formData.get("cf-turnstile-response") ?? "")
           }
         : {
             subject: String(formData.get("subject") ?? ""),
@@ -167,7 +171,8 @@ export function ContactSection({ contact }: ContactSectionProps) {
             email: String(formData.get("email") ?? ""),
             phone: String(formData.get("phone") ?? ""),
             message: String(formData.get("message") ?? ""),
-            company_reference: String(formData.get("company_reference") ?? "")
+            company_reference: String(formData.get("company_reference") ?? ""),
+            turnstileToken: String(formData.get("cf-turnstile-response") ?? "")
           };
 
     try {
@@ -187,7 +192,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
           const firstFieldEntry = Object.entries(result.fieldErrors).find(([, errors]) => Array.isArray(errors) && errors.length > 0);
           if (firstFieldEntry) {
             const [fieldKey, errors] = firstFieldEntry;
-            const label = fieldLabelMap[fieldKey] ?? fieldKey;
+            const label = fieldKey === "turnstile" ? "Beveiligingscheck" : (fieldLabelMap[fieldKey] ?? fieldKey);
             setSubmitError(`${label}: ${errors[0]}`);
           } else {
             setSubmitError(result.error ?? "Controleer je invoer en probeer opnieuw.");
@@ -223,6 +228,9 @@ export function ContactSection({ contact }: ContactSectionProps) {
       className="section-ambient section-ambient-contact bg-[linear-gradient(180deg,#231816_0%,#201613_54%,#1a1412_100%)] py-16"
     >
       <div className="mx-auto w-full max-w-[1120px] px-4 sm:px-6">
+        {turnstileEnabled ? (
+          <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="afterInteractive" async defer />
+        ) : null}
         <Reveal>
           <h2 id="contact-title" className="mb-4 font-display text-3xl leading-tight sm:text-4xl lg:text-5xl">
             {contact.title}
@@ -279,6 +287,18 @@ export function ContactSection({ contact }: ContactSectionProps) {
                   />
                 ) : null}
                 <div className="mt-2 grid gap-2">
+                  {turnstileEnabled ? (
+                    <div className="turnstile-wrap">
+                      <div
+                        className="cf-turnstile"
+                        data-sitekey={turnstileSiteKey}
+                        data-theme="dark"
+                        data-language="nl"
+                        data-action="contact_form_mobile_step2"
+                        data-size="flexible"
+                      />
+                    </div>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => setMobileStep(1)}
@@ -313,6 +333,18 @@ export function ContactSection({ contact }: ContactSectionProps) {
                 <FormField field={field} idPrefix="desktop" subjectOptions={subjectOptions} />
               </div>
             ))}
+            {turnstileEnabled ? (
+              <div className="turnstile-wrap md:col-span-2">
+                <div
+                  className="cf-turnstile"
+                  data-sitekey={turnstileSiteKey}
+                  data-theme="dark"
+                  data-language="nl"
+                  data-action="contact_form_desktop"
+                  data-size="flexible"
+                />
+              </div>
+            ) : null}
             <button
               type="submit"
               data-cta="contact_desktop_submit"

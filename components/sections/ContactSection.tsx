@@ -252,16 +252,14 @@ export function ContactSection({ contact }: ContactSectionProps) {
               />
             </div>
             {turnstileEnabled ? (
-              <div className="turnstile-wrap">
-                <div
-                  className="cf-turnstile"
-                  data-sitekey={turnstileSiteKey}
-                  data-theme="dark"
-                  data-language="nl"
-                  data-action="contact_form_mobile"
-                  data-size="flexible"
-                />
-              </div>
+              <div
+                className="cf-turnstile mt-1"
+                data-sitekey={turnstileSiteKey}
+                data-theme="dark"
+                data-language="nl"
+                data-action="contact_form_mobile"
+                data-size="flexible"
+              />
             ) : null}
 
             {mobileStep === 1 ? (
@@ -334,16 +332,14 @@ export function ContactSection({ contact }: ContactSectionProps) {
               </div>
             ))}
             {turnstileEnabled ? (
-              <div className="turnstile-wrap md:col-span-2">
-                <div
-                  className="cf-turnstile"
-                  data-sitekey={turnstileSiteKey}
-                  data-theme="dark"
-                  data-language="nl"
-                  data-action="contact_form_desktop"
-                  data-size="flexible"
-                />
-              </div>
+              <div
+                className="cf-turnstile mt-1 md:col-span-2"
+                data-sitekey={turnstileSiteKey}
+                data-theme="dark"
+                data-language="nl"
+                data-action="contact_form_desktop"
+                data-size="flexible"
+              />
             ) : null}
             <button
               type="submit"

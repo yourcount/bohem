@@ -696,15 +696,7 @@ section.section-ambient + section.section-ambient {
   background: linear-gradient(160deg, rgba(14, 22, 34, 0.58) 0%, rgba(14, 22, 34, 0.2) 42%, rgba(14, 22, 34, 0.68) 100%);
 }
 
-.turnstile-wrap {
-  margin-top: 0.5rem;
-  border: 1px solid rgba(67, 135, 133, 0.45);
-  border-radius: 12px;
-  background: linear-gradient(160deg, rgba(16, 22, 33, 0.75) 0%, rgba(23, 31, 46, 0.72) 100%);
-  padding: 0.55rem;
-}
-
-.turnstile-wrap .cf-turnstile {
+.cf-turnstile {
   width: 100%;
 }
 

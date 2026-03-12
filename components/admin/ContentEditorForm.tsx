@@ -41,6 +41,7 @@ type MediaFile = {
 };
 
 type StatusTone = "neutral" | "success" | "error";
+type EditorMode = "form" | "visual";
 const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][number]["format"]> = [
   "Single",
   "EP",
@@ -282,6 +283,7 @@ function normalizeEditorContent(content: EditorManagedContent): EditorManagedCon
 }
 
 export function ContentEditorForm() {
+  const [editorMode, setEditorMode] = useState<EditorMode>("form");
   const [content, setContent] = useState<EditorManagedContent | null>(null);
   const [initialContent, setInitialContent] = useState<EditorManagedContent | null>(null);
   const [lastSavedAt, setLastSavedAt] = useState("");
@@ -307,6 +309,8 @@ export function ContentEditorForm() {
   const [activeFocusPath, setActiveFocusPath] = useState<string | null>(null);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [isSectionMenuCompact, setIsSectionMenuCompact] = useState(false);
+  const [visualSelectedSection, setVisualSelectedSection] = useState<string | null>(null);
+  const [visualSelectedPath, setVisualSelectedPath] = useState<string | null>(null);
 
   const fieldRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const mediaUploadInputRef = useRef<HTMLInputElement | null>(null);
@@ -392,6 +396,7 @@ export function ContentEditorForm() {
     () => [DISC_SECTION_TITLE, SHOWS_SECTION_TITLE, ...groupedFields.map(([sectionTitle]) => sectionTitle)],
     [groupedFields]
   );
+  const groupedFieldsMap = useMemo(() => new Map(groupedFields), [groupedFields]);
 
   useEffect(() => {
     setOpenSections((previous) => {
@@ -401,6 +406,14 @@ export function ContentEditorForm() {
       }
       return next;
     });
+  }, [managedSectionTitles]);
+
+  useEffect(() => {
+    if (managedSectionTitles.length === 0) {
+      setVisualSelectedSection(null);
+      return;
+    }
+    setVisualSelectedSection((previous) => (previous && managedSectionTitles.includes(previous) ? previous : managedSectionTitles[0]));
   }, [managedSectionTitles]);
 
   useEffect(() => {
@@ -894,6 +907,11 @@ export function ContentEditorForm() {
   };
 
   const onJumpToSection = (sectionTitle: string) => {
+    if (editorMode === "visual") {
+      setVisualSelectedSection(sectionTitle);
+      setVisualSelectedPath(null);
+      return;
+    }
     setOpenSections((previous) => ({ ...previous, [sectionTitle]: true }));
     const sectionId = sectionToId(sectionTitle);
     const node = sectionRefs.current[sectionId] ?? document.getElementById(sectionId);
@@ -906,6 +924,17 @@ export function ContentEditorForm() {
       window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
     });
   };
+
+  const selectVisualField = (sectionTitle: string, path: string) => {
+    setVisualSelectedSection(sectionTitle);
+    setVisualSelectedPath(path);
+  };
+
+  const visualSectionFields = visualSelectedSection ? groupedFieldsMap.get(visualSelectedSection) ?? [] : [];
+  const visualSelectedField =
+    visualSelectedPath && visualSectionFields.length > 0
+      ? visualSectionFields.find((field) => field.path === visualSelectedPath) ?? null
+      : null;
 
   if (isLoading) {
     return <p className="text-[#d9c6ac]">Inhoud laden...</p>;
@@ -929,13 +958,50 @@ export function ContentEditorForm() {
         Website-inhoud
       </h2>
       <p className="mb-4 text-sm text-[#d9c6ac]">Pas hier alle zichtbare website-inhoud aan.</p>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setEditorMode("form")}
+          className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+            editorMode === "form"
+              ? "border-transparent bg-[var(--color-accent-amber)] text-[var(--color-bg-deep)]"
+              : "border-[var(--color-line-muted)] text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
+          }`}
+          aria-pressed={editorMode === "form"}
+        >
+          Formuliermodus
+        </button>
+        <button
+          type="button"
+          onClick={() => setEditorMode("visual")}
+          className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+            editorMode === "visual"
+              ? "border-transparent bg-[var(--color-accent-amber)] text-[var(--color-bg-deep)]"
+              : "border-[var(--color-line-muted)] text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
+          }`}
+          aria-pressed={editorMode === "visual"}
+        >
+          Visuele modus
+        </button>
+      </div>
       <div className="mb-4 rounded-xl border border-[rgba(67,135,133,0.45)] bg-[rgba(18,30,46,0.55)] p-4 text-sm text-[#e7d7c1]">
         <p className="font-semibold text-[#f8f5f1]">Inhoud wijzigen in 2 minuten</p>
         <ol className="mt-2 list-decimal space-y-1 pl-5 text-xs sm:text-sm">
-          <li>Kies een sectie in het sectiemenu.</li>
-          <li>Pas tekst, links of foto&apos;s aan.</li>
-          <li>Klik onderaan op <strong>Opslaan</strong>.</li>
-          <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
+          {editorMode === "visual" ? (
+            <>
+              <li>Kies links een sectie en klik in de preview op het onderdeel dat je wilt aanpassen.</li>
+              <li>Pas rechts tekst, links of foto&apos;s aan.</li>
+              <li>Klik onderaan op <strong>Opslaan</strong>.</li>
+              <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
+            </>
+          ) : (
+            <>
+              <li>Kies een sectie in het sectiemenu.</li>
+              <li>Pas tekst, links of foto&apos;s aan.</li>
+              <li>Klik onderaan op <strong>Opslaan</strong>.</li>
+              <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
+            </>
+          )}
         </ol>
       </div>
 
@@ -954,26 +1020,28 @@ export function ContentEditorForm() {
               {statusMessage || "Geen openstaande wijzigingen."}
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:w-auto">
-            <button
-              type="button"
-              onClick={() => setAllSectionsOpen(true)}
-              className={`inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.08)] text-xs font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.16)] ${
-                isSectionMenuCompact ? "px-3 py-1.5" : "px-4 py-2"
-              }`}
-            >
-              Alles open
-            </button>
-            <button
-              type="button"
-              onClick={() => setAllSectionsOpen(false)}
-              className={`inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.08)] text-xs font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.16)] ${
-                isSectionMenuCompact ? "px-3 py-1.5" : "px-4 py-2"
-              }`}
-            >
-              Alles dicht
-            </button>
-          </div>
+          {editorMode === "form" ? (
+            <div className="grid grid-cols-2 gap-2 sm:w-auto">
+              <button
+                type="button"
+                onClick={() => setAllSectionsOpen(true)}
+                className={`inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.08)] text-xs font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.16)] ${
+                  isSectionMenuCompact ? "px-3 py-1.5" : "px-4 py-2"
+                }`}
+              >
+                Alles open
+              </button>
+              <button
+                type="button"
+                onClick={() => setAllSectionsOpen(false)}
+                className={`inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.08)] text-xs font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.16)] ${
+                  isSectionMenuCompact ? "px-3 py-1.5" : "px-4 py-2"
+                }`}
+              >
+                Alles dicht
+              </button>
+            </div>
+          ) : null}
         </div>
 
         {!isSectionMenuCompact && statusDetails.length > 0 ? (
@@ -997,18 +1065,275 @@ export function ContentEditorForm() {
                 key={`jump-${sectionTitle}`}
                 type="button"
                 onClick={() => onJumpToSection(sectionTitle)}
-                className={`inline-flex items-center justify-between rounded-lg border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.34)] text-left font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(36,58,86,0.5)] ${
+                className={`inline-flex items-center justify-between rounded-lg border text-left font-medium transition-colors ${
+                  visualSelectedSection === sectionTitle && editorMode === "visual"
+                    ? "border-[var(--color-accent-amber)] bg-[rgba(242,139,14,0.16)] text-[#f8f5f1]"
+                    : "border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.34)] text-[var(--color-text-primary)] hover:bg-[rgba(36,58,86,0.5)]"
+                } ${
                   isSectionMenuCompact ? "min-h-8 px-2.5 py-1.5 text-xs" : "min-h-10 px-3 py-2 text-sm"
                 }`}
               >
                 <span className="truncate">{sectionTitle}</span>
-                <span aria-hidden="true" className="ml-2 text-xs text-[#d9c6ac]">→</span>
+                <span aria-hidden="true" className="ml-2 text-xs text-[#d9c6ac]">{editorMode === "visual" ? "✓" : "→"}</span>
               </button>
             ))}
           </div>
         </div>
       </div>
 
+      {editorMode === "visual" ? (
+        <div className="mb-6 grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)_360px]">
+          <aside className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.52)] p-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--color-accent-amber)]">Secties</p>
+            <ul className="space-y-2">
+              {managedSectionTitles.map((sectionTitle) => (
+                <li key={`visual-nav-${sectionTitle}`}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setVisualSelectedSection(sectionTitle);
+                      setVisualSelectedPath(null);
+                    }}
+                    className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+                      visualSelectedSection === sectionTitle
+                        ? "border-[var(--color-accent-amber)] bg-[rgba(242,139,14,0.16)] text-[#f8f5f1]"
+                        : "border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.34)] text-[var(--color-text-primary)] hover:bg-[rgba(36,58,86,0.5)]"
+                    }`}
+                  >
+                    {sectionTitle}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </aside>
+
+          <section className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(11,16,25,0.9)] p-4">
+            <div className="mx-auto w-full max-w-[980px] overflow-hidden rounded-xl border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,#151b26_0%,#0f1420_100%)]">
+              <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] px-4 py-2 text-xs text-[#d9c6ac]">
+                <span>Visual Editor Canvas (desktop)</span>
+                <span>{visualSelectedSection ?? "Geen sectie"}</span>
+              </div>
+              <div className="max-h-[70vh] space-y-4 overflow-auto p-4">
+                {managedSectionTitles.map((sectionTitle) => {
+                  const sectionFields = groupedFieldsMap.get(sectionTitle) ?? [];
+                  const isSpecialSection = sectionTitle === DISC_SECTION_TITLE || sectionTitle === SHOWS_SECTION_TITLE;
+                  const isActiveSection = visualSelectedSection === sectionTitle;
+                  return (
+                    <article
+                      key={`visual-section-${sectionTitle}`}
+                      className={`rounded-xl border p-4 transition-colors ${
+                        isActiveSection
+                          ? "border-[var(--color-accent-amber)] bg-[rgba(242,139,14,0.08)]"
+                          : "border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.24)]"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setVisualSelectedSection(sectionTitle);
+                          setVisualSelectedPath(null);
+                        }}
+                        className="mb-3 text-left font-display text-2xl text-[#f8f5f1]"
+                      >
+                        {sectionTitle}
+                      </button>
+                      {isSpecialSection ? (
+                        <div className="space-y-2 text-sm text-[#d9c6ac]">
+                          {sectionTitle === DISC_SECTION_TITLE ? (
+                            <>
+                              <p>Aantal releases: {releases.length}</p>
+                              {releases.slice(0, 4).map((release, index) => (
+                                <button
+                                  key={`visual-release-${index}`}
+                                  type="button"
+                                  onClick={() => {
+                                    setVisualSelectedSection(DISC_SECTION_TITLE);
+                                    setVisualSelectedPath(`discography.releases.${index}.title`);
+                                  }}
+                                  className="block w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-left hover:bg-[rgba(36,58,86,0.5)]"
+                                >
+                                  {index + 1}. {release.title || "Nieuwe release"}
+                                </button>
+                              ))}
+                            </>
+                          ) : (
+                            <>
+                              <p>Aantal shows: {shows.length}</p>
+                              {shows.slice(0, 4).map((show, index) => (
+                                <button
+                                  key={`visual-show-${index}`}
+                                  type="button"
+                                  onClick={() => {
+                                    setVisualSelectedSection(SHOWS_SECTION_TITLE);
+                                    setVisualSelectedPath(`bookings.upcomingShows.${index}.venue`);
+                                  }}
+                                  className="block w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-left hover:bg-[rgba(36,58,86,0.5)]"
+                                >
+                                  {index + 1}. {show.venue || "Nieuwe show"}
+                                </button>
+                              ))}
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="grid gap-2 md:grid-cols-2">
+                          {sectionFields.slice(0, 12).map((field) => {
+                            const isActiveField = visualSelectedPath === field.path;
+                            const isImageField = isImageSourcePath(field.path);
+                            const imageAltPath = isImageField ? field.path.replace(/\.src$/, ".alt") : "";
+                            const imageAltRaw = imageAltPath ? readValueAtPath(content, imageAltPath) : "";
+                            const imageAlt = typeof imageAltRaw === "string" && imageAltRaw.trim().length > 0 ? imageAltRaw : "Afbeelding preview";
+                            const focusPoint = isImageField ? getFocusForPath(field.path) : { x: 50, y: 50 };
+
+                            return (
+                              <button
+                                key={`visual-field-${field.path}`}
+                                type="button"
+                                onClick={() => selectVisualField(sectionTitle, field.path)}
+                                className={`rounded-lg border p-3 text-left transition-colors ${
+                                  isActiveField
+                                    ? "border-[var(--color-accent-amber)] bg-[rgba(242,139,14,0.16)]"
+                                    : "border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] hover:bg-[rgba(36,58,86,0.5)]"
+                                }`}
+                              >
+                                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.06em] text-[#d9c6ac]">{field.label}</p>
+                                {isImageField && field.value ? (
+                                  <Image
+                                    src={field.value}
+                                    alt={imageAlt}
+                                    width={420}
+                                    height={240}
+                                    className="h-24 w-full rounded-md object-cover"
+                                    style={{ objectPosition: `${focusPoint.x}% ${focusPoint.y}%` }}
+                                  />
+                                ) : (
+                                  <p className="line-clamp-2 text-sm text-[#f8f5f1]">{field.value || "Leeg"}</p>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+
+          <aside className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.52)] p-4">
+            <h3 className="mb-2 font-display text-2xl text-[#f8f5f1]">Inspector</h3>
+            <p className="mb-4 text-xs text-[#d9c6ac]">
+              {visualSelectedPath
+                ? "Je bewerkt nu een specifiek onderdeel."
+                : "Kies links een sectie of klik in de canvas op tekst/knop/foto."}
+            </p>
+            {visualSelectedSection === DISC_SECTION_TITLE ? (
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={addRelease}
+                    className="rounded-full border border-transparent bg-[var(--color-accent-amber)] px-3 py-1.5 text-xs font-semibold text-[var(--color-bg-deep)] hover:bg-[var(--color-accent-copper)]"
+                  >
+                    Release toevoegen
+                  </button>
+                </div>
+                {releases.map((release, index) => (
+                  <div key={`visual-release-edit-${index}`} className="rounded-lg border border-[var(--color-line-muted)] p-3">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <p className="text-sm font-semibold text-[#f8f5f1]">{index + 1}. {release.title || "Nieuwe release"}</p>
+                      <div className="flex items-center gap-1">
+                        <button type="button" onClick={() => moveRelease(index, "up")} disabled={index === 0} className="rounded border border-[var(--color-line-muted)] px-2 py-1 text-[11px] disabled:opacity-50">↑</button>
+                        <button type="button" onClick={() => moveRelease(index, "down")} disabled={index === releases.length - 1} className="rounded border border-[var(--color-line-muted)] px-2 py-1 text-[11px] disabled:opacity-50">↓</button>
+                        <button type="button" onClick={() => removeRelease(index)} className="rounded border border-[var(--color-line-muted)] px-2 py-1 text-[11px]">Verwijder</button>
+                      </div>
+                    </div>
+                    <input value={release.title} onChange={(event) => updateReleaseField(index, "title", event.target.value)} className={editorInputClass} />
+                  </div>
+                ))}
+              </div>
+            ) : visualSelectedSection === SHOWS_SECTION_TITLE ? (
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={addShow}
+                    className="rounded-full border border-transparent bg-[var(--color-accent-amber)] px-3 py-1.5 text-xs font-semibold text-[var(--color-bg-deep)] hover:bg-[var(--color-accent-copper)]"
+                  >
+                    Show toevoegen
+                  </button>
+                </div>
+                {shows.map((show, index) => (
+                  <div key={`visual-show-edit-${index}`} className="rounded-lg border border-[var(--color-line-muted)] p-3">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <p className="text-sm font-semibold text-[#f8f5f1]">{index + 1}. {show.venue || "Nieuwe show"}</p>
+                      <div className="flex items-center gap-1">
+                        <button type="button" onClick={() => moveShow(index, "up")} disabled={index === 0} className="rounded border border-[var(--color-line-muted)] px-2 py-1 text-[11px] disabled:opacity-50">↑</button>
+                        <button type="button" onClick={() => moveShow(index, "down")} disabled={index === shows.length - 1} className="rounded border border-[var(--color-line-muted)] px-2 py-1 text-[11px] disabled:opacity-50">↓</button>
+                        <button type="button" onClick={() => removeShow(index)} className="rounded border border-[var(--color-line-muted)] px-2 py-1 text-[11px]">Verwijder</button>
+                      </div>
+                    </div>
+                    <input value={show.venue} onChange={(event) => updateShowField(index, "venue", event.target.value)} className={editorInputClass} />
+                  </div>
+                ))}
+              </div>
+            ) : visualSelectedField ? (
+              <div className="space-y-3">
+                <label className="block text-xs font-semibold text-[#d9c6ac]">{visualSelectedField.label}</label>
+                {isImageSourcePath(visualSelectedField.path) ? (
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => openMediaModal(visualSelectedField.path)}
+                      className="rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
+                    >
+                      Kies uit fotobibliotheek
+                    </button>
+                    <input
+                      value={String(readValueAtPath(content, visualSelectedField.path) ?? "")}
+                      onChange={(event) => onChangeField(visualSelectedField.path, event.target.value)}
+                      className={editorInputClass}
+                    />
+                  </div>
+                ) : visualSelectedField.multiline ? (
+                  <textarea
+                    rows={5}
+                    value={String(readValueAtPath(content, visualSelectedField.path) ?? "")}
+                    onChange={(event) => onChangeField(visualSelectedField.path, event.target.value)}
+                    className={`${editorInputClass} min-h-32`}
+                  />
+                ) : (
+                  <input
+                    value={String(readValueAtPath(content, visualSelectedField.path) ?? "")}
+                    onChange={(event) => onChangeField(visualSelectedField.path, event.target.value)}
+                    className={editorInputClass}
+                  />
+                )}
+                {fieldErrors[visualSelectedField.path]?.[0] ? (
+                  <p className="text-xs text-[#ffb4a8]">{fieldErrors[visualSelectedField.path]?.[0]}</p>
+                ) : null}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {visualSectionFields.map((field) => (
+                  <button
+                    key={`visual-inspector-field-${field.path}`}
+                    type="button"
+                    onClick={() => setVisualSelectedPath(field.path)}
+                    className="block w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.34)] px-3 py-2 text-left text-sm text-[var(--color-text-primary)] hover:bg-[rgba(36,58,86,0.5)]"
+                  >
+                    {field.label}
+                  </button>
+                ))}
+                {visualSectionFields.length === 0 ? <p className="text-sm text-[#d9c6ac]">Geen velden gevonden voor deze sectie.</p> : null}
+              </div>
+            )}
+          </aside>
+        </div>
+      ) : null}
+
+      <div className={editorMode === "form" ? "" : "hidden"}>
       <details
         id={sectionToId(DISC_SECTION_TITLE)}
         ref={(node) => {
@@ -1530,6 +1855,7 @@ export function ContentEditorForm() {
         ))}
 
       </form>
+      </div>
 
       <div className="fixed inset-x-3 bottom-3 z-40 mx-auto w-full max-w-[1120px] rounded-xl border border-[var(--color-line-muted)] bg-[rgba(14,19,30,0.94)] p-3 shadow-[0_10px_30px_rgba(0,0,0,0.36)] backdrop-blur supports-[padding:max(0px)]:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="flex flex-wrap items-center gap-3">

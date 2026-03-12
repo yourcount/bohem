@@ -41,6 +41,28 @@ function stripBookingsRouteChoiceFields(bookings: SiteContent["bookings"]): Site
   ) as SiteContent["bookings"];
 }
 
+function normalizeContactTemplates(contact: SiteContent["contact"]): SiteContent["contact"] {
+  const fallback = siteContent.contact.emailTemplates;
+  const incoming = contact.emailTemplates;
+
+  if (!fallback) return contact;
+
+  return {
+    ...siteContent.contact,
+    ...contact,
+    emailTemplates: {
+      admin: {
+        ...fallback.admin,
+        ...(incoming?.admin ?? {})
+      },
+      sender: {
+        ...fallback.sender,
+        ...(incoming?.sender ?? {})
+      }
+    }
+  };
+}
+
 function addFieldError(errors: FieldErrors, path: string, message: string) {
   if (!errors[path]) {
     errors[path] = [];
@@ -197,7 +219,7 @@ function stripDisallowedReleaseLinksFromDiscography(content: EditorContent): Edi
     musicExperience: normalized.musicExperience,
     kampvuur: stripKampvuurFormatChoiceFields(normalized.kampvuur),
     bookings: stripBookingsRouteChoiceFields(normalized.bookings),
-    contact: normalized.contact,
+    contact: normalizeContactTemplates(normalized.contact),
     footer: normalized.footer
   };
 }
@@ -212,7 +234,7 @@ export function pickEditorContent(full: SiteContent): EditorContent {
     musicExperience: full.musicExperience,
     kampvuur: stripKampvuurFormatChoiceFields(full.kampvuur),
     bookings: stripBookingsRouteChoiceFields(full.bookings),
-    contact: full.contact,
+    contact: normalizeContactTemplates(full.contact),
     footer: full.footer
   };
 
@@ -232,7 +254,11 @@ export function mergeEditorContent(full: SiteContent, editorContent: EditorConte
     bookings: {
       ...full.bookings,
       ...editorContent.bookings
-    }
+    },
+    contact: normalizeContactTemplates({
+      ...full.contact,
+      ...editorContent.contact
+    })
   };
 }
 

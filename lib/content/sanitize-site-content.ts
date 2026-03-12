@@ -47,6 +47,7 @@ export function sanitizeNavigationItems(items: SiteContent["navigation"]): SiteC
 
 export function sanitizeSiteContent(content: SiteContent): SiteContent {
   const fallbackReleases = siteContent.discography.releases;
+  const fallbackMailTemplates = siteContent.contact.emailTemplates;
 
   return {
     ...content,
@@ -158,6 +159,24 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
             press: {
               ...content.bookings.press,
               kitHref: sanitizeHref(content.bookings.press.kitHref, siteContent.bookings.press?.kitHref ?? "/")
+            }
+          }
+        : {})
+    },
+    contact: {
+      ...siteContent.contact,
+      ...content.contact,
+      ...(fallbackMailTemplates
+        ? {
+            emailTemplates: {
+              admin: {
+                ...fallbackMailTemplates.admin,
+                ...(content.contact.emailTemplates?.admin ?? {})
+              },
+              sender: {
+                ...fallbackMailTemplates.sender,
+                ...(content.contact.emailTemplates?.sender ?? {})
+              }
             }
           }
         : {})

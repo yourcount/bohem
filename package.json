@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "prompt:generate": "node scripts/generate-superprompt.mjs",
     "seed:admin": "node scripts/seed-admin.mjs",
     "db:migrate:content": "node scripts/migrate-content-db.mjs",
     "db:seed:content": "node scripts/seed-content-db.mjs",
@@ -15,6 +16,8 @@
   "dependencies": {
     "@vercel/blob": "^2.3.1",
     "better-sqlite3": "^12.6.2",
+    "form-data": "^4.0.1",
+    "mailgun.js": "^11.1.0",
     "next": "^16.1.6",
     "react": "19.0.0",
     "react-dom": "19.0.0",

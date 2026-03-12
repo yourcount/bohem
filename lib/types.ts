@@ -211,6 +211,23 @@ export type SiteContent = {
       placeholder?: string;
       required: boolean;
     }>;
+    emailTemplates?: {
+      admin: {
+        subject: string;
+        preheader: string;
+        title: string;
+        intro: string;
+        footer: string;
+      };
+      sender: {
+        subject: string;
+        preheader: string;
+        title: string;
+        intro: string;
+        body: string;
+        footer: string;
+      };
+    };
   };
   footer: {
     copyright: string;

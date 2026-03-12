@@ -407,7 +407,24 @@
         "placeholder": "Vermeld datum, locatie, type avond en gewenste setduur.",
         "required": true
       }
-    ]
+    ],
+    "emailTemplates": {
+      "admin": {
+        "subject": "Nieuwe website-aanvraag: {{subject}}",
+        "preheader": "Er is een nieuw bericht binnengekomen via het contactformulier.",
+        "title": "Nieuwe aanvraag via musicbybohem.nl",
+        "intro": "Je hebt een nieuw bericht ontvangen van {{name}}.",
+        "footer": "Reageer direct op deze e-mail om {{name}} terug te mailen."
+      },
+      "sender": {
+        "subject": "We hebben je bericht ontvangen — Bohèm",
+        "preheader": "Dank voor je bericht. We komen snel bij je terug.",
+        "title": "Dank voor je bericht, {{name}}",
+        "intro": "We hebben je aanvraag over \"{{subject}}\" goed ontvangen.",
+        "body": "We reageren meestal binnen 2 werkdagen. Hieronder vind je een kopie van je bericht.",
+        "footer": "Hartelijke groet,\nBohèm"
+      }
+    }
   },
   "footer": {
     "copyright": "Bohèm"

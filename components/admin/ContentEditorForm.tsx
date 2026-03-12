@@ -104,7 +104,11 @@ const keyLabels: Record<string, string> = {
   format: "Type release",
   year: "Jaar",
   note: "Toelichting",
-  embedUrl: "Spotify embed link"
+  embedUrl: "Spotify embed link",
+  emailTemplates: "E-mail templates",
+  admin: "Admin mail",
+  sender: "Bevestigingsmail",
+  preheader: "Preheader"
 };
 
 const helperByKey: Record<string, string> = {
@@ -132,6 +136,9 @@ function prettifyPart(part: string) {
 }
 
 function helperForPath(path: string) {
+  if (path.includes("emailTemplates.")) {
+    return "Je kunt placeholders gebruiken: {{name}}, {{email}}, {{phone}}, {{subject}}, {{message}}.";
+  }
   const parts = pathParts(path);
   const leaf = parts[parts.length - 1] ?? "";
   return helperByKey[leaf] ?? "";

@@ -119,7 +119,7 @@ export function validateTechnicalSettingsPatch(input: unknown) {
 
 export function buildSafeEnvironmentProfile() {
   const nodeEnv = process.env.NODE_ENV || "development";
-  const siteUrl = sanitizeText(process.env.NEXT_PUBLIC_SITE_URL || "https://musicbybohem.nl");
+  const siteUrl = sanitizeText(process.env.NEXT_PUBLIC_SITE_URL || "https://www.musicbybohem.nl");
   const authSecretSet = Boolean(process.env.AUTH_SECRET && process.env.AUTH_SECRET.length >= 32);
 
   return {

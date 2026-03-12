@@ -66,7 +66,7 @@ export async function generateMetadata(): Promise<Metadata> {
     verification: {
       google: "kratEAespNbD3M93NVF-AXEl4dwR7FbJq3M3qNgBCxU"
     },
-    manifest: "/site.webmanifest",
+    manifest: "/manifest.webmanifest",
     icons: {
       icon: [
         { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },

@@ -12,7 +12,7 @@ Projectdoel:
 
 | Onderdeel | Keuze | Waarom | Bron |
 | --- | --- | --- | --- |
-| Inputformaat | JSON met formeel schema | Eenvoudig te valideren en scriptbaar zonder extra dependencies | docs/prompt-framework/input/example.v3.run.json |
+| Inputformaat | JSON met formeel schema | Eenvoudig te valideren en scriptbaar zonder extra dependencies | ../../../../var/folders/f1/b1jgkbq14m31tzgf_vwx8nbm0000gn/T/tmp.khHqWChgiY |
 | Automatisering | Scaffold + merge | Houdt output bruikbaar zonder inhoud te verzinnen | scripts/generate-superprompt.mjs |
 | Outputlocaties | Vast onder docs/prompt-framework/output | Sluit aan op het frameworkcontract | docs/prompt-framework/README.md |
 | Snapshot-history | Per-run snapshot naast current output | Verbetert traceability en rollback | docs/prompt-framework/V3-CLI.md |

@@ -207,7 +207,7 @@ export function SeoSettingsForm() {
 
       <section className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
         <h2 className="font-display text-3xl">Homepagina metadata</h2>
-        <p className="mt-1 text-sm text-[#d9c6ac]">Alles hieronder geldt voor `https://musicbybohem.nl/`.</p>
+        <p className="mt-1 text-sm text-[#d9c6ac]">Alles hieronder geldt voor `https://www.musicbybohem.nl/`.</p>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <label className="text-sm md:col-span-2">

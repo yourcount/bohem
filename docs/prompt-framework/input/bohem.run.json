@@ -1,0 +1,84 @@
+{
+  "conversation_source": {
+    "type": "phase-summary",
+    "source": "Bohèm website traject in Codex",
+    "summary": "Meerfasig traject met merkstrategie, one-pager frontend, admin/CMS, security, SEO, Vercel deployment en veel iteratieve verfijningen op mobile UX, caching en beheerervaring."
+  },
+  "project_context": {
+    "brand": "Bohèm",
+    "audiences": [
+      "Theaterprogrammeurs die snel vertrouwen en boekbaarheid willen beoordelen",
+      "Culturele eventorganisatoren die een match met setting en publiek zoeken",
+      "Muziekliefhebbers die emotionele connectie en luisterintentie zoeken",
+      "Niet-technische editors die content zelfstandig willen beheren"
+    ],
+    "website_goal": "Bouw een warme, theatraal-professionele website die boekingen verhoogt, vertrouwen opbouwt en beheersbaar blijft voor niet-technische gebruikers.",
+    "features": [
+      "One-page artist website met sterke hero en boekingsflow",
+      "Admin editor voor content en media",
+      "Super-admin backend voor SEO, users, cache en system controls",
+      "Vercel-ready hosting, caching en live content updates"
+    ],
+    "constraints": [
+      "Mobile-first en visueel premium",
+      "WCAG-basis, semantische HTML en duidelijke focus states",
+      "Geen stille regressies in caching, SEO of security",
+      "Niet-technische editors mogen geen technische backend zien"
+    ],
+    "tone_of_voice": "Warm, theatraal, doorleefd, professioneel en menselijk"
+  },
+  "repo_artifacts": {
+    "paths": [
+      "app/",
+      "components/",
+      "lib/",
+      "docs/release-matrix.md",
+      "docs/prompt-framework/"
+    ],
+    "categories": [
+      "frontend",
+      "admin",
+      "super-admin",
+      "seo",
+      "security",
+      "caching",
+      "deployment"
+    ]
+  },
+  "lessons_learned": [
+    {
+      "label": "success",
+      "summary": "Kleine iteraties met duidelijke acceptance criteria werkten beter dan brede verzamelrequests."
+    },
+    {
+      "label": "regression",
+      "summary": "Vercel caching en invalidatie veroorzaakten regressies totdat tags en revalidation expliciet waren ingericht."
+    },
+    {
+      "label": "misunderstanding",
+      "summary": "Hero focuspoint en mobile beeldbehandeling liepen meerdere keren mis zonder expliciete device-checks."
+    },
+    {
+      "label": "process_change",
+      "summary": "Een content parity audit tussen frontend en admin bleek nodig om alle beheerbare velden af te dekken."
+    }
+  ],
+  "open_questions": [],
+  "run_metadata": {
+    "date": "2026-03-11",
+    "operator": "Codex",
+    "source_project": "Bohèm",
+    "output_language": "nl",
+    "framework_version": "v3",
+    "template_version": "2026-03-v1"
+  },
+  "success_criteria": [
+    "Boekingsgerichte en fangerichte flows moeten zonder scopeverwarring gestart kunnen worden.",
+    "Admin- en frontendbeslissingen moeten expliciet in het framework terugkomen.",
+    "Lessons learned uit Vercel, caching en beheerervaring moeten toekomstige runs aantoonbaar verbeteren."
+  ],
+  "scope_notes": [
+    "Bohèm blijft een leer- en referentiecase, niet de default voor nieuwe runs.",
+    "Deze input mag gebruikt worden om regressies in branding, content parity en beheerflows te illustreren."
+  ]
+}

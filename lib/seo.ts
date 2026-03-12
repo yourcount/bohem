@@ -1,6 +1,6 @@
 import type { SiteContent } from "@/lib/types";
 
-const DEFAULT_SITE_URL = "https://musicbybohem.nl";
+const DEFAULT_SITE_URL = "https://www.musicbybohem.nl";
 
 const dutchMonthMap: Record<string, string> = {
   jan: "01",

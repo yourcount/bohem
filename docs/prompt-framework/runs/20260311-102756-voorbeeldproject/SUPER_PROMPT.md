@@ -10,9 +10,7 @@ Projectdoel:
 
 Succescriteria:
 
-- Nieuwe projectstarts moeten binnen één prompt een stabiele structuur afdwingen.
-- Output moet direct op de vaste framework-paden verschijnen zonder handmatige herschikking.
-- Regressies in scope, logging en gates moeten vroeg zichtbaar zijn in het run-report.
+- [Aanvullen: concrete succescriteria voor Voorbeeldproject]
 
 Feature scope voor deze run:
 
@@ -170,6 +168,7 @@ Artifact-categorieen:
 - Templateversie: 2026-03-v1
 - Outputtaal: nl
 - Generator werkt als scaffold + merge en verzint geen projectspecifieke inhoud.
+- Succescriteria ontbreken nog; de output houdt daarom een placeholder zichtbaar.
 
 ## Plan complete
 

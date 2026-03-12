@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Superprompt Generator Run Input",
+  "type": "object",
+  "required": [
+    "conversation_source",
+    "project_context",
+    "repo_artifacts",
+    "lessons_learned",
+    "open_questions",
+    "run_metadata"
+  ],
+  "properties": {
+    "conversation_source": {
+      "type": "object",
+      "required": ["type", "source", "summary"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 }
+      }
+    },
+    "project_context": {
+      "type": "object",
+      "required": ["brand", "audiences", "website_goal", "features", "constraints", "tone_of_voice"],
+      "properties": {
+        "brand": { "type": "string", "minLength": 1 },
+        "audiences": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "website_goal": { "type": "string", "minLength": 1 },
+        "features": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "constraints": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "tone_of_voice": { "type": "string", "minLength": 1 }
+      }
+    },
+    "repo_artifacts": {
+      "type": "object",
+      "required": ["paths", "categories"],
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "categories": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "lessons_learned": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "summary"],
+        "properties": {
+          "label": {
+            "type": "string",
+            "enum": ["success", "regression", "misunderstanding", "process_change"]
+          },
+          "summary": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "open_questions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "run_metadata": {
+      "type": "object",
+      "required": ["date", "operator", "source_project", "framework_version", "template_version"],
+      "properties": {
+        "date": { "type": "string", "minLength": 1 },
+        "operator": { "type": "string", "minLength": 1 },
+        "source_project": { "type": "string", "minLength": 1 },
+        "output_language": { "type": "string", "minLength": 1 },
+        "framework_version": { "type": "string", "const": "v3" },
+        "template_version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "success_criteria": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "scope_notes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

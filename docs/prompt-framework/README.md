@@ -1,4 +1,4 @@
-# Superprompt Generator v1
+# Superprompt Generator Framework
 
 Dit framework definieert een herhaalbare, `prompt-first` werkwijze om uit een afgerond Codex-websiteproject vier artifacts te genereren:
 
@@ -7,11 +7,30 @@ Dit framework definieert een herhaalbare, `prompt-first` werkwijze om uit een af
 - `logs/prompt-events.jsonl`
 - `logs/decision-register.md`
 
-Het framework is documentgedreven. v1 bevat geen CLI, UI of scriptbare generator. De interface is een vaste operator-run binnen Codex.
+Het framework begon documentgedreven in v1. Vanaf v3 is er daarnaast een lokale workflow-CLI die input valideert, diffs samenvat, run-reports schrijft en snapshots bewaart.
 
 ## Snel starten
 
 Voor een directe operator-ingang voor nieuwe projecten, gebruik [`QUICKSTART.md`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/QUICKSTART.md).
+
+## v3 CLI
+
+Vanaf v3 kun je de framework-artifacts genereren vanuit een JSON-runbestand met schema-validatie, diff, report en snapshot-history:
+
+```bash
+npm run prompt:generate -- --input docs/prompt-framework/input/example.v3.run.json
+```
+
+De CLI:
+
+- leest exact een JSON-bestand
+- valideert tegen `input/run.schema.json`
+- voert aanvullende semantische checks uit
+- schrijft de current output naar `docs/prompt-framework/output/`
+- maakt per succesvolle run een immutable snapshot onder `docs/prompt-framework/runs/`
+- schrijft ook een `run-report.md`
+
+Zie [`V3-CLI.md`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/V3-CLI.md) voor flags, exit codes en voorbeelden.
 
 ## Doel
 
@@ -19,6 +38,7 @@ Gebruik afgeronde website-trajecten als bronmateriaal om een decision-complete s
 
 ## Structuur
 
+- `QUICKSTART.md`
 - `SUPER_PROMPT.template.md`
 - `PROMPT_PLAYBOOK.template.md`
 - `decision-register.template.md`
@@ -26,10 +46,17 @@ Gebruik afgeronde website-trajecten als bronmateriaal om een decision-complete s
 - `operator-workflow.md`
 - `quality-gates.md`
 - `examples/bohem-dry-run.md`
+- `V3-CLI.md`
+- `input/example.run.json`
+- `input/example.v3.run.json`
+- `input/bohem.run.json`
+- `input/run.schema.json`
 - `output/SUPER_PROMPT.md`
 - `output/PROMPT_PLAYBOOK.md`
+- `output/run-report.md`
 - `output/logs/prompt-events.jsonl`
 - `output/logs/decision-register.md`
+- `runs/<timestamp>-<slug>/...`
 
 ## Canoniek inputcontract
 
@@ -157,4 +184,7 @@ Toegestane `event_type` waarden:
 3. Run de vijf workers in vaste volgorde.
 4. Laat elke gate expliciet `pass` of `fail` opleveren.
 5. Schrijf de definitieve artifacts naar `output/`.
-6. Vergelijk een nieuwe run met de vorige versie via het playbook updateprotocol.
+6. Beoordeel `run-report.md` en diff-samenvatting.
+7. Vergelijk een nieuwe run met de vorige versie via het playbook updateprotocol.
+
+De generator is generiek. `example.v3.run.json` is het primaire startpunt voor nieuwe projecten. `bohem.run.json` en `examples/bohem-dry-run.md` zijn referentiecases om van te leren, niet de default voor nieuwe projecten.

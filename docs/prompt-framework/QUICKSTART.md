@@ -30,11 +30,33 @@ Als een onderdeel ontbreekt, mag je dat niet stil invullen. Eerst repo of transc
 
 1. Lees kort [`README.md`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/README.md) voor het input- en outputcontract.
 2. Gebruik het inputtemplate hieronder en vul alle zes blokken in.
-3. Start een nieuwe Codex-sessie.
-4. Plak eerst de startprompt uit deze quickstart.
-5. Plak daarna het ingevulde inputtemplate.
-6. Laat de run pas doorgaan als de context- en plangates expliciet gesloten zijn.
-7. Controleer of de outputs op de vaste paden zijn geschreven.
+3. Kies standaard voor de v3 CLI workflow; gebruik handmatig prompt-first alleen als fallback.
+4. Zet de input in een JSON-bestand op basis van `example.v3.run.json`.
+5. Draai `npm run prompt:generate -- --input docs/prompt-framework/input/example.v3.run.json --diff --report`.
+6. Controleer `output/run-report.md` en de snapshot-map onder `runs/`.
+7. Gebruik de handmatige startprompt hieronder alleen als je bewust zonder CLI wilt werken.
+
+## Primaire flow: v3 CLI workflow
+
+Gebruik de CLI als standaardroute. Die valideert input, bewaakt quality gates en legt elke succesvolle run vast in snapshots.
+
+Command:
+
+```bash
+npm run prompt:generate -- --input docs/prompt-framework/input/example.v3.run.json --diff --report
+```
+
+De CLI:
+
+- valideert tegen `input/run.schema.json`
+- voert semantische checks uit op lessons, audiences, features en repo-artifacts
+- schrijft de current outputbestanden
+- maakt per succesvolle run een immutable snapshot
+- schrijft een `run-report.md` met quality score, warnings en diff-samenvatting
+
+## Fallback: handmatige prompt-first flow
+
+Gebruik deze alleen als je bewust zonder CLI wilt draaien, bijvoorbeeld om een run eerst conceptueel te verkennen.
 
 ## Copy/paste startprompt
 
@@ -118,6 +140,13 @@ Vul dit template eerst in en plak het direct onder de startprompt:
 - source_project:
 - output_language:
 - framework_version:
+- template_version:
+
+### success_criteria
+- 
+
+### scope_notes
+- 
 ```
 
 ## Verwachte outputs
@@ -142,12 +171,14 @@ Na een complete run moeten deze artifacts bestaan:
 
 Je bent klaar om te starten als:
 
-- alle zes inputblokken zijn ingevuld
+- alle verplichte inputblokken zijn ingevuld
+- optionele v3-blokken zoals `success_criteria` en `scope_notes` zijn bewust ingevuld of bewust leeg gelaten
 - lessons learned labels aanwezig zijn
 - repo-artifacts concreet genoeg zijn
 - je bereid bent high-impact ambiguities te laten falen in plaats van te gokken
 - je de startprompt en het inputtemplate direct kunt plakken in een nieuwe Codex-sessie
 
-## Referentievoorbeeld
+## Referentievoorbeelden
 
-Zie [`examples/bohem-dry-run.md`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/examples/bohem-dry-run.md) voor een ingevulde referentierun.
+- Gebruik [`input/example.v3.run.json`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/input/example.v3.run.json) als generiek startpunt voor nieuwe projecten.
+- Zie [`examples/bohem-dry-run.md`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/examples/bohem-dry-run.md) en [`input/bohem.run.json`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/input/bohem.run.json) als leer- en referentiecase.

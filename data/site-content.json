@@ -374,7 +374,7 @@
         "id": "subject",
         "label": "Onderwerp",
         "type": "select",
-        "required": true
+        "required": false
       },
       {
         "id": "name",

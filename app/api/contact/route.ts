@@ -161,19 +161,19 @@ function renderEmailHtml(input: {
     input.ctas && input.ctas.length > 0
       ? `
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:18px;border-collapse:collapse;">
-        <tr>
-          ${input.ctas
-            .map(
-              (cta) => `
-            <td align="center" valign="top" style="padding:8px 6px;width:50%;">
-              <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;max-width:220px;padding:13px 18px;border-radius:999px;background:#f28b0e;border:1px solid #c26f08;color:#231610 !important;text-decoration:none;font-weight:800;font-size:15px;line-height:1.2;text-align:center;">
-                ${escapeHtml(cta.label)}
+        ${input.ctas
+          .map(
+            (cta) => `
+          <tr>
+            <td align="center" style="padding:0 0 10px;">
+              <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;max-width:260px;padding:13px 18px;border-radius:999px;background:#f28b0e;border:1px solid #c26f08;color:#ffffff !important;text-decoration:none;font-weight:800;font-size:16px;line-height:1.2;text-align:center;">
+                <span style="color:#ffffff !important;">${escapeHtml(cta.label)}</span>
               </a>
             </td>
-          `
-            )
-            .join("")}
-        </tr>
+          </tr>
+        `
+          )
+          .join("")}
       </table>
     `
       : "";
@@ -312,8 +312,7 @@ async function sendContactMail(payload: {
     message: payload.message
   };
 
-  const adminSubjectPrefix = payload.spamSignal ? "[Controleer inzending] " : "";
-  const adminSubject = `${adminSubjectPrefix}${tokenReplace(resolvedTemplates.admin.subject, tokens)}`.slice(0, 180);
+  const adminSubject = tokenReplace(resolvedTemplates.admin.subject, tokens).slice(0, 180);
   const senderSubject = tokenReplace(resolvedTemplates.sender.subject, tokens).slice(0, 180);
 
   const adminText = [
@@ -360,8 +359,6 @@ async function sendContactMail(payload: {
       { label: "E-mail", value: payload.email },
       { label: "Telefoon", value: payload.phone },
       { label: "Bericht", value: payload.message }
-      ,
-      ...(payload.spamSignal ? [{ label: "Signaal", value: `Honeypot gevuld: ${payload.spamSignal}` }] : [])
     ]
   });
 
@@ -423,7 +420,7 @@ export async function POST(request: Request) {
   const companyReference = sanitize(body.company_reference);
   const spamSignal = companyReference || companyWebsite;
 
-  const subject = sanitize(body.subject);
+  const subject = sanitize(body.subject) || "Algemene aanvraag";
   const name = sanitize(body.name);
   const email = sanitize(body.email).toLowerCase();
   const phone = sanitize(body.phone);
@@ -431,7 +428,6 @@ export async function POST(request: Request) {
 
   const fieldErrors: Record<string, string[]> = {};
 
-  if (!subject) fieldErrors.subject = ["Kies een onderwerp."];
   if (!name || name.length < 2) fieldErrors.name = ["Vul een geldige naam in."];
   if (!isValidEmail(email)) fieldErrors.email = ["Vul een geldig e-mailadres in."];
   if (!phone || phone.length < 6) fieldErrors.phone = ["Vul een geldig telefoonnummer in."];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type FormEvent, type MouseEvent } from "react";
+import { useMemo, useState, type ChangeEvent, type FormEvent, type MouseEvent } from "react";
 
 import { Reveal } from "@/components/ui/Reveal";
 import type { SiteContent } from "@/lib/types";
@@ -14,13 +14,21 @@ type FieldType = SiteContent["contact"]["fields"][number];
 function FormField({
   field,
   idPrefix,
-  subjectOptions
+  subjectOptions,
+  value,
+  onValueChange
 }: {
   field: FieldType;
   idPrefix: string;
   subjectOptions: string[];
+  value?: string;
+  onValueChange?: (nextValue: string) => void;
 }) {
   const fieldId = `${idPrefix}-${field.id}`;
+  const isRequired = field.id === "subject" ? false : field.required;
+  const onChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    onValueChange?.(event.target.value);
+  };
 
   return (
     <div className="grid gap-2">
@@ -31,9 +39,11 @@ function FormField({
         <textarea
           id={fieldId}
           name={field.id}
-          required={field.required}
+          required={isRequired}
           rows={5}
           placeholder={field.placeholder}
+          value={value}
+          onChange={onChange}
           className="w-full rounded-[10px] border border-[rgba(36,27,23,0.2)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text-dark)]"
         />
       ) : field.type === "select" ? (
@@ -41,12 +51,12 @@ function FormField({
           <select
             id={fieldId}
             name={field.id}
-            required={field.required}
+            required={isRequired}
             className="w-full appearance-none rounded-[10px] border border-[rgba(36,27,23,0.2)] bg-[var(--color-surface)] px-4 py-3 pr-12 text-[var(--color-text-dark)] transition-colors focus:border-[var(--color-accent-amber)] focus:outline-none"
-            defaultValue=""
+            {...(typeof value === "string" ? { value, onChange } : { defaultValue: "" })}
           >
-            <option value="" disabled>
-              Kies een onderwerp
+            <option value="">
+              Onderwerp (optioneel)
             </option>
             {subjectOptions.map((option) => (
               <option key={option} value={option}>
@@ -68,7 +78,9 @@ function FormField({
           type={field.type}
           autoComplete={field.autoComplete}
           placeholder={field.placeholder}
-          required={field.required}
+          required={isRequired}
+          value={value}
+          onChange={onChange}
           className="w-full rounded-[10px] border border-[rgba(36,27,23,0.2)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text-dark)]"
         />
       )}
@@ -81,6 +93,14 @@ export function ContactSection({ contact }: ContactSectionProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
+  const [mobileFormValues, setMobileFormValues] = useState({
+    subject: "",
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+    company_reference: ""
+  });
   const subjectOptions = contact.subjectOptions ?? [];
 
   const stepOneFields = useMemo(
@@ -130,14 +150,25 @@ export function ContactSection({ contact }: ContactSectionProps) {
     setSubmitError("");
     setSubmitSuccess("");
 
-    const payload = {
-      subject: String(formData.get("subject") ?? ""),
-      name: String(formData.get("name") ?? ""),
-      email: String(formData.get("email") ?? ""),
-      phone: String(formData.get("phone") ?? ""),
-      message: String(formData.get("message") ?? ""),
-      company_reference: String(formData.get("company_reference") ?? "")
-    };
+    const mode = form.dataset.formMode ?? "desktop";
+    const payload =
+      mode === "mobile"
+        ? {
+            subject: mobileFormValues.subject,
+            name: mobileFormValues.name,
+            email: mobileFormValues.email,
+            phone: mobileFormValues.phone,
+            message: mobileFormValues.message,
+            company_reference: mobileFormValues.company_reference
+          }
+        : {
+            subject: String(formData.get("subject") ?? ""),
+            name: String(formData.get("name") ?? ""),
+            email: String(formData.get("email") ?? ""),
+            phone: String(formData.get("phone") ?? ""),
+            message: String(formData.get("message") ?? ""),
+            company_reference: String(formData.get("company_reference") ?? "")
+          };
 
     try {
       const response = await fetch("/api/contact", {
@@ -169,6 +200,14 @@ export function ContactSection({ contact }: ContactSectionProps) {
 
       form.reset();
       setMobileStep(1);
+      setMobileFormValues({
+        subject: "",
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
+        company_reference: ""
+      });
       setSubmitSuccess("Bedankt, je bericht is verzonden. We reageren zo snel mogelijk.");
     } catch {
       setSubmitError("Er ging iets mis. Probeer het opnieuw.");
@@ -193,7 +232,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
         </Reveal>
 
         <Reveal delayMs={120}>
-          <form className="grid max-w-[820px] gap-3 md:hidden" action="#" method="post" onSubmit={handleSubmit}>
+          <form className="grid max-w-[820px] gap-3 md:hidden" action="#" method="post" onSubmit={handleSubmit} data-form-mode="mobile">
             <div className="mb-1 flex items-center justify-between text-xs uppercase tracking-[0.12em] text-[#d6be9f]">
               <span>Stap {mobileStep} van 2</span>
               <span>{mobileStep === 1 ? "Contact" : "Bericht"}</span>
@@ -208,7 +247,16 @@ export function ContactSection({ contact }: ContactSectionProps) {
             {mobileStep === 1 ? (
               <>
                 {stepOneFields.map((field) => (
-                  <FormField key={`mobile-${field.id}`} field={field} idPrefix="mobile" subjectOptions={subjectOptions} />
+                  <FormField
+                    key={`mobile-${field.id}`}
+                    field={field}
+                    idPrefix="mobile"
+                    subjectOptions={subjectOptions}
+                    value={mobileFormValues[field.id]}
+                    onValueChange={(nextValue) =>
+                      setMobileFormValues((prev) => ({ ...prev, [field.id]: nextValue }))
+                    }
+                  />
                 ))}
                 <button
                   type="button"
@@ -221,7 +269,15 @@ export function ContactSection({ contact }: ContactSectionProps) {
               </>
             ) : (
               <>
-                {messageField ? <FormField field={messageField} idPrefix="mobile" subjectOptions={subjectOptions} /> : null}
+                {messageField ? (
+                  <FormField
+                    field={messageField}
+                    idPrefix="mobile"
+                    subjectOptions={subjectOptions}
+                    value={mobileFormValues.message}
+                    onValueChange={(nextValue) => setMobileFormValues((prev) => ({ ...prev, message: nextValue }))}
+                  />
+                ) : null}
                 <div className="mt-2 grid gap-2">
                   <button
                     type="button"
@@ -243,7 +299,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
             )}
           </form>
 
-          <form className="hidden max-w-[820px] gap-3 md:grid md:grid-cols-2" action="#" method="post" onSubmit={handleSubmit}>
+          <form className="hidden max-w-[820px] gap-3 md:grid md:grid-cols-2" action="#" method="post" onSubmit={handleSubmit} data-form-mode="desktop">
             <input
               type="text"
               name="company_reference"

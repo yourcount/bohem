@@ -24,6 +24,14 @@ function sanitizeText(value: string) {
   return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
 }
 
+const ESSENTIAL_REQUIRED_TEXT_EXACT_PATHS = new Set(["content.meta.locale"]);
+const ESSENTIAL_REQUIRED_TEXT_SUFFIXES = [".id", ".type"];
+
+function isEssentialRequiredTextPath(path: string) {
+  if (ESSENTIAL_REQUIRED_TEXT_EXACT_PATHS.has(path)) return true;
+  return ESSENTIAL_REQUIRED_TEXT_SUFFIXES.some((suffix) => path.endsWith(suffix));
+}
+
 function validateAndSanitizeByTemplate(
   input: unknown,
   template: unknown,
@@ -41,8 +49,8 @@ function validateAndSanitizeByTemplate(
     }
 
     const nextValue = sanitizeText(input);
-    if (template.length > 0 && nextValue.length === 0) {
-      addFieldError(errors, path, "Dit veld is verplicht.");
+    if (isEssentialRequiredTextPath(path) && nextValue.length === 0) {
+      addFieldError(errors, path, "Dit veld is essentieel en mag niet leeg zijn.");
     }
     if (nextValue.length > 8000) {
       addFieldError(errors, path, "Deze tekst is te lang.");

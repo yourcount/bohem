@@ -80,6 +80,14 @@ function isOptionalEmptyTextPath(path: string) {
   return OPTIONAL_EMPTY_TEXT_PATH_SUFFIXES.some((suffix) => path.endsWith(suffix));
 }
 
+const ESSENTIAL_REQUIRED_TEXT_EXACT_PATHS = new Set(["content.meta.locale"]);
+const ESSENTIAL_REQUIRED_TEXT_SUFFIXES = [".id", ".type"];
+
+function isEssentialRequiredTextPath(path: string) {
+  if (ESSENTIAL_REQUIRED_TEXT_EXACT_PATHS.has(path)) return true;
+  return ESSENTIAL_REQUIRED_TEXT_SUFFIXES.some((suffix) => path.endsWith(suffix));
+}
+
 const URL_FIELD_KEYS = new Set(["href", "website", "ticketsHref", "infoHref", "kitHref", "embedUrl"]);
 
 function getFieldKeyFromPath(path: string) {
@@ -120,8 +128,9 @@ function validateAndSanitizeByTemplate(input: unknown, template: unknown, path: 
 
     const nextValue = sanitizeText(input);
     const isOptionalPath = isOptionalEmptyTextPath(path);
-    if (!isOptionalPath && template.length > 0 && nextValue.length === 0) {
-      addFieldError(errors, path, "Dit veld is verplicht.");
+    const isEssentialPath = isEssentialRequiredTextPath(path);
+    if (!isOptionalPath && isEssentialPath && nextValue.length === 0) {
+      addFieldError(errors, path, "Dit veld is essentieel en mag niet leeg zijn.");
     }
     if (nextValue.length > 8000) {
       addFieldError(errors, path, "Deze tekst is te lang.");

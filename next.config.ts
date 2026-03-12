@@ -14,8 +14,8 @@ const nextConfig: NextConfig = {
   async headers() {
     const isDev = process.env.NODE_ENV !== "production";
     const scriptSrc = isDev
-      ? "'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com"
-      : "'self' 'unsafe-inline' https://www.googletagmanager.com";
+      ? "'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://vercel.live"
+      : "'self' 'unsafe-inline' https://www.googletagmanager.com https://vercel.live";
     const connectSrc = isDev
       ? "'self' https: ws: wss: https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com"
       : "'self' https: https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com";
@@ -29,6 +29,7 @@ const nextConfig: NextConfig = {
       "media-src 'self' https:",
       "font-src 'self' data: https:",
       `script-src ${scriptSrc}`,
+      `script-src-elem ${scriptSrc}`,
       "style-src 'self' 'unsafe-inline'",
       `connect-src ${connectSrc}`,
       "worker-src 'self' blob:",

@@ -188,10 +188,11 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                 </ul>
                 <p className="mb-4 max-w-[80ch] text-sm text-[#ead7bc]">{bookings.press.boilerplate}</p>
                 <div className="flex flex-wrap items-center gap-3">
-                  <Link
+                  <a
                     href={bookings.press.kitHref}
                     target="_blank"
                     rel="noopener noreferrer"
+                    download
                     data-cta="epk_download"
                     className="perskit-download-cue inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                   >
@@ -200,7 +201,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                       <span className="perskit-download-head" />
                     </span>
                     {bookings.press.kitLabel}
-                  </Link>
+                  </a>
                   <a
                     href={`mailto:${bookings.press.contactEmail}`}
                     data-cta="press_contact_email"

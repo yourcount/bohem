@@ -101,6 +101,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
       Verzenden...
     </span>
   );
+  const fieldLabelMap = useMemo(() => Object.fromEntries(contact.fields.map((field) => [field.id, field.label])), [contact.fields]);
 
   const handleNextStep = (event: MouseEvent<HTMLButtonElement>) => {
     const form = event.currentTarget.form;
@@ -144,10 +145,25 @@ export function ContactSection({ contact }: ContactSectionProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      const result = (await response.json()) as { ok?: boolean; error?: string };
+      const result = (await response.json()) as {
+        ok?: boolean;
+        error?: string;
+        fieldErrors?: Record<string, string[]>;
+      };
 
       if (!response.ok || !result.ok) {
-        setSubmitError(result.error ?? "Er ging iets mis. Probeer het opnieuw.");
+        if (response.status === 422 && result.fieldErrors) {
+          const firstFieldEntry = Object.entries(result.fieldErrors).find(([, errors]) => Array.isArray(errors) && errors.length > 0);
+          if (firstFieldEntry) {
+            const [fieldKey, errors] = firstFieldEntry;
+            const label = fieldLabelMap[fieldKey] ?? fieldKey;
+            setSubmitError(`${label}: ${errors[0]}`);
+          } else {
+            setSubmitError(result.error ?? "Controleer je invoer en probeer opnieuw.");
+          }
+        } else {
+          setSubmitError(result.error ?? "Er ging iets mis. Probeer het opnieuw.");
+        }
         return;
       }
 

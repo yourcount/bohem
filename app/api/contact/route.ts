@@ -162,17 +162,21 @@ function renderEmailHtml(input: {
       ? `
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:18px;border-collapse:collapse;">
         ${input.ctas
-          .map(
-            (cta) => `
-          <tr>
-            <td align="center" style="padding:0 0 10px;">
-              <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;max-width:260px;padding:13px 18px;border-radius:999px;background:#f28b0e;border:1px solid #c26f08;color:#ffffff !important;text-decoration:none;font-weight:800;font-size:16px;line-height:1.2;text-align:center;">
-                <span style="color:#ffffff !important;">${escapeHtml(cta.label)}</span>
+          .slice(0, 2)
+          .map((cta, index, all) => {
+            const isFirst = index === 0;
+            const isLast = index === all.length - 1;
+            return `
+          ${isFirst ? '<tr>' : ""}
+            <td align="center" valign="top" style="padding:0;${all.length === 1 ? "width:100%;" : "width:48%;"}">
+              <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;max-width:240px;padding:13px 18px;border-radius:999px;background:linear-gradient(180deg,#f39a1f 0%,#e57f08 100%);border:1px solid #b96806;box-shadow:0 6px 14px rgba(229,127,8,0.28);color:#ffffff !important;text-decoration:none;font-weight:800;font-size:15px;line-height:1.2;text-align:center;">
+                <span style="color:#ffffff !important;white-space:nowrap;">${escapeHtml(cta.label)}</span>
               </a>
             </td>
-          </tr>
-        `
-          )
+            ${!isLast ? '<td style="width:12px;line-height:0;font-size:0;">&nbsp;</td>' : ""}
+          ${isLast ? "</tr>" : ""}
+        `;
+          })
           .join("")}
       </table>
     `

@@ -13,15 +13,19 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     const isDev = process.env.NODE_ENV !== "production";
-    const scriptSrc = isDev ? "'self' 'unsafe-inline' 'unsafe-eval'" : "'self' 'unsafe-inline'";
-    const connectSrc = isDev ? "'self' https: ws: wss:" : "'self' https:";
+    const scriptSrc = isDev
+      ? "'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com"
+      : "'self' 'unsafe-inline' https://www.googletagmanager.com";
+    const connectSrc = isDev
+      ? "'self' https: ws: wss: https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com"
+      : "'self' https: https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com";
     const csp = [
       "default-src 'self'",
       "base-uri 'self'",
       "form-action 'self'",
       "frame-ancestors 'none'",
       "object-src 'none'",
-      "img-src 'self' data: blob: https:",
+      "img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https:",
       "media-src 'self' https:",
       "font-src 'self' data: https:",
       `script-src ${scriptSrc}`,

@@ -53,6 +53,21 @@ function toHtmlParagraphs(value: string) {
   return escapeHtml(value).replace(/\n/g, "<br />");
 }
 
+function resolveBannerImageUrl(siteUrl: string, src: string | undefined) {
+  const value = (src ?? "").trim();
+  if (!value) return undefined;
+
+  if (value.startsWith("http://") || value.startsWith("https://")) {
+    return value;
+  }
+
+  if (value.startsWith("/")) {
+    return `${siteUrl}${value}`;
+  }
+
+  return `${siteUrl}/${value}`;
+}
+
 function parseMailProviderError(error: unknown) {
   const fallback = {
     userMessage: "Je bericht kon niet worden verzonden. Probeer het opnieuw of mail direct naar info@musicbybohem.nl.",
@@ -257,7 +272,7 @@ async function sendContactMail(payload: {
   const liveContent = await getLiveSiteContent();
   const siteUrl = getSiteUrl();
   const showsUrl = `${siteUrl}/#shows`;
-  const bannerImageUrl = `${siteUrl}${liveContent.hero.image.src.startsWith("/") ? liveContent.hero.image.src : `/${liveContent.hero.image.src}`}`;
+  const bannerImageUrl = resolveBannerImageUrl(siteUrl, liveContent.hero.image.src);
   const musicUrl = liveContent.discography?.featuredSingle?.href?.trim() || `${siteUrl}/#discografie`;
   const ctas = [
     { label: "Nieuwe muziek", href: musicUrl },

@@ -3,6 +3,7 @@ import FormData from "form-data";
 import Mailgun from "mailgun.js";
 
 import { getLiveSiteContent } from "@/lib/content/live-content";
+import { getSiteUrl } from "@/lib/seo";
 import { consumeRateLimit } from "@/lib/security/rate-limit";
 import { assertSameOrigin, getRequestMeta } from "@/lib/security/request";
 
@@ -116,6 +117,9 @@ function renderEmailHtml(input: {
   intro: string;
   body: string;
   footer: string;
+  bannerTitle: string;
+  bannerSubtitle: string;
+  ctas?: Array<{ label: string; href: string }>;
   details?: Array<{ label: string; value: string }>;
 }) {
   const detailsRows =
@@ -136,6 +140,27 @@ function renderEmailHtml(input: {
     `
       : "";
 
+  const ctaRows =
+    input.ctas && input.ctas.length > 0
+      ? `
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:18px;border-collapse:collapse;">
+        <tr>
+          ${input.ctas
+            .map(
+              (cta) => `
+            <td style="padding:6px 4px;">
+              <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:12px 18px;border-radius:999px;background:#f28b0e;color:#111827;text-decoration:none;font-weight:700;font-size:14px;">
+                ${escapeHtml(cta.label)}
+              </a>
+            </td>
+          `
+            )
+            .join("")}
+        </tr>
+      </table>
+    `
+      : "";
+
   return `
 <!doctype html>
 <html lang="nl">
@@ -144,31 +169,44 @@ function renderEmailHtml(input: {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${escapeHtml(input.title)}</title>
   </head>
-  <body style="margin:0;padding:0;background:#141011;color:#f8f1e5;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;">
+  <body style="margin:0;padding:0;background:#f6efe6;color:#1f2937;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;">
     <span style="display:none;opacity:0;visibility:hidden;mso-hide:all;height:0;width:0;overflow:hidden;">${escapeHtml(input.preheader)}</span>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:linear-gradient(180deg,#201613 0%,#231816 100%);padding:24px 12px;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 12px;background:#f6efe6;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:rgba(20,26,42,0.72);border:1px solid rgba(67,135,133,0.45);border-radius:18px;overflow:hidden;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#fffaf3;border:1px solid #e6d5bd;border-radius:18px;overflow:hidden;box-shadow:0 8px 28px rgba(31,41,55,0.12);">
             <tr>
-              <td style="padding:28px 24px 8px;color:#f3d7b0;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;">Bohèm</td>
-            </tr>
-            <tr>
-              <td style="padding:0 24px 10px;">
-                <h1 style="margin:0;color:#f8f1e5;font-size:30px;line-height:1.2;font-family:Georgia,'Times New Roman',serif;">${escapeHtml(input.title)}</h1>
+              <td style="padding:0;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:linear-gradient(120deg,#2b2230 0%,#3b2e36 45%,#8f4f2b 100%);">
+                  <tr>
+                    <td style="padding:24px 24px 20px;">
+                      <p style="margin:0 0 6px;color:#f3d7b0;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;">Bohèm</p>
+                      <p style="margin:0;color:#fff8ec;font-size:24px;line-height:1.3;font-family:Georgia,'Times New Roman',serif;">${escapeHtml(input.bannerTitle)}</p>
+                      <p style="margin:8px 0 0;color:#f8e8cf;font-size:14px;line-height:1.5;">${escapeHtml(input.bannerSubtitle)}</p>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
             <tr>
-              <td style="padding:0 24px 10px;color:#ead7bc;font-size:16px;line-height:1.6;">${toHtmlParagraphs(input.intro)}</td>
+              <td style="padding:24px 24px 10px;">
+                <h1 style="margin:0;color:#1f2937;font-size:30px;line-height:1.2;font-family:Georgia,'Times New Roman',serif;">${escapeHtml(input.title)}</h1>
+              </td>
             </tr>
             <tr>
-              <td style="padding:0 24px 10px;color:#ead7bc;font-size:15px;line-height:1.6;">${toHtmlParagraphs(input.body)}</td>
+              <td style="padding:0 24px 10px;color:#374151;font-size:16px;line-height:1.6;">${toHtmlParagraphs(input.intro)}</td>
+            </tr>
+            <tr>
+              <td style="padding:0 24px 10px;color:#4b5563;font-size:15px;line-height:1.6;">${toHtmlParagraphs(input.body)}</td>
             </tr>
             <tr>
               <td style="padding:0 24px;">${detailsRows}</td>
             </tr>
             <tr>
-              <td style="padding:10px 24px 24px;color:#d6be9f;font-size:13px;line-height:1.6;border-top:1px solid rgba(67,135,133,0.35);">
+              <td style="padding:8px 24px 10px;">${ctaRows}</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 24px 24px;color:#6b7280;font-size:13px;line-height:1.6;border-top:1px solid #e9ddcc;">
                 ${toHtmlParagraphs(input.footer)}
               </td>
             </tr>
@@ -201,6 +239,13 @@ async function sendContactMail(payload: {
   });
 
   const liveContent = await getLiveSiteContent();
+  const siteUrl = getSiteUrl();
+  const showsUrl = `${siteUrl}/#shows`;
+  const musicUrl = liveContent.discography?.featuredSingle?.href?.trim() || `${siteUrl}/#discografie`;
+  const ctas = [
+    { label: "Nieuwe muziek", href: musicUrl },
+    { label: "Nieuwe shows", href: showsUrl }
+  ];
   const templates = liveContent.contact.emailTemplates;
   const fallbackTemplates = {
     admin: {
@@ -270,6 +315,9 @@ async function sendContactMail(payload: {
     intro: tokenReplace(resolvedTemplates.admin.intro, tokens),
     body: "Overzicht van de aanvraag:",
     footer: tokenReplace(resolvedTemplates.admin.footer, tokens),
+    bannerTitle: "Nieuwe aanvraag ontvangen",
+    bannerSubtitle: "Via het contactformulier op musicbybohem.nl",
+    ctas,
     details: [
       { label: "Onderwerp", value: payload.subject },
       { label: "Naam", value: payload.name },
@@ -285,6 +333,9 @@ async function sendContactMail(payload: {
     intro: tokenReplace(resolvedTemplates.sender.intro, tokens),
     body: tokenReplace(resolvedTemplates.sender.body, tokens),
     footer: tokenReplace(resolvedTemplates.sender.footer, tokens),
+    bannerTitle: "Dank voor je bericht",
+    bannerSubtitle: "We komen zo snel mogelijk bij je terug.",
+    ctas,
     details: [{ label: "Jouw bericht", value: payload.message }]
   });
 

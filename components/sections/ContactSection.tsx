@@ -251,6 +251,18 @@ export function ContactSection({ contact }: ContactSectionProps) {
                 style={{ width: mobileStep === 1 ? "50%" : "100%" }}
               />
             </div>
+            {turnstileEnabled ? (
+              <div className="turnstile-wrap">
+                <div
+                  className="cf-turnstile"
+                  data-sitekey={turnstileSiteKey}
+                  data-theme="dark"
+                  data-language="nl"
+                  data-action="contact_form_mobile"
+                  data-size="flexible"
+                />
+              </div>
+            ) : null}
 
             {mobileStep === 1 ? (
               <>
@@ -287,18 +299,6 @@ export function ContactSection({ contact }: ContactSectionProps) {
                   />
                 ) : null}
                 <div className="mt-2 grid gap-2">
-                  {turnstileEnabled ? (
-                    <div className="turnstile-wrap">
-                      <div
-                        className="cf-turnstile"
-                        data-sitekey={turnstileSiteKey}
-                        data-theme="dark"
-                        data-language="nl"
-                        data-action="contact_form_mobile_step2"
-                        data-size="flexible"
-                      />
-                    </div>
-                  ) : null}
                   <button
                     type="button"
                     onClick={() => setMobileStep(1)}

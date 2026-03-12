@@ -8,7 +8,14 @@ type MusicExperienceSectionProps = {
   musicExperience: SiteContent["musicExperience"];
 };
 
+function hasText(value: string | undefined | null) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 export function MusicExperienceSection({ musicExperience }: MusicExperienceSectionProps) {
+  const hasCta = hasText(musicExperience.cta.label) && hasText(musicExperience.cta.href);
+  const hasImage = hasText(musicExperience.image.src);
+
   return (
     <section
       id="muziek"
@@ -22,30 +29,34 @@ export function MusicExperienceSection({ musicExperience }: MusicExperienceSecti
               {musicExperience.title}
             </h2>
             <p>{musicExperience.body}</p>
-            <a
-              href={musicExperience.cta.href}
-              data-cta="music_experience_bookings"
-              className="inline-block border-0 font-bold text-[#f3d7b0] underline decoration-2 underline-offset-[3px] outline-none transition-colors hover:border-0 hover:text-[#ffd8a5] focus:border-0 focus:outline-none focus-visible:border-0 focus-visible:outline-none focus-visible:ring-0"
-            >
-              {musicExperience.cta.label}
-            </a>
+            {hasCta ? (
+              <a
+                href={musicExperience.cta.href}
+                data-cta="music_experience_bookings"
+                className="inline-block border-0 font-bold text-[#f3d7b0] underline decoration-2 underline-offset-[3px] outline-none transition-colors hover:border-0 hover:text-[#ffd8a5] focus:border-0 focus:outline-none focus-visible:border-0 focus-visible:outline-none focus-visible:ring-0"
+              >
+                {musicExperience.cta.label}
+              </a>
+            ) : null}
           </div>
         </Reveal>
-        <Reveal delayMs={140}>
-          <figure className="overflow-hidden rounded-2xl border border-[var(--color-line-muted)]">
-            <Image
-              src={musicExperience.image.src}
-              alt={musicExperience.image.alt}
-              width={musicExperience.image.width}
-              height={musicExperience.image.height}
-              className="h-full w-full object-cover contrast-[1.12] saturate-[1.04] aspect-[4/5] md:aspect-[16/10]"
-              style={{ objectPosition: getImageObjectPosition(musicExperience.image, 50, 30) }}
-              loading="lazy"
-              quality={78}
-              sizes="(max-width: 767px) 92vw, (max-width: 1279px) 44vw, 460px"
-            />
-          </figure>
-        </Reveal>
+        {hasImage ? (
+          <Reveal delayMs={140}>
+            <figure className="overflow-hidden rounded-2xl border border-[var(--color-line-muted)]">
+              <Image
+                src={musicExperience.image.src}
+                alt={musicExperience.image.alt}
+                width={musicExperience.image.width}
+                height={musicExperience.image.height}
+                className="h-full w-full object-cover contrast-[1.12] saturate-[1.04] aspect-[4/5] md:aspect-[16/10]"
+                style={{ objectPosition: getImageObjectPosition(musicExperience.image, 50, 30) }}
+                loading="lazy"
+                quality={78}
+                sizes="(max-width: 767px) 92vw, (max-width: 1279px) 44vw, 460px"
+              />
+            </figure>
+          </Reveal>
+        ) : null}
       </div>
     </section>
   );

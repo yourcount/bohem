@@ -8,8 +8,45 @@ type DiscographySectionProps = {
   discography: SiteContent["discography"];
 };
 
+function hasText(value: string | undefined | null) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function nonEmptyItems(items: string[] | undefined) {
+  return (items ?? []).map((item) => item.trim()).filter((item) => item.length > 0);
+}
+
 export function DiscographySection({ discography }: DiscographySectionProps) {
   const isReleaseLinkVisible = (label: string) => !label.toLowerCase().includes("artiestprofiel");
+  const featuredLinksVisible = hasText(discography.featuredSingle.href) && hasText(discography.featuredSingle.ctaLabel ?? "Luister op Spotify");
+  const hasFeaturedEmbed = hasText(discography.featuredSingle.embedUrl);
+  const hasFeaturedCard =
+    hasText(discography.featuredSingle.title) ||
+    hasText(discography.featuredSingle.description) ||
+    hasFeaturedEmbed ||
+    featuredLinksVisible;
+  const productionItems = nonEmptyItems(discography.productionItems);
+  const hasArtistCta = hasText(discography.artist.href) && hasText(discography.artist.ctaLabel ?? "Open Spotify-profiel");
+  const hasArtistCard =
+    hasText(discography.artist.title) ||
+    hasText(discography.artist.description) ||
+    hasArtistCta ||
+    productionItems.length > 0 ||
+    hasText(discography.legal);
+  const visibleReleases = discography.releases
+    .map((release, index) => {
+      const links = release.links.filter((link) => hasText(link.label) && hasText(link.href) && isReleaseLinkVisible(link.label));
+      const hasReleaseContent =
+        hasText(release.title) ||
+        hasText(release.year) ||
+        hasText(release.format) ||
+        hasText(release.note) ||
+        links.length > 0;
+
+      if (!hasReleaseContent) return null;
+      return { ...release, links, __index: index };
+    })
+    .filter((release): release is NonNullable<typeof release> => release !== null);
 
   return (
     <section
@@ -41,102 +78,125 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
           <p className="mb-7 max-w-[70ch]">{discography.intro}</p>
         </Reveal>
 
-        <div className="mb-6 grid gap-6 md:grid-cols-[1.3fr_1fr] md:items-stretch">
-          <Reveal className="h-full">
-            <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(165deg,rgba(244,233,220,0.12)_0%,rgba(244,233,220,0.04)_100%)] p-6">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">
-                {discography.featuredSingleEyebrow ?? "Nieuw uitgelicht"}
-              </p>
-              <h3 className="mb-2 font-display text-2xl sm:text-3xl">{discography.featuredSingle.title}</h3>
-              <p className="mb-4 text-[#e7d6c1]">{discography.featuredSingle.description}</p>
-              <SpotifyEmbedWithConsent
-                embedUrl={discography.featuredSingle.embedUrl}
-                title="Spotify player eerste nieuwe single Bohèm"
-              />
-              <Link
-                href={discography.featuredSingle.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-cta="discography_featured_single"
-                className="cta-glow listen-pulse mt-4 inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
-              >
-                <span className="equalizer-icon mr-2" aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
-                </span>
-                {discography.featuredSingle.ctaLabel ?? "Luister op Spotify"}
-              </Link>
-            </article>
-          </Reveal>
-
-          <Reveal delayMs={120} className="h-full">
-            <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">
-                {discography.artistEyebrow ?? "Streaming"}
-              </p>
-              <h3 className="mb-2 font-display text-2xl sm:text-3xl">{discography.artist.title}</h3>
-              <p className="mb-4 text-[#e7d6c1]">{discography.artist.description}</p>
-              <Link
-                href={discography.artist.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-cta="discography_artist_profile"
-                className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-bold transition-colors hover:border-[#c8873e] hover:bg-[rgba(200,135,62,0.16)]"
-              >
-                {discography.artist.ctaLabel ?? "Open Spotify-profiel"}
-              </Link>
-
-              {discography.productionItems && discography.productionItems.length > 0 ? (
-                <div className="mt-5 border-t border-[var(--color-line-muted)] pt-4">
-                  {discography.productionTitle ? (
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.1em] text-[#f3d7b0]">{discography.productionTitle}</p>
+        {hasFeaturedCard || hasArtistCard ? (
+          <div className="mb-6 grid gap-6 md:grid-cols-[1.3fr_1fr] md:items-stretch">
+            {hasFeaturedCard ? (
+              <Reveal className="h-full">
+                <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(165deg,rgba(244,233,220,0.12)_0%,rgba(244,233,220,0.04)_100%)] p-6">
+                  {hasText(discography.featuredSingleEyebrow ?? "Nieuw uitgelicht") ? (
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">
+                      {discography.featuredSingleEyebrow ?? "Nieuw uitgelicht"}
+                    </p>
                   ) : null}
-                  <ul className="mb-3 space-y-1.5 text-sm text-[#e7d6c1]">
-                    {discography.productionItems.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                  {discography.legal ? <p className="text-xs text-[#d9c6ac]">{discography.legal}</p> : null}
-                </div>
-              ) : null}
-
-            </article>
-          </Reveal>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-2">
-          {discography.releases.map((release, index) => (
-            <Reveal key={release.title} delayMs={index * 100}>
-              <article className="discography-tilt-card group h-full rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(165deg,rgba(244,233,220,0.12)_0%,rgba(244,233,220,0.04)_100%)] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#b17a47]">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <span className="rounded-full border border-[#9c744e] bg-[rgba(200,135,62,0.12)] px-3 py-1 text-xs font-semibold tracking-[0.08em] text-[#f3d7b0]">
-                    {release.format}
-                  </span>
-                  <span className="text-sm text-[#d6be9f]">{release.year}</span>
-                </div>
-
-                <h3 className="mb-2 font-display text-2xl sm:text-3xl">{release.title}</h3>
-                <p className="mb-5 text-sm text-[#e7d6c1]">{release.note}</p>
-
-                <div className="mt-auto flex flex-wrap gap-2">
-                  {release.links.filter((link) => isReleaseLinkVisible(link.label)).map((link) => (
+                  {hasText(discography.featuredSingle.title) ? <h3 className="mb-2 font-display text-2xl sm:text-3xl">{discography.featuredSingle.title}</h3> : null}
+                  {hasText(discography.featuredSingle.description) ? <p className="mb-4 text-[#e7d6c1]">{discography.featuredSingle.description}</p> : null}
+                  {hasFeaturedEmbed ? (
+                    <SpotifyEmbedWithConsent
+                      embedUrl={discography.featuredSingle.embedUrl}
+                      title="Spotify player eerste nieuwe single Bohèm"
+                    />
+                  ) : null}
+                  {featuredLinksVisible ? (
                     <Link
-                      key={`${release.title}-${link.label}`}
-                      href={link.href}
+                      href={discography.featuredSingle.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      data-cta={`release_${release.title.toLowerCase().replace(/\s+/g, "_")}`}
-                      className="cta-glow rounded-full border border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.4)] px-3 py-2 text-xs font-semibold transition-colors hover:border-[#c8873e] hover:bg-[rgba(200,135,62,0.18)] focus-visible:border-[#c8873e]"
+                      data-cta="discography_featured_single"
+                      className="cta-glow listen-pulse mt-4 inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                     >
-                      {link.label}
+                      <span className="equalizer-icon mr-2" aria-hidden="true">
+                        <span />
+                        <span />
+                        <span />
+                      </span>
+                      {discography.featuredSingle.ctaLabel ?? "Luister op Spotify"}
                     </Link>
-                  ))}
+                  ) : null}
+                </article>
+              </Reveal>
+            ) : null}
+
+            {hasArtistCard ? (
+              <Reveal delayMs={120} className="h-full">
+                <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
+                  {hasText(discography.artistEyebrow ?? "Streaming") ? (
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">
+                      {discography.artistEyebrow ?? "Streaming"}
+                    </p>
+                  ) : null}
+                  {hasText(discography.artist.title) ? <h3 className="mb-2 font-display text-2xl sm:text-3xl">{discography.artist.title}</h3> : null}
+                  {hasText(discography.artist.description) ? <p className="mb-4 text-[#e7d6c1]">{discography.artist.description}</p> : null}
+                  {hasArtistCta ? (
+                    <Link
+                      href={discography.artist.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-cta="discography_artist_profile"
+                      className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-bold transition-colors hover:border-[#c8873e] hover:bg-[rgba(200,135,62,0.16)]"
+                    >
+                      {discography.artist.ctaLabel ?? "Open Spotify-profiel"}
+                    </Link>
+                  ) : null}
+
+                  {productionItems.length > 0 || hasText(discography.legal) ? (
+                    <div className="mt-5 border-t border-[var(--color-line-muted)] pt-4">
+                      {hasText(discography.productionTitle) ? (
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.1em] text-[#f3d7b0]">{discography.productionTitle}</p>
+                      ) : null}
+                      {productionItems.length > 0 ? (
+                        <ul className="mb-3 space-y-1.5 text-sm text-[#e7d6c1]">
+                          {productionItems.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : null}
+                      {hasText(discography.legal) ? <p className="text-xs text-[#d9c6ac]">{discography.legal}</p> : null}
+                    </div>
+                  ) : null}
+                </article>
+              </Reveal>
+            ) : null}
+          </div>
+        ) : null}
+
+        {visibleReleases.length > 0 ? (
+          <div className="grid gap-5 md:grid-cols-2">
+            {visibleReleases.map((release, index) => (
+              <Reveal key={`${release.title || "release"}-${release.__index}`} delayMs={index * 100}>
+              <article className="discography-tilt-card group h-full rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(165deg,rgba(244,233,220,0.12)_0%,rgba(244,233,220,0.04)_100%)] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#b17a47]">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  {hasText(release.format) ? (
+                    <span className="rounded-full border border-[#9c744e] bg-[rgba(200,135,62,0.12)] px-3 py-1 text-xs font-semibold tracking-[0.08em] text-[#f3d7b0]">
+                      {release.format}
+                    </span>
+                  ) : null}
+                  {hasText(release.year) ? <span className="text-sm text-[#d6be9f]">{release.year}</span> : null}
                 </div>
+
+                {hasText(release.title) ? <h3 className="mb-2 font-display text-2xl sm:text-3xl">{release.title}</h3> : null}
+                {hasText(release.note) ? <p className="mb-5 text-sm text-[#e7d6c1]">{release.note}</p> : null}
+
+                {release.links.length > 0 ? (
+                  <div className="mt-auto flex flex-wrap gap-2">
+                    {release.links.map((link) => (
+                      <Link
+                        key={`${release.title || "release"}-${link.label}-${link.href}`}
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-cta={`release_${(release.title || "release").toLowerCase().replace(/\s+/g, "_")}`}
+                        className="cta-glow rounded-full border border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.4)] px-3 py-2 text-xs font-semibold transition-colors hover:border-[#c8873e] hover:bg-[rgba(200,135,62,0.18)] focus-visible:border-[#c8873e]"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                ) : null}
               </article>
             </Reveal>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   );

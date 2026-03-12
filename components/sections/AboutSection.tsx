@@ -8,7 +8,19 @@ type AboutSectionProps = {
   about: SiteContent["about"];
 };
 
+function hasText(value: string | undefined | null) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function nonEmptyItems(items: string[] | undefined) {
+  return (items ?? []).map((item) => item.trim()).filter((item) => item.length > 0);
+}
+
 export function AboutSection({ about }: AboutSectionProps) {
+  const photoMoments = (about.photoMoments ?? []).filter((photo) => hasText(photo.src));
+  const bios = about.bios.filter((bio) => hasText(bio.name) || hasText(bio.text) || hasText(bio.website));
+  const lineupItems = nonEmptyItems(about.lineupItems);
+
   return (
     <section
       id="bio"
@@ -23,9 +35,9 @@ export function AboutSection({ about }: AboutSectionProps) {
           <p className="mb-6 max-w-[74ch]">{about.intro}</p>
         </Reveal>
 
-        {about.photoMoments && about.photoMoments.length > 0 ? (
+        {photoMoments.length > 0 ? (
           <div className="bio-photo-slider mb-6 md:grid md:grid-cols-2" aria-label="Fotomomenten">
-            {about.photoMoments.map((photo, index) => (
+            {photoMoments.map((photo, index) => (
               <Reveal key={photo.src} delayMs={index * 120} className="bio-photo-item">
                 <figure className="bio-photo-slide overflow-hidden border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.24)]">
                   <Image
@@ -46,12 +58,12 @@ export function AboutSection({ about }: AboutSectionProps) {
         ) : null}
 
         <div className="grid gap-6 md:grid-cols-2" aria-label="Bio's">
-          {about.bios.map((bio, index) => (
-            <Reveal key={bio.name} delayMs={index * 120} className="h-full">
+          {bios.map((bio, index) => (
+            <Reveal key={`${bio.name || "bio"}-${index}`} delayMs={index * 120} className="h-full">
               <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
-                <h3 className="mb-3 font-display text-2xl sm:text-3xl">{bio.name}</h3>
-                <p className="mb-0">{bio.text}</p>
-                {bio.website ? (
+                {hasText(bio.name) ? <h3 className="mb-3 font-display text-2xl sm:text-3xl">{bio.name}</h3> : null}
+                {hasText(bio.text) ? <p className="mb-0">{bio.text}</p> : null}
+                {hasText(bio.website) ? (
                   <div className="mt-auto pt-5">
                     <a
                       href={bio.website}
@@ -68,12 +80,12 @@ export function AboutSection({ about }: AboutSectionProps) {
           ))}
         </div>
 
-        {about.lineupItems && about.lineupItems.length > 0 ? (
+        {lineupItems.length > 0 ? (
           <Reveal delayMs={220}>
             <article className="mt-6 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.04)] p-6">
-              {about.lineupTitle ? <h3 className="mb-3 font-display text-2xl sm:text-3xl">{about.lineupTitle}</h3> : null}
+              {hasText(about.lineupTitle) ? <h3 className="mb-3 font-display text-2xl sm:text-3xl">{about.lineupTitle}</h3> : null}
               <ul className="space-y-2">
-                {about.lineupItems.map((item) => (
+                {lineupItems.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>

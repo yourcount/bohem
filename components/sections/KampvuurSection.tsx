@@ -8,7 +8,22 @@ type KampvuurSectionProps = {
   kampvuur: SiteContent["kampvuur"];
 };
 
+function hasText(value: string | undefined | null) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function nonEmptyItems(items: string[] | undefined) {
+  return (items ?? []).map((item) => item.trim()).filter((item) => item.length > 0);
+}
+
 export function KampvuurSection({ kampvuur }: KampvuurSectionProps) {
+  const bodyItems = nonEmptyItems(kampvuur.body);
+  const benefitsItems = nonEmptyItems(kampvuur.benefits);
+  const hasEmailCta = hasText(kampvuur.contactEmail);
+  const hasPhoneCta = hasText(kampvuur.contactPhone);
+  const hasContactActions = hasEmailCta || hasPhoneCta;
+  const hasImage = Boolean(kampvuur.image && hasText(kampvuur.image.src));
+
   return (
     <section
       id="kampvuurklanken"
@@ -57,25 +72,27 @@ export function KampvuurSection({ kampvuur }: KampvuurSectionProps) {
                 </div>
               </div>
               <div className="kampvuur-flame-divider mb-4" aria-hidden="true" />
-              <p className="mb-4 text-lg text-[var(--color-text-primary)]">{kampvuur.intro}</p>
-              <div className="space-y-4 text-[var(--color-text-primary)]">
-                {kampvuur.body.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-              </div>
+              {hasText(kampvuur.intro) ? <p className="mb-4 text-lg text-[var(--color-text-primary)]">{kampvuur.intro}</p> : null}
+              {bodyItems.length > 0 ? (
+                <div className="space-y-4 text-[var(--color-text-primary)]">
+                  {bodyItems.map((paragraph) => (
+                    <p key={paragraph}>{paragraph}</p>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </Reveal>
 
-          {kampvuur.image ? (
+          {hasImage ? (
             <Reveal delayMs={120} className="md:order-1 h-full">
               <figure className="kampvuur-media h-full overflow-hidden rounded-2xl border border-[var(--color-line-muted)]">
                 <Image
-                  src={kampvuur.image.src}
-                  alt={kampvuur.image.alt}
-                  width={kampvuur.image.width}
-                  height={kampvuur.image.height}
+                  src={kampvuur.image!.src}
+                  alt={kampvuur.image!.alt}
+                  width={kampvuur.image!.width}
+                  height={kampvuur.image!.height}
                   className="h-full w-full object-cover contrast-[1.08] saturate-[1.14]"
-                  style={{ objectPosition: getImageObjectPosition(kampvuur.image) }}
+                  style={{ objectPosition: getImageObjectPosition(kampvuur.image!) }}
                   loading="lazy"
                   quality={78}
                   sizes="(max-width: 767px) 92vw, (max-width: 1279px) 44vw, 460px"
@@ -87,37 +104,49 @@ export function KampvuurSection({ kampvuur }: KampvuurSectionProps) {
 
         <Reveal delayMs={160}>
           <div className="mx-auto mt-14 max-w-[760px]">
-            <article className="kampvuur-benefits mt-6 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-5 text-center">
-              <h3 className="mb-3 font-display text-2xl sm:text-3xl">{kampvuur.benefitsTitle}</h3>
-              <ul className="mx-auto w-fit space-y-2 text-left">
-                {kampvuur.benefits.map((item) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <span aria-hidden="true" className="mt-[5px] h-2 w-2 rounded-full bg-[#f3d7b0] shadow-[0_0_10px_rgba(242,139,14,0.6)]" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </article>
+            {hasText(kampvuur.benefitsTitle) || benefitsItems.length > 0 ? (
+              <article className="kampvuur-benefits mt-6 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-5 text-center">
+                {hasText(kampvuur.benefitsTitle) ? <h3 className="mb-3 font-display text-2xl sm:text-3xl">{kampvuur.benefitsTitle}</h3> : null}
+                {benefitsItems.length > 0 ? (
+                  <ul className="mx-auto w-fit space-y-2 text-left">
+                    {benefitsItems.map((item) => (
+                      <li key={item} className="flex items-start gap-2">
+                        <span aria-hidden="true" className="mt-[5px] h-2 w-2 rounded-full bg-[#f3d7b0] shadow-[0_0_10px_rgba(242,139,14,0.6)]" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </article>
+            ) : null}
 
-            <blockquote className="kampvuur-quote mx-auto mt-5 max-w-[44ch] text-center text-[#f3d7b0]">“{kampvuur.quote}”</blockquote>
+            {hasText(kampvuur.quote) ? (
+              <blockquote className="kampvuur-quote mx-auto mt-5 max-w-[44ch] text-center text-[#f3d7b0]">“{kampvuur.quote}”</blockquote>
+            ) : null}
 
-            <p className="mt-5 text-center text-[var(--color-text-primary)]">{kampvuur.contactPrompt}</p>
-            <div className="mt-2 flex flex-wrap justify-center gap-3">
-              <a
-                href={`mailto:${kampvuur.contactEmail}`}
-                data-cta="kampvuur_contact_email"
-                className="kampvuur-fire-cta inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
-              >
-                {kampvuur.contactEmail}
-              </a>
-              <a
-                href={`tel:${kampvuur.contactPhone.replace(/\s+/g, "")}`}
-                data-cta="kampvuur_contact_phone"
-                className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-              >
-                {kampvuur.contactPhone}
-              </a>
-            </div>
+            {hasText(kampvuur.contactPrompt) ? <p className="mt-5 text-center text-[var(--color-text-primary)]">{kampvuur.contactPrompt}</p> : null}
+            {hasContactActions ? (
+              <div className="mt-2 flex flex-wrap justify-center gap-3">
+                {hasEmailCta ? (
+                  <a
+                    href={`mailto:${kampvuur.contactEmail}`}
+                    data-cta="kampvuur_contact_email"
+                    className="kampvuur-fire-cta inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+                  >
+                    {kampvuur.contactEmail}
+                  </a>
+                ) : null}
+                {hasPhoneCta ? (
+                  <a
+                    href={`tel:${kampvuur.contactPhone.replace(/\s+/g, "")}`}
+                    data-cta="kampvuur_contact_phone"
+                    className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                  >
+                    {kampvuur.contactPhone}
+                  </a>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </Reveal>
       </div>

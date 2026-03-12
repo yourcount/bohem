@@ -19,6 +19,9 @@ import { getFeatureFlagsSafe } from "@/lib/system/feature-flags";
 export const revalidate = 90;
 
 const NON_CONTENT_KEYS = new Set(["href", "variant", "id", "type", "autoComplete", "required", "width", "height", "focusX", "focusY"]);
+function hasText(value: string | undefined | null) {
+  return typeof value === "string" && value.trim().length > 0;
+}
 
 function hasSectionContent(value: unknown): boolean {
   if (typeof value === "string") {
@@ -58,6 +61,7 @@ export default async function HomePage() {
   const hasPressSection = hasBookingsSection && hasSectionContent(siteContent.bookings.press ?? null);
 
   const baseNavigation = siteContent.navigation.filter((item) => {
+    if (!hasText(item.label) || !hasText(item.href)) return false;
     if (item.href === "#bio") return hasAboutSection;
     if (item.href === "#discografie") return hasDiscographySection;
     if (item.href === "#muziek") return hasMusicExperienceSection;
@@ -146,7 +150,7 @@ export default async function HomePage() {
           trackHref={siteContent.discography.featuredSingle.href}
         />
       ) : null}
-      {flags.enable_mobile_sticky_cta && hasBookingsSection ? (
+      {flags.enable_mobile_sticky_cta && hasBookingsSection && hasText(siteContent.bookings.cta.label) && hasText(siteContent.bookings.cta.href) ? (
         <MobileStickyCta
           href={siteContent.bookings.cta.href}
           label={siteContent.bookings.cta.label}

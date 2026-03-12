@@ -10,8 +10,17 @@ type ShowsSectionProps = {
   badgeLabel?: string;
 };
 
+function hasText(value: string | undefined | null) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 export function ShowsSection({ shows, eyebrow, title, badgeLabel }: ShowsSectionProps) {
-  if (!shows || shows.length === 0) return null;
+  const visibleShows = (shows ?? []).filter((show) => {
+    const hasBasics = hasText(show.date) || hasText(show.venue) || hasText(show.city);
+    const hasCta = hasText(show.ticketsHref) || hasText(show.infoHref);
+    return hasBasics || hasCta;
+  });
+  if (visibleShows.length === 0) return null;
 
   return (
     <section
@@ -40,39 +49,46 @@ export function ShowsSection({ shows, eyebrow, title, badgeLabel }: ShowsSection
               </span>
             </div>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {shows.map((show, index) => (
-                <Reveal key={`${show.date}-${show.venue}`} delayMs={index * 90}>
+              {visibleShows.map((show, index) => {
+                const showSlug = (show.venue || show.city || `show-${index}`).toLowerCase().replace(/\s+/g, "_");
+                return (
+                <Reveal key={`${show.date}-${show.venue}-${index}`} delayMs={index * 90}>
                   <article
                     className="flex h-full flex-col rounded-2xl border border-[rgba(242,139,14,0.34)] bg-[linear-gradient(160deg,rgba(26,18,22,0.8)_0%,rgba(21,17,21,0.92)_100%)] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(242,139,14,0.58)] hover:shadow-[0_10px_26px_rgba(0,0,0,0.32)]"
                   >
-                    <p className="mb-3 inline-flex w-fit rounded-full border border-[rgba(242,139,14,0.36)] bg-[rgba(242,139,14,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[#f3d7b0]">
-                      {show.date}
-                    </p>
-                    <p className="text-xl font-semibold text-[#f8f1e5]">{show.venue}</p>
-                    <p className="mt-1 text-sm text-[#d9c4a8]">{show.city}</p>
-                    <div className="mt-5 flex flex-col gap-2">
-                      {show.ticketsHref?.trim() ? (
+                    {hasText(show.date) ? (
+                      <p className="mb-3 inline-flex w-fit rounded-full border border-[rgba(242,139,14,0.36)] bg-[rgba(242,139,14,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[#f3d7b0]">
+                        {show.date}
+                      </p>
+                    ) : null}
+                    {hasText(show.venue) ? <p className="text-xl font-semibold text-[#f8f1e5]">{show.venue}</p> : null}
+                    {hasText(show.city) ? <p className="mt-1 text-sm text-[#d9c4a8]">{show.city}</p> : null}
+                    {hasText(show.ticketsHref) || hasText(show.infoHref) ? (
+                      <div className="mt-5 flex flex-col gap-2">
+                      {hasText(show.ticketsHref) ? (
                         <Link
-                          href={show.ticketsHref}
-                          data-cta={`show_tickets_${show.venue.toLowerCase().replace(/\s+/g, "_")}`}
+                          href={show.ticketsHref!}
+                          data-cta={`show_tickets_${showSlug}`}
                           className="cta-glow ticket-burst inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                         >
                           <span className="ticket-burst-label">Tickets</span>
                         </Link>
                       ) : null}
-                      {show.infoHref?.trim() ? (
+                      {hasText(show.infoHref) ? (
                         <Link
-                          href={show.infoHref}
-                          data-cta={`show_info_${show.venue.toLowerCase().replace(/\s+/g, "_")}`}
+                          href={show.infoHref!}
+                          data-cta={`show_info_${showSlug}`}
                           className="inline-flex w-full items-center justify-center rounded-full border border-[rgba(242,139,14,0.52)] bg-transparent px-4 py-2.5 text-sm font-bold text-[#f3d7b0] transition-colors hover:bg-[rgba(242,139,14,0.16)] hover:text-[#f8f1e5]"
                         >
                           Extra info
                         </Link>
                       ) : null}
                     </div>
+                    ) : null}
                   </article>
                 </Reveal>
-              ))}
+              );
+              })}
             </div>
           </section>
         </Reveal>

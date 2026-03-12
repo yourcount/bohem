@@ -12,6 +12,10 @@ type HeroSectionProps = {
   hero: SiteContent["hero"];
 };
 
+function hasText(value: string | undefined | null) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 export function HeroSection({ hero }: HeroSectionProps) {
   const [parallaxY, setParallaxY] = useState(0);
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -72,6 +76,11 @@ export function HeroSection({ hero }: HeroSectionProps) {
     sectionRef.current.style.setProperty("--hero-spot-y", `${Math.min(Math.max(y, 0), 100)}%`);
   };
 
+  const visibleCtas = hero.ctas.filter((cta) => hasText(cta.label) && hasText(cta.href));
+  const hasHeadline = hasText(hero.headline);
+  const hasSubhead = hasText(hero.subhead);
+  const hasActions = visibleCtas.length > 0;
+
   return (
     <section
       ref={sectionRef}
@@ -122,25 +131,31 @@ export function HeroSection({ hero }: HeroSectionProps) {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-[1120px] px-4 sm:px-6 2xl:max-w-[1440px] 2xl:px-12">
-        <Reveal className="hero-intro" delayMs={110}>
-          <h1 id="hero-title" className="mb-4 max-w-[18ch] font-display text-4xl leading-[1.1] sm:text-5xl md:text-6xl 2xl:max-w-[22ch] 2xl:text-7xl">
-            {hero.headline}
-          </h1>
-        </Reveal>
-        <Reveal className="hero-intro" delayMs={200}>
-          <p className="mb-6 max-w-[56ch] text-[0.98rem] text-[var(--color-text-primary)] sm:text-base 2xl:max-w-[64ch] 2xl:text-xl">
-            {hero.subhead}
-          </p>
-        </Reveal>
-        <Reveal className="hero-intro" delayMs={290}>
-          <div aria-label="Primaire acties" className="flex flex-wrap gap-3">
-            {hero.ctas.map((cta) => (
-              <ButtonLink key={cta.label} href={cta.href} variant={cta.variant ?? "primary"} dataCta="hero_book_primary">
-                {cta.label}
-              </ButtonLink>
-            ))}
-          </div>
-        </Reveal>
+        {hasHeadline ? (
+          <Reveal className="hero-intro" delayMs={110}>
+            <h1 id="hero-title" className="mb-4 max-w-[18ch] font-display text-4xl leading-[1.1] sm:text-5xl md:text-6xl 2xl:max-w-[22ch] 2xl:text-7xl">
+              {hero.headline}
+            </h1>
+          </Reveal>
+        ) : null}
+        {hasSubhead ? (
+          <Reveal className="hero-intro" delayMs={200}>
+            <p className="mb-6 max-w-[56ch] text-[0.98rem] text-[var(--color-text-primary)] sm:text-base 2xl:max-w-[64ch] 2xl:text-xl">
+              {hero.subhead}
+            </p>
+          </Reveal>
+        ) : null}
+        {hasActions ? (
+          <Reveal className="hero-intro" delayMs={290}>
+            <div aria-label="Primaire acties" className="flex flex-wrap gap-3">
+              {visibleCtas.map((cta) => (
+                <ButtonLink key={`${cta.label}-${cta.href}`} href={cta.href} variant={cta.variant ?? "primary"} dataCta="hero_book_primary">
+                  {cta.label}
+                </ButtonLink>
+              ))}
+            </div>
+          </Reveal>
+        ) : null}
       </div>
     </section>
   );

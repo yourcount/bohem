@@ -165,8 +165,8 @@ function renderEmailHtml(input: {
           ${input.ctas
             .map(
               (cta) => `
-            <td style="padding:6px 4px;">
-              <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:12px 18px;border-radius:999px;background:#f28b0e;color:#111827;text-decoration:none;font-weight:700;font-size:14px;">
+            <td align="center" valign="top" style="padding:8px 6px;width:50%;">
+              <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;max-width:220px;padding:13px 18px;border-radius:999px;background:#f28b0e;border:1px solid #c26f08;color:#231610 !important;text-decoration:none;font-weight:800;font-size:15px;line-height:1.2;text-align:center;">
                 ${escapeHtml(cta.label)}
               </a>
             </td>
@@ -214,7 +214,7 @@ function renderEmailHtml(input: {
                 ? `
             <tr>
               <td style="padding:0;background:#1f1b21;">
-                <img src="${escapeHtml(input.bannerImageUrl)}" alt="Bohèm sfeerbeeld" width="640" style="display:block;width:100%;height:auto;max-height:220px;object-fit:cover;border:0;" />
+                <img src="${escapeHtml(input.bannerImageUrl)}" alt="Bohèm sfeerbeeld" width="640" style="display:block;width:100%;height:240px;max-height:240px;object-fit:cover;object-position:50% 8%;border:0;" />
               </td>
             </tr>
             `

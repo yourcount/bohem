@@ -52,6 +52,64 @@ function toHtmlParagraphs(value: string) {
   return escapeHtml(value).replace(/\n/g, "<br />");
 }
 
+function parseMailProviderError(error: unknown) {
+  const fallback = {
+    userMessage: "Je bericht kon niet worden verzonden. Probeer het opnieuw of mail direct naar info@musicbybohem.nl.",
+    code: "MAIL_SEND_FAILED",
+    status: 502
+  } as const;
+
+  if (!error || typeof error !== "object") return fallback;
+
+  const raw = error as {
+    status?: number;
+    details?: string;
+    message?: string;
+  };
+  const status = Number(raw.status ?? 0);
+  const details = String(raw.details ?? raw.message ?? "").toLowerCase();
+
+  if (status === 401 || details.includes("forbidden") || details.includes("unauthorized")) {
+    return {
+      userMessage: "Mailverzending is geblokkeerd door de mailprovider. Controleer API-sleutel en domeininstellingen.",
+      code: "MAIL_PROVIDER_AUTH_FAILED",
+      status: 502
+    } as const;
+  }
+
+  if (
+    status === 400 &&
+    (details.includes("from") ||
+      details.includes("sender") ||
+      details.includes("domain") ||
+      details.includes("not allowed"))
+  ) {
+    return {
+      userMessage: "Afzenderadres of domein wordt niet geaccepteerd door Mailgun. Controleer MAILGUN_FROM_EMAIL en MAILGUN_DOMAIN.",
+      code: "MAIL_PROVIDER_SENDER_INVALID",
+      status: 502
+    } as const;
+  }
+
+  if (status === 429 || details.includes("rate")) {
+    return {
+      userMessage: "Mailprovider is tijdelijk overbelast. Probeer het over een paar minuten opnieuw.",
+      code: "MAIL_PROVIDER_RATE_LIMITED",
+      status: 503
+    } as const;
+  }
+
+  if (status >= 500 && status < 600) {
+    return {
+      userMessage: "Mailprovider is tijdelijk niet bereikbaar. Probeer het later opnieuw of mail direct naar info@musicbybohem.nl.",
+      code: "MAIL_PROVIDER_UNAVAILABLE",
+      status: 503
+    } as const;
+  }
+
+  return fallback;
+}
+
 function renderEmailHtml(input: {
   preheader: string;
   title: string;
@@ -310,12 +368,14 @@ export async function POST(request: Request) {
       );
     }
 
+    const parsed = parseMailProviderError(error);
+    console.error("Contact mail send failed:", error);
     return NextResponse.json(
       {
-        error: "Je bericht kon niet worden verzonden. Probeer het opnieuw of mail direct naar info@musicbybohem.nl.",
-        code: "MAIL_SEND_FAILED"
+        error: parsed.userMessage,
+        code: parsed.code
       },
-      { status: 502 }
+      { status: parsed.status }
     );
   }
 

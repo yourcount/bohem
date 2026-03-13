@@ -97,7 +97,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
           style={{ objectPosition: getImageObjectPosition(hero.image, 50, 12) }}
           priority
           quality={92}
-          sizes="(max-width: 767px) 100vw, 100vw"
+          sizes="(max-width: 430px) 125vw, (max-width: 767px) 115vw, 100vw"
         />
       </div>
       <div className="hero-mask absolute inset-0" />

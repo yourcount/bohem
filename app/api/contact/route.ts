@@ -210,24 +210,24 @@ function renderEmailHtml(input: {
   const ctaRows =
     input.ctas && input.ctas.length > 0
       ? `
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:16px;border-collapse:separate;border-spacing:8px 0;table-layout:fixed;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:16px;border-collapse:collapse;table-layout:fixed;">
         <tr>
           ${(function () {
             const selected = input.ctas.slice(0, 2);
             if (selected.length === 1) {
               const cta = selected[0];
               return `
-              <td align="center" valign="top" style="padding:0 18px;">
-                <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;padding:12px 10px;border-radius:999px;background:#d8893c;border:1px solid #b96e29;box-shadow:0 4px 10px rgba(145,83,31,0.16);color:#fffdf9 !important;text-decoration:none !important;font-weight:700;font-size:14px;line-height:1.2;text-align:center;">
-                  <span style="color:#fffdf9 !important;white-space:nowrap;text-decoration:none !important;">${escapeHtml(cta.label)}</span>
+              <td align="center" valign="top" style="padding:0 12px;">
+                <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;box-sizing:border-box;padding:12px 12px;border-radius:999px;background:#c67636;border:1px solid #a95f24;box-shadow:0 3px 8px rgba(120,66,24,0.14);color:#fffaf2 !important;text-decoration:none !important;font-weight:700;font-size:14px;line-height:1.25;text-align:center;">
+                  <span style="color:#fffaf2 !important;text-decoration:none !important;">${escapeHtml(cta.label)}</span>
                 </a>
               </td>
               `;
             }
             const cells = selected.map((cta) => `
-              <td width="50%" align="center" valign="top" style="padding:0;">
-                <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;padding:12px 10px;border-radius:999px;background:#d8893c;border:1px solid #b96e29;box-shadow:0 4px 10px rgba(145,83,31,0.16);color:#fffdf9 !important;text-decoration:none !important;font-weight:700;font-size:14px;line-height:1.2;text-align:center;">
-                  <span style="color:#fffdf9 !important;white-space:nowrap;text-decoration:none !important;">${escapeHtml(cta.label)}</span>
+              <td width="50%" align="center" valign="top" style="padding:0 6px;">
+                <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;box-sizing:border-box;padding:12px 8px;border-radius:999px;background:#c67636;border:1px solid #a95f24;box-shadow:0 3px 8px rgba(120,66,24,0.14);color:#fffaf2 !important;text-decoration:none !important;font-weight:700;font-size:14px;line-height:1.25;text-align:center;">
+                  <span style="color:#fffaf2 !important;text-decoration:none !important;">${escapeHtml(cta.label)}</span>
                 </a>
               </td>
             `);

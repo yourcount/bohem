@@ -126,6 +126,8 @@ export function ContactSection({ contact }: ContactSectionProps) {
     company_reference: ""
   });
   const subjectOptions = contact.subjectOptions ?? [];
+  const canRenderDesktopTurnstile = turnstileEnabled && turnstileActivated && turnstileScriptReady;
+  const canRenderMobileTurnstile = turnstileEnabled && turnstileActivated && turnstileScriptReady && mobileStep === 2;
 
   const stepOneFields = useMemo(
     () => contact.fields.filter((field) => field.id !== "message"),
@@ -186,7 +188,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
   }, [turnstileEnabled, turnstileActivated]);
 
   useEffect(() => {
-    if (!turnstileEnabled || !turnstileScriptReady || desktopWidgetId || !desktopTurnstileRef.current || !window.turnstile) return;
+    if (!canRenderDesktopTurnstile || desktopWidgetId || !desktopTurnstileRef.current || !window.turnstile) return;
     const widgetId = window.turnstile.render(desktopTurnstileRef.current, {
       sitekey: turnstileSiteKey,
       theme: "dark",
@@ -200,10 +202,10 @@ export function ContactSection({ contact }: ContactSectionProps) {
       }
     });
     setDesktopWidgetId(widgetId);
-  }, [turnstileEnabled, turnstileScriptReady, desktopWidgetId, turnstileSiteKey]);
+  }, [canRenderDesktopTurnstile, desktopWidgetId, turnstileSiteKey]);
 
   useEffect(() => {
-    if (!turnstileEnabled || !turnstileScriptReady || mobileWidgetId || mobileStep !== 2 || !mobileTurnstileRef.current || !window.turnstile) return;
+    if (!canRenderMobileTurnstile || mobileWidgetId || !mobileTurnstileRef.current || !window.turnstile) return;
     const widgetId = window.turnstile.render(mobileTurnstileRef.current, {
       sitekey: turnstileSiteKey,
       theme: "dark",
@@ -217,7 +219,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
       }
     });
     setMobileWidgetId(widgetId);
-  }, [turnstileEnabled, turnstileScriptReady, mobileWidgetId, mobileStep, turnstileSiteKey]);
+  }, [canRenderMobileTurnstile, mobileWidgetId, turnstileSiteKey]);
 
   const requestTurnstileToken = async (mode: "mobile" | "desktop") => {
     if (!turnstileEnabled) return "";
@@ -420,7 +422,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                 ) : null}
                 {turnstileEnabled ? (
                   <div className="mt-1 min-h-[74px]">
-                    {turnstileActivated ? (
+                    {canRenderMobileTurnstile ? (
                       <div ref={mobileTurnstileRef} />
                     ) : (
                       <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
@@ -464,7 +466,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
             ))}
             {turnstileEnabled ? (
               <div className="mt-1 min-h-[74px] md:col-span-2">
-                {turnstileActivated ? (
+                {canRenderDesktopTurnstile ? (
                   <div ref={desktopTurnstileRef} />
                 ) : (
                   <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>

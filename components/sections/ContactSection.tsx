@@ -117,6 +117,8 @@ export function ContactSection({ contact }: ContactSectionProps) {
   const [turnstileScriptReady, setTurnstileScriptReady] = useState(false);
   const [desktopWidgetId, setDesktopWidgetId] = useState<string | null>(null);
   const [mobileWidgetId, setMobileWidgetId] = useState<string | null>(null);
+  const [desktopWidgetVisible, setDesktopWidgetVisible] = useState(false);
+  const [mobileWidgetVisible, setMobileWidgetVisible] = useState(false);
   const [mobileFormValues, setMobileFormValues] = useState({
     subject: "",
     name: "",
@@ -221,6 +223,36 @@ export function ContactSection({ contact }: ContactSectionProps) {
     setMobileWidgetId(widgetId);
   }, [canRenderMobileTurnstile, mobileWidgetId, turnstileSiteKey]);
 
+  useEffect(() => {
+    const host = desktopTurnstileRef.current;
+    if (!host) return;
+
+    const markVisibleIfReady = () => {
+      const iframe = host.querySelector("iframe");
+      if (iframe) setDesktopWidgetVisible(true);
+    };
+
+    markVisibleIfReady();
+    const observer = new MutationObserver(markVisibleIfReady);
+    observer.observe(host, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [desktopWidgetId]);
+
+  useEffect(() => {
+    const host = mobileTurnstileRef.current;
+    if (!host) return;
+
+    const markVisibleIfReady = () => {
+      const iframe = host.querySelector("iframe");
+      if (iframe) setMobileWidgetVisible(true);
+    };
+
+    markVisibleIfReady();
+    const observer = new MutationObserver(markVisibleIfReady);
+    observer.observe(host, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [mobileWidgetId]);
+
   const requestTurnstileToken = async (mode: "mobile" | "desktop") => {
     if (!turnstileEnabled) return "";
     const widgetId = mode === "mobile" ? mobileWidgetId : desktopWidgetId;
@@ -251,6 +283,22 @@ export function ContactSection({ contact }: ContactSectionProps) {
         reject(new Error("TURNSTILE_EXECUTE_FAILED"));
       }
     });
+  };
+
+  const resetTurnstileWidget = (mode: "mobile" | "desktop") => {
+    if (!turnstileEnabled || !window.turnstile) return;
+    const widgetId = mode === "mobile" ? mobileWidgetId : desktopWidgetId;
+    if (!widgetId) return;
+    try {
+      window.turnstile.reset(widgetId);
+      if (mode === "mobile") {
+        setMobileWidgetVisible(false);
+      } else {
+        setDesktopWidgetVisible(false);
+      }
+    } catch {
+      // Ignore reset errors; next submit will request a fresh token.
+    }
   };
 
   const handleNextStep = (event: MouseEvent<HTMLButtonElement>) => {
@@ -287,6 +335,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
         turnstileToken = await requestTurnstileToken(mode === "mobile" ? "mobile" : "desktop");
       } catch {
         setSubmitError("Beveiligingscheck: kon niet worden geladen. Probeer het opnieuw.");
+        resetTurnstileWidget(mode === "mobile" ? "mobile" : "desktop");
         setIsSubmitting(false);
         return;
       }
@@ -337,6 +386,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
         } else {
           setSubmitError(result.error ?? "Er ging iets mis. Probeer het opnieuw.");
         }
+        resetTurnstileWidget(mode === "mobile" ? "mobile" : "desktop");
         return;
       }
 
@@ -351,8 +401,10 @@ export function ContactSection({ contact }: ContactSectionProps) {
         company_reference: ""
       });
       setSubmitSuccess("Bedankt, je bericht is verzonden. We reageren zo snel mogelijk.");
+      resetTurnstileWidget(mode === "mobile" ? "mobile" : "desktop");
     } catch {
       setSubmitError("Er ging iets mis. Probeer het opnieuw.");
+      resetTurnstileWidget(mode === "mobile" ? "mobile" : "desktop");
     } finally {
       setIsSubmitting(false);
     }
@@ -423,7 +475,16 @@ export function ContactSection({ contact }: ContactSectionProps) {
                 {turnstileEnabled ? (
                   <div className="mt-1 min-h-[74px]">
                     {canRenderMobileTurnstile ? (
-                      <div ref={mobileTurnstileRef} />
+                      <div className="relative">
+                        <div
+                          ref={mobileTurnstileRef}
+                          aria-hidden={!mobileWidgetVisible}
+                          style={{ opacity: mobileWidgetVisible ? 1 : 0, pointerEvents: mobileWidgetVisible ? "auto" : "none" }}
+                        />
+                        {!mobileWidgetVisible ? (
+                          <p className="absolute inset-0 flex items-center text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
+                        ) : null}
+                      </div>
                     ) : (
                       <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
                     )}
@@ -467,7 +528,16 @@ export function ContactSection({ contact }: ContactSectionProps) {
             {turnstileEnabled ? (
               <div className="mt-1 min-h-[74px] md:col-span-2">
                 {canRenderDesktopTurnstile ? (
-                  <div ref={desktopTurnstileRef} />
+                  <div className="relative">
+                    <div
+                      ref={desktopTurnstileRef}
+                      aria-hidden={!desktopWidgetVisible}
+                      style={{ opacity: desktopWidgetVisible ? 1 : 0, pointerEvents: desktopWidgetVisible ? "auto" : "none" }}
+                    />
+                    {!desktopWidgetVisible ? (
+                      <p className="absolute inset-0 flex items-center text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
+                    ) : null}
+                  </div>
                 ) : (
                   <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
                 )}

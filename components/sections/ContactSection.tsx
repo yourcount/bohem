@@ -439,21 +439,6 @@ export function ContactSection({ contact }: ContactSectionProps) {
                     onValueChange={(nextValue) => setMobileFormValues((prev) => ({ ...prev, message: nextValue }))}
                   />
                 ) : null}
-                {turnstileEnabled && canRenderMobileTurnstile ? (
-                  <div className="mt-1">
-                    <div className="relative min-h-[70px] max-h-[74px] overflow-hidden">
-                      <div
-                        ref={mobileTurnstileRef}
-                        className="cf-turnstile"
-                        aria-hidden={!mobileWidgetVisible}
-                        style={{ opacity: mobileWidgetVisible ? 1 : 0, pointerEvents: mobileWidgetVisible ? "auto" : "none" }}
-                      />
-                      {!mobileWidgetVisible ? (
-                        <p className="absolute inset-0 flex items-center text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
-                      ) : null}
-                    </div>
-                  </div>
-                ) : null}
                 <div className="mt-2 grid gap-2">
                   <button
                     type="button"
@@ -471,6 +456,21 @@ export function ContactSection({ contact }: ContactSectionProps) {
                     {isSubmitting ? submittingLabel : contact.ctaLabel}
                   </button>
                 </div>
+                {turnstileEnabled && canRenderMobileTurnstile ? (
+                  <div className="mt-1">
+                    <div className="relative min-h-[70px] max-h-[74px] overflow-hidden">
+                      <div
+                        ref={mobileTurnstileRef}
+                        className="cf-turnstile"
+                        aria-hidden={!mobileWidgetVisible}
+                        style={{ opacity: mobileWidgetVisible ? 1 : 0, pointerEvents: mobileWidgetVisible ? "auto" : "none" }}
+                      />
+                      {!mobileWidgetVisible ? (
+                        <p className="absolute inset-0 flex items-center text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null}
                 {turnstileEnabled && !canRenderMobileTurnstile ? (
                   <div className="mt-1">
                     <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
@@ -494,6 +494,14 @@ export function ContactSection({ contact }: ContactSectionProps) {
                 <FormField field={field} idPrefix="desktop" subjectOptions={subjectOptions} />
               </div>
             ))}
+            <button
+              type="submit"
+              data-cta="contact_desktop_submit"
+              disabled={isSubmitting}
+              className="cta-glow mt-4 inline-flex w-fit items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-6 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)] focus-visible:bg-[var(--color-accent-copper)] focus-visible:text-[var(--color-text-primary)] md:col-span-2"
+            >
+              {isSubmitting ? submittingLabel : contact.ctaLabel}
+            </button>
             {turnstileEnabled && canRenderDesktopTurnstile ? (
               <div className="mt-1 md:col-span-2">
                 <div className="relative min-h-[70px] max-h-[74px] overflow-hidden">
@@ -509,14 +517,6 @@ export function ContactSection({ contact }: ContactSectionProps) {
                 </div>
               </div>
             ) : null}
-            <button
-              type="submit"
-              data-cta="contact_desktop_submit"
-              disabled={isSubmitting}
-              className="cta-glow mt-4 inline-flex w-fit items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-6 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)] focus-visible:bg-[var(--color-accent-copper)] focus-visible:text-[var(--color-text-primary)] md:col-span-2"
-            >
-              {isSubmitting ? submittingLabel : contact.ctaLabel}
-            </button>
             {turnstileEnabled && !canRenderDesktopTurnstile ? (
               <div className="mt-1 md:col-span-2">
                 <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>

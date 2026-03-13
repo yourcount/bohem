@@ -439,22 +439,19 @@ export function ContactSection({ contact }: ContactSectionProps) {
                     onValueChange={(nextValue) => setMobileFormValues((prev) => ({ ...prev, message: nextValue }))}
                   />
                 ) : null}
-                {turnstileEnabled ? (
+                {turnstileEnabled && canRenderMobileTurnstile ? (
                   <div className="mt-1 min-h-[74px]">
-                    {canRenderMobileTurnstile ? (
-                      <div className="relative">
-                        <div
-                          ref={mobileTurnstileRef}
-                          aria-hidden={!mobileWidgetVisible}
-                          style={{ opacity: mobileWidgetVisible ? 1 : 0, pointerEvents: mobileWidgetVisible ? "auto" : "none" }}
-                        />
-                        {!mobileWidgetVisible ? (
-                          <p className="absolute inset-0 flex items-center text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
-                        ) : null}
-                      </div>
-                    ) : (
-                      <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
-                    )}
+                    <div className="relative">
+                      <div
+                        ref={mobileTurnstileRef}
+                        className="cf-turnstile"
+                        aria-hidden={!mobileWidgetVisible}
+                        style={{ opacity: mobileWidgetVisible ? 1 : 0, pointerEvents: mobileWidgetVisible ? "auto" : "none" }}
+                      />
+                      {!mobileWidgetVisible ? (
+                        <p className="absolute inset-0 flex items-center text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
+                      ) : null}
+                    </div>
                   </div>
                 ) : null}
                 <div className="mt-2 grid gap-2">
@@ -474,6 +471,11 @@ export function ContactSection({ contact }: ContactSectionProps) {
                     {isSubmitting ? submittingLabel : contact.ctaLabel}
                   </button>
                 </div>
+                {turnstileEnabled && !canRenderMobileTurnstile ? (
+                  <div className="mt-1 min-h-[74px]">
+                    <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
+                  </div>
+                ) : null}
               </>
             )}
           </form>
@@ -492,22 +494,19 @@ export function ContactSection({ contact }: ContactSectionProps) {
                 <FormField field={field} idPrefix="desktop" subjectOptions={subjectOptions} />
               </div>
             ))}
-            {turnstileEnabled ? (
+            {turnstileEnabled && canRenderDesktopTurnstile ? (
               <div className="mt-1 min-h-[74px] md:col-span-2">
-                {canRenderDesktopTurnstile ? (
-                  <div className="relative">
-                    <div
-                      ref={desktopTurnstileRef}
-                      aria-hidden={!desktopWidgetVisible}
-                      style={{ opacity: desktopWidgetVisible ? 1 : 0, pointerEvents: desktopWidgetVisible ? "auto" : "none" }}
-                    />
-                    {!desktopWidgetVisible ? (
-                      <p className="absolute inset-0 flex items-center text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
-                    ) : null}
-                  </div>
-                ) : (
-                  <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
-                )}
+                <div className="relative">
+                  <div
+                    ref={desktopTurnstileRef}
+                    className="cf-turnstile"
+                    aria-hidden={!desktopWidgetVisible}
+                    style={{ opacity: desktopWidgetVisible ? 1 : 0, pointerEvents: desktopWidgetVisible ? "auto" : "none" }}
+                  />
+                  {!desktopWidgetVisible ? (
+                    <p className="absolute inset-0 flex items-center text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
+                  ) : null}
+                </div>
               </div>
             ) : null}
             <button
@@ -518,6 +517,11 @@ export function ContactSection({ contact }: ContactSectionProps) {
             >
               {isSubmitting ? submittingLabel : contact.ctaLabel}
             </button>
+            {turnstileEnabled && !canRenderDesktopTurnstile ? (
+              <div className="mt-1 min-h-[74px] md:col-span-2">
+                <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
+              </div>
+            ) : null}
           </form>
 
           {submitError ? (

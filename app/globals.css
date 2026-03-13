@@ -700,6 +700,14 @@ section.section-ambient + section.section-ambient {
   width: 100%;
 }
 
+/* Turnstile wrapper background neutralization */
+.cf-turnstile body.theme-dark,
+.cf-turnstile .main-wrapper.theme-dark,
+.cf-turnstile .main-wrapper,
+.cf-turnstile iframe {
+  background: transparent !important;
+}
+
 .hero-spotlight {
   opacity: 0.52;
   background:

@@ -440,8 +440,8 @@ export function ContactSection({ contact }: ContactSectionProps) {
                   />
                 ) : null}
                 {turnstileEnabled && canRenderMobileTurnstile ? (
-                  <div className="mt-1 min-h-[74px]">
-                    <div className="relative">
+                  <div className="mt-1">
+                    <div className="relative min-h-[70px] max-h-[74px] overflow-hidden">
                       <div
                         ref={mobileTurnstileRef}
                         className="cf-turnstile"
@@ -472,7 +472,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                   </button>
                 </div>
                 {turnstileEnabled && !canRenderMobileTurnstile ? (
-                  <div className="mt-1 min-h-[74px]">
+                  <div className="mt-1">
                     <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
                   </div>
                 ) : null}
@@ -495,8 +495,8 @@ export function ContactSection({ contact }: ContactSectionProps) {
               </div>
             ))}
             {turnstileEnabled && canRenderDesktopTurnstile ? (
-              <div className="mt-1 min-h-[74px] md:col-span-2">
-                <div className="relative">
+              <div className="mt-1 md:col-span-2">
+                <div className="relative min-h-[70px] max-h-[74px] overflow-hidden">
                   <div
                     ref={desktopTurnstileRef}
                     className="cf-turnstile"
@@ -518,7 +518,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
               {isSubmitting ? submittingLabel : contact.ctaLabel}
             </button>
             {turnstileEnabled && !canRenderDesktopTurnstile ? (
-              <div className="mt-1 min-h-[74px] md:col-span-2">
+              <div className="mt-1 md:col-span-2">
                 <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
               </div>
             ) : null}

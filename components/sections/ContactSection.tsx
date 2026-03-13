@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ChangeEvent, type FormEvent, type MouseEvent } from "react";
-import Script from "next/script";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent, type MouseEvent } from "react";
 
 import { Reveal } from "@/components/ui/Reveal";
 import type { SiteContent } from "@/lib/types";
@@ -9,6 +8,18 @@ import type { SiteContent } from "@/lib/types";
 type ContactSectionProps = {
   contact: SiteContent["contact"];
 };
+
+type TurnstileInstance = {
+  render: (container: string | HTMLElement, options: Record<string, unknown>) => string;
+  execute: (widgetId: string) => void;
+  reset: (widgetId: string) => void;
+};
+
+declare global {
+  interface Window {
+    turnstile?: TurnstileInstance;
+  }
+}
 
 type FieldType = SiteContent["contact"]["fields"][number];
 
@@ -92,10 +103,20 @@ function FormField({
 export function ContactSection({ contact }: ContactSectionProps) {
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? "";
   const turnstileEnabled = turnstileSiteKey.length > 0;
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const desktopTurnstileRef = useRef<HTMLDivElement | null>(null);
+  const mobileTurnstileRef = useRef<HTMLDivElement | null>(null);
+  const desktopTurnstileResolverRef = useRef<((token: string) => void) | null>(null);
+  const mobileTurnstileResolverRef = useRef<((token: string) => void) | null>(null);
+
   const [mobileStep, setMobileStep] = useState<1 | 2>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
+  const [turnstileActivated, setTurnstileActivated] = useState(false);
+  const [turnstileScriptReady, setTurnstileScriptReady] = useState(false);
+  const [desktopWidgetId, setDesktopWidgetId] = useState<string | null>(null);
+  const [mobileWidgetId, setMobileWidgetId] = useState<string | null>(null);
   const [mobileFormValues, setMobileFormValues] = useState({
     subject: "",
     name: "",
@@ -126,6 +147,110 @@ export function ContactSection({ contact }: ContactSectionProps) {
   );
   const fieldLabelMap = useMemo(() => Object.fromEntries(contact.fields.map((field) => [field.id, field.label])), [contact.fields]);
 
+  useEffect(() => {
+    if (!turnstileEnabled) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setTurnstileActivated(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "120px 0px" }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [turnstileEnabled]);
+
+  useEffect(() => {
+    if (!turnstileEnabled || !turnstileActivated) return;
+    if (window.turnstile) {
+      setTurnstileScriptReady(true);
+      return;
+    }
+
+    const existing = document.querySelector<HTMLScriptElement>('script[data-turnstile-script="true"]');
+    if (existing) {
+      const onLoad = () => setTurnstileScriptReady(true);
+      existing.addEventListener("load", onLoad);
+      return () => existing.removeEventListener("load", onLoad);
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.async = true;
+    script.defer = true;
+    script.dataset.turnstileScript = "true";
+    script.addEventListener("load", () => setTurnstileScriptReady(true), { once: true });
+    document.head.appendChild(script);
+  }, [turnstileEnabled, turnstileActivated]);
+
+  useEffect(() => {
+    if (!turnstileEnabled || !turnstileScriptReady || desktopWidgetId || !desktopTurnstileRef.current || !window.turnstile) return;
+    const widgetId = window.turnstile.render(desktopTurnstileRef.current, {
+      sitekey: turnstileSiteKey,
+      theme: "dark",
+      language: "nl",
+      action: "contact_form_desktop",
+      size: "flexible",
+      execution: "execute",
+      callback: (token: string) => {
+        desktopTurnstileResolverRef.current?.(token);
+        desktopTurnstileResolverRef.current = null;
+      }
+    });
+    setDesktopWidgetId(widgetId);
+  }, [turnstileEnabled, turnstileScriptReady, desktopWidgetId, turnstileSiteKey]);
+
+  useEffect(() => {
+    if (!turnstileEnabled || !turnstileScriptReady || mobileWidgetId || mobileStep !== 2 || !mobileTurnstileRef.current || !window.turnstile) return;
+    const widgetId = window.turnstile.render(mobileTurnstileRef.current, {
+      sitekey: turnstileSiteKey,
+      theme: "dark",
+      language: "nl",
+      action: "contact_form_mobile",
+      size: "flexible",
+      execution: "execute",
+      callback: (token: string) => {
+        mobileTurnstileResolverRef.current?.(token);
+        mobileTurnstileResolverRef.current = null;
+      }
+    });
+    setMobileWidgetId(widgetId);
+  }, [turnstileEnabled, turnstileScriptReady, mobileWidgetId, mobileStep, turnstileSiteKey]);
+
+  const requestTurnstileToken = async (mode: "mobile" | "desktop") => {
+    if (!turnstileEnabled) return "";
+    const widgetId = mode === "mobile" ? mobileWidgetId : desktopWidgetId;
+    const resolverRef = mode === "mobile" ? mobileTurnstileResolverRef : desktopTurnstileResolverRef;
+    const turnstile = window.turnstile;
+
+    if (!widgetId || !turnstile) {
+      throw new Error("TURNSTILE_NOT_READY");
+    }
+
+    return await new Promise<string>((resolve, reject) => {
+      const timeout = window.setTimeout(() => {
+        resolverRef.current = null;
+        reject(new Error("TURNSTILE_TIMEOUT"));
+      }, 12000);
+
+      resolverRef.current = (token: string) => {
+        window.clearTimeout(timeout);
+        resolve(token);
+      };
+
+      try {
+        turnstile.reset(widgetId);
+        turnstile.execute(widgetId);
+      } catch {
+        window.clearTimeout(timeout);
+        resolverRef.current = null;
+        reject(new Error("TURNSTILE_EXECUTE_FAILED"));
+      }
+    });
+  };
+
   const handleNextStep = (event: MouseEvent<HTMLButtonElement>) => {
     const form = event.currentTarget.form;
     if (!form) {
@@ -154,6 +279,16 @@ export function ContactSection({ contact }: ContactSectionProps) {
     setSubmitSuccess("");
 
     const mode = form.dataset.formMode ?? "desktop";
+    let turnstileToken = "";
+    if (turnstileEnabled) {
+      try {
+        turnstileToken = await requestTurnstileToken(mode === "mobile" ? "mobile" : "desktop");
+      } catch {
+        setSubmitError("Beveiligingscheck: kon niet worden geladen. Probeer het opnieuw.");
+        setIsSubmitting(false);
+        return;
+      }
+    }
     const payload =
       mode === "mobile"
         ? {
@@ -163,7 +298,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
             phone: mobileFormValues.phone,
             message: mobileFormValues.message,
             company_reference: mobileFormValues.company_reference,
-            turnstileToken: String(formData.get("cf-turnstile-response") ?? "")
+            turnstileToken
           }
         : {
             subject: String(formData.get("subject") ?? ""),
@@ -172,7 +307,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
             phone: String(formData.get("phone") ?? ""),
             message: String(formData.get("message") ?? ""),
             company_reference: String(formData.get("company_reference") ?? ""),
-            turnstileToken: String(formData.get("cf-turnstile-response") ?? "")
+            turnstileToken
           };
 
     try {
@@ -223,14 +358,12 @@ export function ContactSection({ contact }: ContactSectionProps) {
 
   return (
     <section
+      ref={sectionRef}
       id="contact"
       aria-labelledby="contact-title"
       className="section-ambient section-ambient-contact bg-[linear-gradient(180deg,#231816_0%,#201613_54%,#1a1412_100%)] py-16"
     >
       <div className="mx-auto w-full max-w-[1120px] px-4 sm:px-6">
-        {turnstileEnabled ? (
-          <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="afterInteractive" async defer />
-        ) : null}
         <Reveal>
           <h2 id="contact-title" className="mb-4 font-display text-3xl leading-tight sm:text-4xl lg:text-5xl">
             {contact.title}
@@ -251,17 +384,6 @@ export function ContactSection({ contact }: ContactSectionProps) {
                 style={{ width: mobileStep === 1 ? "50%" : "100%" }}
               />
             </div>
-            {turnstileEnabled ? (
-              <div
-                className="cf-turnstile mt-1"
-                data-sitekey={turnstileSiteKey}
-                data-theme="dark"
-                data-language="nl"
-                data-action="contact_form_mobile"
-                data-size="flexible"
-              />
-            ) : null}
-
             {mobileStep === 1 ? (
               <>
                 {stepOneFields.map((field) => (
@@ -295,6 +417,15 @@ export function ContactSection({ contact }: ContactSectionProps) {
                     value={mobileFormValues.message}
                     onValueChange={(nextValue) => setMobileFormValues((prev) => ({ ...prev, message: nextValue }))}
                   />
+                ) : null}
+                {turnstileEnabled ? (
+                  <div className="mt-1 min-h-[74px]">
+                    {turnstileActivated ? (
+                      <div ref={mobileTurnstileRef} />
+                    ) : (
+                      <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
+                    )}
+                  </div>
                 ) : null}
                 <div className="mt-2 grid gap-2">
                   <button
@@ -332,14 +463,13 @@ export function ContactSection({ contact }: ContactSectionProps) {
               </div>
             ))}
             {turnstileEnabled ? (
-              <div
-                className="cf-turnstile mt-1 md:col-span-2"
-                data-sitekey={turnstileSiteKey}
-                data-theme="dark"
-                data-language="nl"
-                data-action="contact_form_desktop"
-                data-size="flexible"
-              />
+              <div className="mt-1 min-h-[74px] md:col-span-2">
+                {turnstileActivated ? (
+                  <div ref={desktopTurnstileRef} />
+                ) : (
+                  <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
+                )}
+              </div>
             ) : null}
             <button
               type="submit"

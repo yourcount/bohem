@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 
+import { AnalyticsScripts } from "@/components/analytics/AnalyticsScripts";
 import { CookieConsentProvider } from "@/components/cookies/CookieConsentProvider";
 import { getLiveSiteContent } from "@/lib/content/live-content";
 import { getSiteUrl } from "@/lib/seo";
@@ -82,16 +82,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="nl">
       <body>
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-W2Z0GGDLDX" strategy="afterInteractive" />
-        <Script id="google-analytics-gtag" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-W2Z0GGDLDX');
-          `}
-        </Script>
-        <CookieConsentProvider>{children}</CookieConsentProvider>
+        <CookieConsentProvider>
+          <AnalyticsScripts />
+          {children}
+        </CookieConsentProvider>
       </body>
     </html>
   );

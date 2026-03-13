@@ -210,21 +210,30 @@ function renderEmailHtml(input: {
   const ctaRows =
     input.ctas && input.ctas.length > 0
       ? `
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:18px;border-collapse:separate;border-spacing:0 10px;">
-        ${input.ctas
-          .slice(0, 2)
-          .map((cta) => {
-            return `
-          <tr>
-            <td align="center" valign="top" style="padding:0;">
-              <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;max-width:320px;padding:13px 18px;border-radius:999px;background:#e57f08;border:1px solid #b96806;box-shadow:0 6px 14px rgba(229,127,8,0.28);color:#ffffff !important;text-decoration:none !important;font-weight:800;font-size:15px;line-height:1.2;text-align:center;">
-                <span style="color:#ffffff !important;white-space:nowrap;text-decoration:none !important;">${escapeHtml(cta.label)}</span>
-              </a>
-            </td>
-          </tr>
-        `;
-          })
-          .join("")}
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:16px;border-collapse:separate;border-spacing:8px 0;table-layout:fixed;">
+        <tr>
+          ${(function () {
+            const selected = input.ctas.slice(0, 2);
+            if (selected.length === 1) {
+              const cta = selected[0];
+              return `
+              <td align="center" valign="top" style="padding:0 18px;">
+                <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;padding:12px 10px;border-radius:999px;background:#d8893c;border:1px solid #b96e29;box-shadow:0 4px 10px rgba(145,83,31,0.16);color:#fffdf9 !important;text-decoration:none !important;font-weight:700;font-size:14px;line-height:1.2;text-align:center;">
+                  <span style="color:#fffdf9 !important;white-space:nowrap;text-decoration:none !important;">${escapeHtml(cta.label)}</span>
+                </a>
+              </td>
+              `;
+            }
+            const cells = selected.map((cta) => `
+              <td width="50%" align="center" valign="top" style="padding:0;">
+                <a href="${escapeHtml(cta.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;padding:12px 10px;border-radius:999px;background:#d8893c;border:1px solid #b96e29;box-shadow:0 4px 10px rgba(145,83,31,0.16);color:#fffdf9 !important;text-decoration:none !important;font-weight:700;font-size:14px;line-height:1.2;text-align:center;">
+                  <span style="color:#fffdf9 !important;white-space:nowrap;text-decoration:none !important;">${escapeHtml(cta.label)}</span>
+                </a>
+              </td>
+            `);
+            return cells.join("");
+          })()}
+        </tr>
       </table>
     `
       : "";
@@ -403,7 +412,6 @@ async function sendContactMail(payload: {
     bannerTitle: "Nieuwe aanvraag ontvangen",
     bannerSubtitle: "Via het contactformulier op de website",
     bannerImageUrl,
-    ctas,
     details: [
       { label: "Onderwerp", value: payload.subject },
       { label: "Naam", value: payload.name },

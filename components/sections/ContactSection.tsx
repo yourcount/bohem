@@ -204,6 +204,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
       }
     });
     setDesktopWidgetId(widgetId);
+    setDesktopWidgetVisible(true);
   }, [canRenderDesktopTurnstile, desktopWidgetId, turnstileSiteKey]);
 
   useEffect(() => {
@@ -221,37 +222,8 @@ export function ContactSection({ contact }: ContactSectionProps) {
       }
     });
     setMobileWidgetId(widgetId);
+    setMobileWidgetVisible(true);
   }, [canRenderMobileTurnstile, mobileWidgetId, turnstileSiteKey]);
-
-  useEffect(() => {
-    const host = desktopTurnstileRef.current;
-    if (!host) return;
-
-    const markVisibleIfReady = () => {
-      const iframe = host.querySelector("iframe");
-      if (iframe) setDesktopWidgetVisible(true);
-    };
-
-    markVisibleIfReady();
-    const observer = new MutationObserver(markVisibleIfReady);
-    observer.observe(host, { childList: true, subtree: true });
-    return () => observer.disconnect();
-  }, [desktopWidgetId]);
-
-  useEffect(() => {
-    const host = mobileTurnstileRef.current;
-    if (!host) return;
-
-    const markVisibleIfReady = () => {
-      const iframe = host.querySelector("iframe");
-      if (iframe) setMobileWidgetVisible(true);
-    };
-
-    markVisibleIfReady();
-    const observer = new MutationObserver(markVisibleIfReady);
-    observer.observe(host, { childList: true, subtree: true });
-    return () => observer.disconnect();
-  }, [mobileWidgetId]);
 
   const requestTurnstileToken = async (mode: "mobile" | "desktop") => {
     if (!turnstileEnabled) return "";
@@ -291,11 +263,6 @@ export function ContactSection({ contact }: ContactSectionProps) {
     if (!widgetId) return;
     try {
       window.turnstile.reset(widgetId);
-      if (mode === "mobile") {
-        setMobileWidgetVisible(false);
-      } else {
-        setDesktopWidgetVisible(false);
-      }
     } catch {
       // Ignore reset errors; next submit will request a fresh token.
     }

@@ -697,7 +697,10 @@ section.section-ambient + section.section-ambient {
 }
 
 .cf-turnstile {
-  width: 100%;
+  display: inline-block;
+  width: auto;
+  max-width: 100%;
+  background: transparent !important;
 }
 
 /* Turnstile wrapper background neutralization */

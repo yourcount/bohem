@@ -193,10 +193,10 @@ export function ContactSection({ contact }: ContactSectionProps) {
     if (!canRenderDesktopTurnstile || desktopWidgetId || !desktopTurnstileRef.current || !window.turnstile) return;
     const widgetId = window.turnstile.render(desktopTurnstileRef.current, {
       sitekey: turnstileSiteKey,
-      theme: "dark",
+      theme: "light",
       language: "nl",
       action: "contact_form_desktop",
-      size: "flexible",
+      size: "normal",
       execution: "execute",
       callback: (token: string) => {
         desktopTurnstileResolverRef.current?.(token);
@@ -211,10 +211,10 @@ export function ContactSection({ contact }: ContactSectionProps) {
     if (!canRenderMobileTurnstile || mobileWidgetId || !mobileTurnstileRef.current || !window.turnstile) return;
     const widgetId = window.turnstile.render(mobileTurnstileRef.current, {
       sitekey: turnstileSiteKey,
-      theme: "dark",
+      theme: "light",
       language: "nl",
       action: "contact_form_mobile",
-      size: "flexible",
+      size: "normal",
       execution: "execute",
       callback: (token: string) => {
         mobileTurnstileResolverRef.current?.(token);

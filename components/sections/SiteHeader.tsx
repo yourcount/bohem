@@ -12,27 +12,6 @@ type SiteHeaderProps = {
   navigation: NavItem[];
 };
 
-const socialLinks = [
-  {
-    href: "https://www.youtube.com/@VideoBoh%C3%A8m",
-    label: "YouTube van Bohèm",
-    icon: (
-      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
-        <path d="M23.5 6.2a3.2 3.2 0 0 0-2.2-2.3C19.2 3.3 12 3.3 12 3.3s-7.2 0-9.3.6A3.2 3.2 0 0 0 .5 6.2 33.7 33.7 0 0 0 0 12a33.7 33.7 0 0 0 .5 5.8 3.2 3.2 0 0 0 2.2 2.3c2.1.6 9.3.6 9.3.6s7.2 0 9.3-.6a3.2 3.2 0 0 0 2.2-2.3A33.7 33.7 0 0 0 24 12a33.7 33.7 0 0 0-.5-5.8ZM9.6 15.5V8.5L15.8 12l-6.2 3.5Z" />
-      </svg>
-    )
-  },
-  {
-    href: "https://www.instagram.com/musicbybohem/?__d=1%2F",
-    label: "Instagram van Bohèm",
-    icon: (
-      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
-        <path d="M7.2 2h9.6A5.2 5.2 0 0 1 22 7.2v9.6A5.2 5.2 0 0 1 16.8 22H7.2A5.2 5.2 0 0 1 2 16.8V7.2A5.2 5.2 0 0 1 7.2 2Zm0 1.9A3.3 3.3 0 0 0 3.9 7.2v9.6a3.3 3.3 0 0 0 3.3 3.3h9.6a3.3 3.3 0 0 0 3.3-3.3V7.2a3.3 3.3 0 0 0-3.3-3.3H7.2Zm10.1 1.5a1.2 1.2 0 1 1 0 2.3 1.2 1.2 0 0 1 0-2.3ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.9a3.1 3.1 0 1 0 0 6.2 3.1 3.1 0 0 0 0-6.2Z" />
-      </svg>
-    )
-  }
-] as const;
-
 export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeHref, setActiveHref] = useState<string>("");
@@ -153,40 +132,24 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
           {isMenuOpen ? "Sluiten" : "Menu"}
         </button>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <nav aria-label="Snelle navigatie">
-            <ul className="flex min-w-max gap-5 text-sm">
-              {navigation.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    aria-current={activeHref === item.href ? "page" : undefined}
-                    onClick={(event) => handleNavClick(event, item.href)}
-                    className={`transition-colors hover:text-[#f3d7b0] focus-visible:text-[#f3d7b0] ${
-                      activeHref === item.href ? "text-[#f3d7b0] underline decoration-[1.5px] underline-offset-[6px]" : ""
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <div className="ml-1 flex items-center gap-2">
-            {socialLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={link.label}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-line-muted)] text-[#f3d7b0] transition-colors hover:border-[#c8873e] hover:text-white"
-              >
-                {link.icon}
-              </a>
+        <nav aria-label="Snelle navigatie" className="hidden md:block">
+          <ul className="flex min-w-max gap-5 text-sm">
+            {navigation.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  aria-current={activeHref === item.href ? "page" : undefined}
+                  onClick={(event) => handleNavClick(event, item.href)}
+                  className={`transition-colors hover:text-[#f3d7b0] focus-visible:text-[#f3d7b0] ${
+                    activeHref === item.href ? "text-[#f3d7b0] underline decoration-[1.5px] underline-offset-[6px]" : ""
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              </li>
             ))}
-          </div>
-        </div>
+          </ul>
+        </nav>
       </div>
 
       {isMenuOpen ? (
@@ -210,20 +173,6 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
                 </Link>
               </li>
             ))}
-            <li className="mt-2 flex items-center gap-2">
-              {socialLinks.map((link) => (
-                <a
-                  key={`mobile-${link.href}`}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={link.label}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] text-[#f3d7b0] transition-colors hover:border-[#c8873e] hover:text-white"
-                >
-                  {link.icon}
-                </a>
-              ))}
-            </li>
           </ul>
         </nav>
       ) : null}

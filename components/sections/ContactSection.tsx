@@ -447,6 +447,17 @@ export function ContactSection({ contact }: ContactSectionProps) {
                   >
                     Terug
                   </button>
+                  {submitError ? (
+                    <p role="alert" className="text-sm text-[#ffb4a8]">
+                      {submitError}
+                    </p>
+                  ) : null}
+                  {submitSuccess ? (
+                    <p aria-live="polite" className="text-sm text-[#b6efb9]">
+                      <span aria-hidden="true" className="success-pop">✓</span>
+                      {submitSuccess}
+                    </p>
+                  ) : null}
                   <button
                     type="submit"
                     data-cta="contact_mobile_submit"
@@ -494,6 +505,17 @@ export function ContactSection({ contact }: ContactSectionProps) {
                 <FormField field={field} idPrefix="desktop" subjectOptions={subjectOptions} />
               </div>
             ))}
+            {submitError ? (
+              <p role="alert" className="md:col-span-2 text-sm text-[#ffb4a8]">
+                {submitError}
+              </p>
+            ) : null}
+            {submitSuccess ? (
+              <p aria-live="polite" className="md:col-span-2 text-sm text-[#b6efb9]">
+                <span aria-hidden="true" className="success-pop">✓</span>
+                {submitSuccess}
+              </p>
+            ) : null}
             <button
               type="submit"
               data-cta="contact_desktop_submit"
@@ -524,17 +546,6 @@ export function ContactSection({ contact }: ContactSectionProps) {
             ) : null}
           </form>
 
-          {submitError ? (
-            <p role="alert" className="mt-3 text-sm text-[#ffb4a8]">
-              {submitError}
-            </p>
-          ) : null}
-          {submitSuccess ? (
-            <p aria-live="polite" className="mt-3 text-sm text-[#b6efb9]">
-              <span aria-hidden="true" className="success-pop">✓</span>
-              {submitSuccess}
-            </p>
-          ) : null}
         </Reveal>
 
         <Reveal delayMs={200}>

@@ -358,7 +358,9 @@ export function ContactSection({ contact }: ContactSectionProps) {
       }
 
       form.reset();
-      setMobileStep(1);
+      if (mode !== "mobile") {
+        setMobileStep(1);
+      }
       setMobileFormValues({
         subject: "",
         name: "",

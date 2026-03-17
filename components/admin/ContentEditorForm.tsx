@@ -177,10 +177,10 @@ const helperByKey: Record<string, string> = {
 };
 
 const PATH_LABELS: Record<string, string> = {
-  "discography.featuredSingle.href": "Link van de sticky luisterknop",
-  "discography.featuredSingle.ctaLabel": "Knoptekst van de sticky luisterknop",
-  "discography.featuredSingle.image.src": "Cover van de sticky luisterbalk",
-  "discography.featuredSingle.image.alt": "Omschrijving van de sticky cover",
+  "discography.featuredSingle.href": "Link van de pop-up muziekknop",
+  "discography.featuredSingle.ctaLabel": "Knoptekst van de pop-up muziekknop",
+  "discography.featuredSingle.image.src": "Cover van de pop-up muziekbalk",
+  "discography.featuredSingle.image.alt": "Omschrijving van de cover in de pop-up muziekbalk",
   "hero.image.src": "Hero-foto",
   "hero.image.alt": "Omschrijving van de hero-foto",
   "musicExperience.image.src": "Foto bij muziekbeleving",
@@ -192,10 +192,10 @@ const PATH_LABELS: Record<string, string> = {
 };
 
 const PATH_HELPERS: Record<string, string> = {
-  "discography.featuredSingle.href": "Deze link opent als iemand in de sticky luisterbalk op de knop klikt.",
-  "discography.featuredSingle.ctaLabel": "Deze tekst staat op de knop in de sticky luisterbalk.",
-  "discography.featuredSingle.image.src": "Deze cover wordt in de sticky luisterbalk getoond zodra die zichtbaar wordt.",
-  "discography.featuredSingle.image.alt": "Korte beschrijving van de cover in de sticky luisterbalk.",
+  "discography.featuredSingle.href": "Deze link opent als iemand in de pop-up muziekbalk op de knop klikt.",
+  "discography.featuredSingle.ctaLabel": "Deze tekst staat op de knop in de pop-up muziekbalk.",
+  "discography.featuredSingle.image.src": "Deze cover wordt in de pop-up muziekbalk getoond zodra die zichtbaar wordt.",
+  "discography.featuredSingle.image.alt": "Korte beschrijving van de cover in de pop-up muziekbalk.",
   "footer.youtubeHref": "Als je dit leeg laat, wordt het YouTube-icoon in de footer niet getoond.",
   "footer.instagramHref": "Als je dit leeg laat, wordt het Instagram-icoon in de footer niet getoond."
 };
@@ -203,7 +203,7 @@ const PATH_HELPERS: Record<string, string> = {
 const SECTION_SEARCH_TERMS: Record<string, string[]> = {
   "Bovenaan de pagina": ["hero", "bovenaan", "bovenkant", "eerste scherm", "hoofdfoto", "openingsscherm", "introblok"],
   "Over Bohèm": ["bio", "over", "over bohem", "bandinfo", "leden", "bettina", "arthur"],
-  Discografie: ["muziek", "liedjes", "single", "releases", "spotify", "sticky balk", "luisterbalk", "cover"],
+  Discografie: ["muziek", "liedjes", "single", "releases", "spotify", "pop-up", "muziekbalk", "luisterbalk", "cover"],
   Muziekbeleving: ["muziekbeleving", "muzikale beleving", "boom foto", "verhaal", "beleving"],
   Kampvuurklanken: ["kampvuur", "kampvuurklanken", "teams", "management", "team sessie", "vuur"],
   Boekingen: ["boekingen", "live", "optredens", "agenda", "aanvragen", "beschikbaarheid", "pers", "coverkoffer"],
@@ -214,10 +214,10 @@ const SECTION_SEARCH_TERMS: Record<string, string[]> = {
 };
 
 const FIELD_SEARCH_TERMS: Record<string, string[]> = {
-  "discography.featuredSingle.title": ["sticky", "luisterbalk", "spotify", "single", "uitgelichte single"],
-  "discography.featuredSingle.href": ["sticky knop", "spotify knop", "luisterknop", "speel knop"],
-  "discography.featuredSingle.ctaLabel": ["sticky knop", "spotify knop", "knoptekst", "tekst op knop"],
-  "discography.featuredSingle.image.src": ["cover", "single cover", "spotify cover", "luisterbalk foto", "albumhoes"],
+  "discography.featuredSingle.title": ["pop-up", "muziekbalk", "luisterbalk", "spotify", "single", "uitgelichte single"],
+  "discography.featuredSingle.href": ["pop-up knop", "spotify knop", "muziekknop", "luisterknop", "speel knop"],
+  "discography.featuredSingle.ctaLabel": ["pop-up knop", "spotify knop", "knoptekst", "tekst op knop"],
+  "discography.featuredSingle.image.src": ["cover", "single cover", "spotify cover", "muziekbalk foto", "luisterbalk foto", "albumhoes"],
   "discography.featuredSingle.image.alt": ["cover omschrijving", "beschrijving cover"],
   "hero.image.src": ["hero foto", "hoofdfoto", "bovenste foto", "grote foto"],
   "hero.headline": ["titel bovenaan", "hoofdtitel", "grote titel"],
@@ -326,6 +326,21 @@ function scoreSearchTarget(queryTokens: string[], target: SearchTarget) {
   }
 
   return score;
+}
+
+function searchTargetPriority(target: SearchTarget) {
+  switch (target.kind) {
+    case "section":
+      return 0;
+    case "field":
+      return 1;
+    case "release":
+      return 2;
+    case "show":
+      return 3;
+    default:
+      return 9;
+  }
 }
 
 function flattenEditableFields(value: unknown, path = "", section = ""): EditableField[] {
@@ -752,7 +767,12 @@ export function ContentEditorForm() {
     return searchTargets
       .map((target) => ({ target, score: scoreSearchTarget(queryTokens, target) }))
       .filter((item) => item.score > 0)
-      .sort((left, right) => right.score - left.score || left.target.label.localeCompare(right.target.label, "nl"))
+      .sort(
+        (left, right) =>
+          searchTargetPriority(left.target) - searchTargetPriority(right.target) ||
+          right.score - left.score ||
+          left.target.label.localeCompare(right.target.label, "nl")
+      )
       .slice(0, 10)
       .map((item) => item.target);
   }, [searchQuery, searchTargets]);
@@ -1542,7 +1562,7 @@ export function ContentEditorForm() {
           </div>
           {!isSectionMenuCompact ? (
             <p className="mt-2 text-xs text-[#d9c6ac]">
-              Zoek op gewone taal zoals <span className="font-semibold text-[#f8f5f1]">hero foto</span>, <span className="font-semibold text-[#f8f5f1]">sticky luisterbalk</span>, <span className="font-semibold text-[#f8f5f1]">tickets knop</span> of <span className="font-semibold text-[#f8f5f1]">instagram</span>.
+              Zoek op gewone taal zoals <span className="font-semibold text-[#f8f5f1]">hero foto</span>, <span className="font-semibold text-[#f8f5f1]">pop-up muziekbalk</span>, <span className="font-semibold text-[#f8f5f1]">tickets knop</span> of <span className="font-semibold text-[#f8f5f1]">instagram</span>.
             </p>
           ) : null}
         </div>

@@ -191,7 +191,9 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
         : {})
     },
     footer: {
+      ...siteContent.footer,
       ...content.footer,
+      copyright: content.footer.copyright?.trim() ?? siteContent.footer.copyright,
       youtubeHref: sanitizeOptionalHref(content.footer.youtubeHref, siteContent.footer.youtubeHref ?? ""),
       instagramHref: sanitizeOptionalHref(content.footer.instagramHref, siteContent.footer.instagramHref ?? "")
     }

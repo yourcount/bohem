@@ -7,6 +7,7 @@ type SiteFooterProps = {
 };
 
 export function SiteFooter({ footer }: SiteFooterProps) {
+  const footerText = footer.copyright?.trim() ?? "";
   const socialLinks = [
     {
       href: footer.youtubeHref?.trim() ?? "",
@@ -33,7 +34,7 @@ export function SiteFooter({ footer }: SiteFooterProps) {
       <div className="mx-auto flex w-full max-w-[1120px] flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center sm:px-6">
         <Image
           src="/brand/logos/bohem-logo-white-moon-color.webp"
-          alt={footer.copyright}
+          alt={footerText || "Bohèm"}
           width={180}
           height={68}
           className="h-8 w-auto"
@@ -55,6 +56,7 @@ export function SiteFooter({ footer }: SiteFooterProps) {
               ))}
             </span>
           ) : null}
+          {footerText ? <span className="mb-3 block text-sm text-[#d6e3ec]">{footerText}</span> : null}
           Designed &amp; Developed by{" "}
           <a
             id="footer-designer-link"

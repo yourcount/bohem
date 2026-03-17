@@ -40,6 +40,45 @@ type MediaFile = {
   kind?: "photo" | "asset";
 };
 
+type SearchTarget =
+  | {
+      id: string;
+      kind: "section";
+      sectionTitle: string;
+      label: string;
+      description: string;
+      keywords: string[];
+    }
+  | {
+      id: string;
+      kind: "field";
+      sectionTitle: string;
+      path: string;
+      label: string;
+      description: string;
+      keywords: string[];
+    }
+  | {
+      id: string;
+      kind: "release";
+      sectionTitle: string;
+      path: string;
+      label: string;
+      description: string;
+      keywords: string[];
+      itemIndex: number;
+    }
+  | {
+      id: string;
+      kind: "show";
+      sectionTitle: string;
+      path: string;
+      label: string;
+      description: string;
+      keywords: string[];
+      itemIndex: number;
+    };
+
 type StatusTone = "neutral" | "success" | "error";
 type EditorMode = "form" | "visual";
 const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][number]["format"]> = [
@@ -161,8 +200,56 @@ const PATH_HELPERS: Record<string, string> = {
   "footer.instagramHref": "Als je dit leeg laat, wordt het Instagram-icoon in de footer niet getoond."
 };
 
+const SECTION_SEARCH_TERMS: Record<string, string[]> = {
+  "Bovenaan de pagina": ["hero", "bovenaan", "bovenkant", "eerste scherm", "hoofdfoto", "openingsscherm", "introblok"],
+  "Over Bohèm": ["bio", "over", "over bohem", "bandinfo", "leden", "bettina", "arthur"],
+  Discografie: ["muziek", "liedjes", "single", "releases", "spotify", "sticky balk", "luisterbalk", "cover"],
+  Muziekbeleving: ["muziekbeleving", "muzikale beleving", "boom foto", "verhaal", "beleving"],
+  Kampvuurklanken: ["kampvuur", "kampvuurklanken", "teams", "management", "team sessie", "vuur"],
+  Boekingen: ["boekingen", "live", "optredens", "agenda", "aanvragen", "beschikbaarheid", "pers", "coverkoffer"],
+  Contact: ["contact", "formulier", "stuur bericht", "mail", "telefoon"],
+  "Onderaan de pagina en socials": ["footer", "onderaan", "onderkant", "socials", "instagram", "youtube"],
+  [DISC_SECTION_TITLE]: ["releases", "liedjes", "muziek", "single", "ep", "album", "nummers"],
+  [SHOWS_SECTION_TITLE]: ["shows", "optredens", "agenda", "live agenda", "volgende optredens", "tickets", "extra info"]
+};
+
+const FIELD_SEARCH_TERMS: Record<string, string[]> = {
+  "discography.featuredSingle.title": ["sticky", "luisterbalk", "spotify", "single", "uitgelichte single"],
+  "discography.featuredSingle.href": ["sticky knop", "spotify knop", "luisterknop", "speel knop"],
+  "discography.featuredSingle.ctaLabel": ["sticky knop", "spotify knop", "knoptekst", "tekst op knop"],
+  "discography.featuredSingle.image.src": ["cover", "single cover", "spotify cover", "luisterbalk foto", "albumhoes"],
+  "discography.featuredSingle.image.alt": ["cover omschrijving", "beschrijving cover"],
+  "hero.image.src": ["hero foto", "hoofdfoto", "bovenste foto", "grote foto"],
+  "hero.headline": ["titel bovenaan", "hoofdtitel", "grote titel"],
+  "hero.subhead": ["ondertitel bovenaan", "subtitel"],
+  "musicExperience.image.src": ["boom foto", "foto bij muziekbeleving"],
+  "bookings.coverKoffer.image.src": ["coverkoffer foto", "koffer foto"],
+  "bookings.press.kitHref": ["perskit", "technische rider", "media download"],
+  "bookings.press.contactPhone": ["telefoon pers", "pers telefoon"],
+  "bookings.press.contactEmail": ["pers mail", "email pers"],
+  "contact.ctaLabel": ["formulier knop", "verstuur knop", "knop contactformulier"],
+  "contact.responseTimeText": ["antwoordtijd", "reactietijd"],
+  "contact.emailTemplates.admin.subject": ["mail naar bohem", "melding voor bohem", "admin mail"],
+  "contact.emailTemplates.sender.subject": ["bevestigingsmail", "mail naar afzender", "antwoordmail"],
+  "footer.instagramHref": ["instagram", "instagram link", "socials"],
+  "footer.youtubeHref": ["youtube", "youtube link", "socials"]
+};
+
 function pathParts(path: string) {
   return path.split(".");
+}
+
+function normalizeSearchText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9#]+/g, " ")
+    .trim();
+}
+
+function tokenizeSearchText(value: string) {
+  return normalizeSearchText(value).split(/\s+/).filter(Boolean);
 }
 
 function prettifyPart(part: string) {
@@ -202,6 +289,43 @@ function labelForPath(path: string) {
   }
 
   return parent ? `${parent} - ${prettifyPart(leaf)}` : prettifyPart(leaf);
+}
+
+function buildSearchKeywordSet(...values: Array<string | string[] | undefined>) {
+  const keywords = new Set<string>();
+  for (const value of values) {
+    if (!value) continue;
+    const parts = Array.isArray(value) ? value : [value];
+    for (const part of parts) {
+      const normalized = normalizeSearchText(part);
+      if (normalized) {
+        keywords.add(normalized);
+      }
+    }
+  }
+  return Array.from(keywords);
+}
+
+function scoreSearchTarget(queryTokens: string[], target: SearchTarget) {
+  const haystacks = [normalizeSearchText(target.label), normalizeSearchText(target.description), ...target.keywords];
+  let score = 0;
+
+  for (const token of queryTokens) {
+    const inLabel = haystacks[0]?.includes(token);
+    const inDescription = haystacks[1]?.includes(token);
+    const inKeywords = haystacks.slice(2).some((entry) => entry.includes(token));
+
+    if (inLabel) score += 6;
+    if (inDescription) score += 3;
+    if (inKeywords) score += 5;
+    if (haystacks.some((entry) => entry === token)) score += 4;
+  }
+
+  if (normalizeSearchText(target.label).startsWith(queryTokens.join(" "))) {
+    score += 4;
+  }
+
+  return score;
 }
 
 function flattenEditableFields(value: unknown, path = "", section = ""): EditableField[] {
@@ -356,13 +480,18 @@ export function ContentEditorForm() {
   const [isSectionMenuCompact, setIsSectionMenuCompact] = useState(false);
   const [visualSelectedSection, setVisualSelectedSection] = useState<string | null>(null);
   const [visualSelectedPath, setVisualSelectedPath] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeSearchIndex, setActiveSearchIndex] = useState(-1);
+  const [highlightedFieldPath, setHighlightedFieldPath] = useState<string | null>(null);
 
-  const fieldRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
+  const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
+  const fieldContainerRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const mediaUploadInputRef = useRef<HTMLInputElement | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDetailsElement | null>>({});
   const sectionMenuRef = useRef<HTMLDivElement | null>(null);
   const releaseItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
   const showItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
+  const searchHighlightTimeoutRef = useRef<number | null>(null);
 
   const scrollReleaseIntoView = (index: number) => {
     requestAnimationFrame(() => {
@@ -442,6 +571,191 @@ export function ContentEditorForm() {
     [groupedFields]
   );
   const groupedFieldsMap = useMemo(() => new Map(groupedFields), [groupedFields]);
+  const releases = content?.discography.releases ?? [];
+  const shows = content?.bookings.upcomingShows ?? [];
+
+  const searchTargets = useMemo<SearchTarget[]>(() => {
+    const targets: SearchTarget[] = [];
+
+    for (const sectionTitle of managedSectionTitles) {
+      targets.push({
+        id: `section:${sectionTitle}`,
+        kind: "section",
+        sectionTitle,
+        label: sectionTitle,
+        description: "Ga direct naar deze sectie",
+        keywords: buildSearchKeywordSet(sectionTitle, SECTION_SEARCH_TERMS[sectionTitle])
+      });
+    }
+
+    for (const field of editableFields) {
+      const sectionTitle = sectionLabels[field.section] ?? prettifyPart(field.section);
+      targets.push({
+        id: `field:${field.path}`,
+        kind: "field",
+        sectionTitle,
+        path: field.path,
+        label: field.label,
+        description: sectionTitle,
+        keywords: buildSearchKeywordSet(
+          field.label,
+          field.helper,
+          field.path,
+          field.section,
+          field.value,
+          SECTION_SEARCH_TERMS[sectionTitle],
+          FIELD_SEARCH_TERMS[field.path]
+        )
+      });
+    }
+
+    releases.forEach((release, index) => {
+      const releaseBase = `discography.releases.${index}`;
+      const itemLabel = release.title?.trim() || `Release ${index + 1}`;
+      const commonKeywords = [DISC_SECTION_TITLE, itemLabel, "release", "liedje", "single", "muziek", "nummer"];
+      targets.push(
+        {
+          id: `release:${index}:title`,
+          kind: "release",
+          sectionTitle: DISC_SECTION_TITLE,
+          path: `${releaseBase}.title`,
+          label: `Release ${index + 1} - titel`,
+          description: itemLabel,
+          keywords: buildSearchKeywordSet(commonKeywords, ["titel", itemLabel]),
+          itemIndex: index
+        },
+        {
+          id: `release:${index}:year`,
+          kind: "release",
+          sectionTitle: DISC_SECTION_TITLE,
+          path: `${releaseBase}.year`,
+          label: `Release ${index + 1} - jaar`,
+          description: itemLabel,
+          keywords: buildSearchKeywordSet(commonKeywords, ["jaar", "releasejaar"]),
+          itemIndex: index
+        },
+        {
+          id: `release:${index}:format`,
+          kind: "release",
+          sectionTitle: DISC_SECTION_TITLE,
+          path: `${releaseBase}.format`,
+          label: `Release ${index + 1} - type`,
+          description: itemLabel,
+          keywords: buildSearchKeywordSet(commonKeywords, ["type", "soort", "ep", "album", "single"]),
+          itemIndex: index
+        },
+        {
+          id: `release:${index}:note`,
+          kind: "release",
+          sectionTitle: DISC_SECTION_TITLE,
+          path: `${releaseBase}.note`,
+          label: `Release ${index + 1} - toelichting`,
+          description: itemLabel,
+          keywords: buildSearchKeywordSet(commonKeywords, ["toelichting", "beschrijving", "tekst"]),
+          itemIndex: index
+        }
+      );
+      release.links.forEach((link, linkIndex) => {
+        targets.push(
+          {
+            id: `release:${index}:link:${linkIndex}:label`,
+            kind: "release",
+            sectionTitle: DISC_SECTION_TITLE,
+            path: `${releaseBase}.links.${linkIndex}.label`,
+            label: `Release ${index + 1} - knoptekst link ${linkIndex + 1}`,
+            description: itemLabel,
+            keywords: buildSearchKeywordSet(commonKeywords, ["knoptekst", "linktekst", "tekst op knop", link.label]),
+            itemIndex: index
+          },
+          {
+            id: `release:${index}:link:${linkIndex}:href`,
+            kind: "release",
+            sectionTitle: DISC_SECTION_TITLE,
+            path: `${releaseBase}.links.${linkIndex}.href`,
+            label: `Release ${index + 1} - link ${linkIndex + 1}`,
+            description: itemLabel,
+            keywords: buildSearchKeywordSet(commonKeywords, ["spotify", "apple music", "link", "url", link.href]),
+            itemIndex: index
+          }
+        );
+      });
+    });
+
+    shows.forEach((show, index) => {
+      const showBase = `bookings.upcomingShows.${index}`;
+      const itemLabel = [show.venue, show.city].filter(Boolean).join(", ") || `Show ${index + 1}`;
+      const commonKeywords = [SHOWS_SECTION_TITLE, itemLabel, "show", "optreden", "concert", "agenda", "live"];
+      targets.push(
+        {
+          id: `show:${index}:date`,
+          kind: "show",
+          sectionTitle: SHOWS_SECTION_TITLE,
+          path: `${showBase}.date`,
+          label: `Show ${index + 1} - datum`,
+          description: itemLabel,
+          keywords: buildSearchKeywordSet(commonKeywords, ["datum", "speeldatum", show.date]),
+          itemIndex: index
+        },
+        {
+          id: `show:${index}:venue`,
+          kind: "show",
+          sectionTitle: SHOWS_SECTION_TITLE,
+          path: `${showBase}.venue`,
+          label: `Show ${index + 1} - locatie`,
+          description: itemLabel,
+          keywords: buildSearchKeywordSet(commonKeywords, ["locatie", "zaal", "venue", show.venue]),
+          itemIndex: index
+        },
+        {
+          id: `show:${index}:city`,
+          kind: "show",
+          sectionTitle: SHOWS_SECTION_TITLE,
+          path: `${showBase}.city`,
+          label: `Show ${index + 1} - plaats`,
+          description: itemLabel,
+          keywords: buildSearchKeywordSet(commonKeywords, ["plaats", "stad", show.city]),
+          itemIndex: index
+        },
+        {
+          id: `show:${index}:tickets`,
+          kind: "show",
+          sectionTitle: SHOWS_SECTION_TITLE,
+          path: `${showBase}.ticketsHref`,
+          label: `Show ${index + 1} - tickets link`,
+          description: itemLabel,
+          keywords: buildSearchKeywordSet(commonKeywords, ["tickets", "tickets knop", "kaartjes"], show.ticketsHref),
+          itemIndex: index
+        },
+        {
+          id: `show:${index}:info`,
+          kind: "show",
+          sectionTitle: SHOWS_SECTION_TITLE,
+          path: `${showBase}.infoHref`,
+          label: `Show ${index + 1} - extra info link`,
+          description: itemLabel,
+          keywords: buildSearchKeywordSet(commonKeywords, ["extra info", "meer info", "informatie"], show.infoHref),
+          itemIndex: index
+        }
+      );
+    });
+
+    return targets;
+  }, [editableFields, managedSectionTitles, releases, shows]);
+
+  const searchResults = useMemo(() => {
+    const trimmed = searchQuery.trim();
+    if (!trimmed) return [];
+
+    const queryTokens = tokenizeSearchText(trimmed);
+    if (queryTokens.length === 0) return [];
+
+    return searchTargets
+      .map((target) => ({ target, score: scoreSearchTarget(queryTokens, target) }))
+      .filter((item) => item.score > 0)
+      .sort((left, right) => right.score - left.score || left.target.label.localeCompare(right.target.label, "nl"))
+      .slice(0, 10)
+      .map((item) => item.target);
+  }, [searchQuery, searchTargets]);
 
   useEffect(() => {
     setOpenSections((previous) => {
@@ -469,6 +783,10 @@ export function ContentEditorForm() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    setActiveSearchIndex(searchResults.length > 0 ? 0 : -1);
+  }, [searchResults.length]);
 
   const isPristine = useMemo(() => {
     if (!content || !initialContent) return true;
@@ -509,9 +827,6 @@ export function ContentEditorForm() {
       document.removeEventListener("click", onDocumentClick, true);
     };
   }, [isPristine]);
-
-  const releases = content?.discography.releases ?? [];
-  const shows = content?.bookings.upcomingShows ?? [];
 
   const setDirty = () => {
     if (statusTone !== "error") {
@@ -970,6 +1285,59 @@ export function ContentEditorForm() {
     });
   };
 
+  const scrollNodeIntoView = (node: HTMLElement | null) => {
+    if (!node) return;
+
+    requestAnimationFrame(() => {
+      const menuHeight = sectionMenuRef.current?.getBoundingClientRect().height ?? 0;
+      const offset = Math.ceil(menuHeight) + 24;
+      const targetTop = node.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+      requestAnimationFrame(() => {
+        if ("focus" in node) {
+          node.focus({ preventScroll: true });
+        }
+      });
+    });
+  };
+
+  const highlightFieldPath = (path: string) => {
+    setHighlightedFieldPath(path);
+    if (searchHighlightTimeoutRef.current) {
+      window.clearTimeout(searchHighlightTimeoutRef.current);
+    }
+    searchHighlightTimeoutRef.current = window.setTimeout(() => {
+      setHighlightedFieldPath((current) => (current === path ? null : current));
+    }, 2200);
+  };
+
+  const focusFieldPath = (sectionTitle: string, path: string) => {
+    setOpenSections((previous) => ({ ...previous, [sectionTitle]: true }));
+    if (editorMode === "visual") {
+      setEditorMode("form");
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const node = fieldRefs.current[path] ?? fieldContainerRefs.current[path] ?? null;
+        scrollNodeIntoView(node);
+        highlightFieldPath(path);
+      });
+    });
+  };
+
+  const onSelectSearchResult = (target: SearchTarget) => {
+    setSearchQuery("");
+    setActiveSearchIndex(-1);
+
+    if (target.kind === "section") {
+      onJumpToSection(target.sectionTitle);
+      return;
+    }
+
+    focusFieldPath(target.sectionTitle, target.path);
+  };
+
   const selectVisualField = (sectionTitle: string, path: string) => {
     setVisualSelectedSection(sectionTitle);
     setVisualSelectedPath(path);
@@ -1101,6 +1469,83 @@ export function ContentEditorForm() {
             Wat nu? Controleer de gemarkeerde velden hieronder en klik daarna opnieuw op Opslaan.
           </p>
         ) : null}
+
+        <div className={isSectionMenuCompact ? "mt-2" : "mt-4"}>
+          {!isSectionMenuCompact ? <p className="mb-2 text-xs font-semibold uppercase tracking-[0.06em] text-[#d9c6ac]">Zoek veld of inhoud</p> : null}
+          <div className="relative">
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (searchResults.length === 0) {
+                  if (event.key === "Escape") {
+                    setSearchQuery("");
+                  }
+                  return;
+                }
+
+                if (event.key === "ArrowDown") {
+                  event.preventDefault();
+                  setActiveSearchIndex((current) => (current + 1) % searchResults.length);
+                } else if (event.key === "ArrowUp") {
+                  event.preventDefault();
+                  setActiveSearchIndex((current) => (current <= 0 ? searchResults.length - 1 : current - 1));
+                } else if (event.key === "Enter") {
+                  event.preventDefault();
+                  const target = searchResults[activeSearchIndex] ?? searchResults[0];
+                  if (target) {
+                    onSelectSearchResult(target);
+                  }
+                } else if (event.key === "Escape") {
+                  setSearchQuery("");
+                  setActiveSearchIndex(-1);
+                }
+              }}
+              placeholder="Zoek op foto, quote, spotify, shows, mail, instagram..."
+              className={`w-full rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.34)] text-[var(--color-text-primary)] placeholder:text-[#d9c6ac] ${
+                isSectionMenuCompact ? "px-3 py-2 text-xs" : "px-4 py-3 text-sm"
+              }`}
+              aria-label="Zoek naar een veld of sectie in de editor"
+            />
+            {searchQuery.trim() ? (
+              <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 rounded-xl border border-[var(--color-line-muted)] bg-[rgba(10,14,22,0.98)] p-2 shadow-[0_16px_32px_rgba(0,0,0,0.4)]">
+                {searchResults.length > 0 ? (
+                  <ul className="space-y-1">
+                    {searchResults.map((result, index) => (
+                      <li key={result.id}>
+                        <button
+                          type="button"
+                          onClick={() => onSelectSearchResult(result)}
+                          className={`block w-full rounded-lg px-3 py-2 text-left transition-colors ${
+                            index === activeSearchIndex
+                              ? "bg-[rgba(242,139,14,0.16)] text-[#f8f5f1]"
+                              : "text-[var(--color-text-primary)] hover:bg-[rgba(36,58,86,0.5)]"
+                          }`}
+                        >
+                          <span className="block text-sm font-semibold">{result.label}</span>
+                          <span className="mt-0.5 block text-xs text-[#d9c6ac]">
+                            {result.description}
+                            {result.kind !== "section" ? ` · ${result.sectionTitle}` : ""}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="px-3 py-2 text-xs text-[#d9c6ac]">
+                    Geen resultaat gevonden. Probeer bijvoorbeeld <span className="font-semibold text-[#f8f5f1]">foto</span>, <span className="font-semibold text-[#f8f5f1]">spotify</span>, <span className="font-semibold text-[#f8f5f1]">quote</span> of <span className="font-semibold text-[#f8f5f1]">bevestigingsmail</span>.
+                  </div>
+                )}
+              </div>
+            ) : null}
+          </div>
+          {!isSectionMenuCompact ? (
+            <p className="mt-2 text-xs text-[#d9c6ac]">
+              Zoek op gewone taal zoals <span className="font-semibold text-[#f8f5f1]">hero foto</span>, <span className="font-semibold text-[#f8f5f1]">sticky luisterbalk</span>, <span className="font-semibold text-[#f8f5f1]">tickets knop</span> of <span className="font-semibold text-[#f8f5f1]">instagram</span>.
+            </p>
+          ) : null}
+        </div>
 
         <div className={isSectionMenuCompact ? "mt-2" : "mt-4"}>
           {!isSectionMenuCompact ? <p className="mb-2 text-xs font-semibold uppercase tracking-[0.06em] text-[#d9c6ac]">Snel naar sectie</p> : null}
@@ -1453,6 +1898,9 @@ export function ContentEditorForm() {
                 <label className="text-xs font-semibold text-[#d9c6ac]">
                   Titel
                   <input
+                    ref={(node) => {
+                      fieldRefs.current[`discography.releases.${index}.title`] = node;
+                    }}
                     value={release.title}
                     onChange={(event) => updateReleaseField(index, "title", event.target.value)}
                     className={editorInputClass}
@@ -1464,6 +1912,9 @@ export function ContentEditorForm() {
                 <label className="text-xs font-semibold text-[#d9c6ac]">
                   Jaar
                   <input
+                    ref={(node) => {
+                      fieldRefs.current[`discography.releases.${index}.year`] = node;
+                    }}
                     value={release.year}
                     onChange={(event) => updateReleaseField(index, "year", event.target.value)}
                     className={editorInputClass}
@@ -1475,6 +1926,9 @@ export function ContentEditorForm() {
                 <label className="text-xs font-semibold text-[#d9c6ac]">
                   Type
                   <select
+                    ref={(node) => {
+                      fieldRefs.current[`discography.releases.${index}.format`] = node;
+                    }}
                     value={release.format}
                     onChange={(event) => updateReleaseField(index, "format", event.target.value)}
                     className={editorInputClass}
@@ -1494,6 +1948,9 @@ export function ContentEditorForm() {
               <label className="mt-3 block text-xs font-semibold text-[#d9c6ac]">
                 Korte toelichting
                 <textarea
+                  ref={(node) => {
+                    fieldRefs.current[`discography.releases.${index}.note`] = node;
+                  }}
                   rows={3}
                   value={release.note}
                   onChange={(event) => updateReleaseField(index, "note", event.target.value)}
@@ -1512,6 +1969,9 @@ export function ContentEditorForm() {
                       <label className="text-xs font-semibold text-[#d9c6ac]">
                         Linktekst
                         <input
+                          ref={(node) => {
+                            fieldRefs.current[`discography.releases.${index}.links.${linkIndex}.label`] = node;
+                          }}
                           value={link.label}
                           onChange={(event) => updateReleaseLinkField(index, linkIndex, "label", event.target.value)}
                           className={editorInputClass}
@@ -1520,6 +1980,9 @@ export function ContentEditorForm() {
                       <label className="text-xs font-semibold text-[#d9c6ac]">
                         Link URL
                         <input
+                          ref={(node) => {
+                            fieldRefs.current[`discography.releases.${index}.links.${linkIndex}.href`] = node;
+                          }}
                           value={link.href}
                           onChange={(event) => updateReleaseLinkField(index, linkIndex, "href", event.target.value)}
                           className={editorInputClass}
@@ -1615,6 +2078,9 @@ export function ContentEditorForm() {
                 <label className="text-xs font-semibold text-[#d9c6ac]">
                   Datum
                   <input
+                    ref={(node) => {
+                      fieldRefs.current[`bookings.upcomingShows.${index}.date`] = node;
+                    }}
                     value={show.date}
                     onChange={(event) => updateShowField(index, "date", event.target.value)}
                     className={editorInputClass}
@@ -1627,6 +2093,9 @@ export function ContentEditorForm() {
                 <label className="text-xs font-semibold text-[#d9c6ac]">
                   Locatie
                   <input
+                    ref={(node) => {
+                      fieldRefs.current[`bookings.upcomingShows.${index}.venue`] = node;
+                    }}
                     value={show.venue}
                     onChange={(event) => updateShowField(index, "venue", event.target.value)}
                     className={editorInputClass}
@@ -1639,6 +2108,9 @@ export function ContentEditorForm() {
                 <label className="text-xs font-semibold text-[#d9c6ac]">
                   Plaats
                   <input
+                    ref={(node) => {
+                      fieldRefs.current[`bookings.upcomingShows.${index}.city`] = node;
+                    }}
                     value={show.city}
                     onChange={(event) => updateShowField(index, "city", event.target.value)}
                     className={editorInputClass}
@@ -1651,6 +2123,9 @@ export function ContentEditorForm() {
                 <label className="text-xs font-semibold text-[#d9c6ac]">
                   Tickets link
                   <input
+                    ref={(node) => {
+                      fieldRefs.current[`bookings.upcomingShows.${index}.ticketsHref`] = node;
+                    }}
                     value={show.ticketsHref ?? ""}
                     onChange={(event) => updateShowField(index, "ticketsHref", event.target.value)}
                     className={editorInputClass}
@@ -1665,6 +2140,9 @@ export function ContentEditorForm() {
               <label className="mt-3 block text-xs font-semibold text-[#d9c6ac]">
                 Extra info link
                 <input
+                  ref={(node) => {
+                    fieldRefs.current[`bookings.upcomingShows.${index}.infoHref`] = node;
+                  }}
                   value={show.infoHref ?? ""}
                   onChange={(event) => updateShowField(index, "infoHref", event.target.value)}
                   className={editorInputClass}
@@ -1710,7 +2188,13 @@ export function ContentEditorForm() {
                 const isEditingFocus = activeFocusPath === field.path;
 
                 return (
-                  <div key={field.path} className={field.multiline ? "md:col-span-2" : ""}>
+                  <div
+                    key={field.path}
+                    ref={(node) => {
+                      fieldContainerRefs.current[field.path] = node;
+                    }}
+                    className={`${field.multiline ? "md:col-span-2" : ""} ${highlightedFieldPath === field.path ? "rounded-xl ring-2 ring-[var(--color-accent-amber)] ring-offset-2 ring-offset-[rgba(16,22,33,0.7)]" : ""}`}
+                  >
                     <label htmlFor={inputId} className="mb-1 block text-sm font-semibold text-[#f8f5f1]">
                       {field.label}
                     </label>
@@ -1743,6 +2227,9 @@ export function ContentEditorForm() {
                         {field.value ? (
                           <button
                             type="button"
+                            ref={(node) => {
+                              fieldRefs.current[field.path] = node;
+                            }}
                             onClick={() => openMediaModal(field.path)}
                             className="block w-full overflow-hidden rounded-lg border border-[var(--color-line-muted)] transition-colors hover:border-[var(--color-accent-copper)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-amber)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgba(15,24,37,0.9)]"
                             aria-label="Kies een andere foto uit de fotobibliotheek"
@@ -1760,6 +2247,9 @@ export function ContentEditorForm() {
                         ) : (
                           <button
                             type="button"
+                            ref={(node) => {
+                              fieldRefs.current[field.path] = node;
+                            }}
                             onClick={() => openMediaModal(field.path)}
                             className="flex h-44 w-full items-center justify-center rounded-lg border border-dashed border-[var(--color-line-muted)] text-xs text-[#d9c6ac] transition-colors hover:border-[var(--color-accent-copper)] hover:text-[#f8f5f1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-amber)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgba(15,24,37,0.9)]"
                           >

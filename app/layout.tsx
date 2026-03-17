@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { AnalyticsScripts } from "@/components/analytics/AnalyticsScripts";
 import { CookieConsentProvider } from "@/components/cookies/CookieConsentProvider";
@@ -86,6 +87,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <AnalyticsScripts />
           {children}
         </CookieConsentProvider>
+        <SpeedInsights />
       </body>
     </html>
   );

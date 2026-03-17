@@ -200,6 +200,21 @@ const PATH_HELPERS: Record<string, string> = {
   "footer.instagramHref": "Als je dit leeg laat, wordt het Instagram-icoon in de footer niet getoond."
 };
 
+const PATH_VISIBILITY_HINTS: Record<string, string> = {
+  "discography.featuredSingle.href": "Leeg = de knop in de pop-up muziekbalk verdwijnt.",
+  "discography.featuredSingle.ctaLabel": "Leeg = de knop in de pop-up muziekbalk verdwijnt.",
+  "discography.featuredSingle.image.src": "Leeg = de cover in de pop-up muziekbalk valt terug op de standaardafbeelding.",
+  "musicExperience.cta.href": "Leeg = de knop in Muziekbeleving verdwijnt.",
+  "musicExperience.cta.label": "Leeg = de knop in Muziekbeleving verdwijnt.",
+  "bookings.cta.href": "Leeg = de hoofdknop in Boekingen verdwijnt.",
+  "bookings.cta.label": "Leeg = de hoofdknop in Boekingen verdwijnt.",
+  "bookings.press.kitHref": "Leeg = de perskit-knop wordt niet getoond.",
+  "bookings.press.contactEmail": "Leeg = de e-mailknop in Pers wordt niet getoond.",
+  "bookings.press.contactPhone": "Leeg = de telefoonknop in Pers wordt niet getoond.",
+  "footer.youtubeHref": "Leeg = het YouTube-icoon in de footer verdwijnt.",
+  "footer.instagramHref": "Leeg = het Instagram-icoon in de footer verdwijnt."
+};
+
 const SECTION_SEARCH_TERMS: Record<string, string[]> = {
   "Bovenaan de pagina": ["hero", "bovenaan", "bovenkant", "eerste scherm", "hoofdfoto", "openingsscherm", "introblok"],
   "Over Bohèm": ["bio", "over", "over bohem", "bandinfo", "leden", "bettina", "arthur"],
@@ -272,6 +287,10 @@ function helperForPath(path: string) {
   const parts = pathParts(path);
   const leaf = parts[parts.length - 1] ?? "";
   return helperByKey[leaf] ?? "";
+}
+
+function visibilityHintForPath(path: string) {
+  return PATH_VISIBILITY_HINTS[path] ?? "";
 }
 
 function labelForPath(path: string) {
@@ -2197,9 +2216,11 @@ export function ContentEditorForm() {
               {fields.map((field) => {
                 const inputId = `field-${field.path.replace(/[^a-zA-Z0-9]+/g, "-")}`;
                 const helperId = `${inputId}-helper`;
+                const visibilityHintId = `${inputId}-visibility`;
                 const errorId = `${inputId}-error`;
                 const error = fieldErrors[field.path]?.[0];
-                const describedBy = [field.helper ? helperId : "", error ? errorId : ""].filter(Boolean).join(" ") || undefined;
+                const visibilityHint = visibilityHintForPath(field.path);
+                const describedBy = [field.helper ? helperId : "", visibilityHint ? visibilityHintId : "", error ? errorId : ""].filter(Boolean).join(" ") || undefined;
                 const showImageTools = isImageSourcePath(field.path);
                 const imageAltPath = showImageTools ? field.path.replace(/\.src$/, ".alt") : "";
                 const imageAltRaw = imageAltPath ? readValueAtPath(content, imageAltPath) : "";
@@ -2395,6 +2416,11 @@ export function ContentEditorForm() {
                     {field.helper ? (
                       <p id={helperId} className="mt-1 text-xs text-[#d9c6ac]">
                         {field.helper}
+                      </p>
+                    ) : null}
+                    {visibilityHint ? (
+                      <p id={visibilityHintId} className="mt-1 text-xs text-[rgba(246,210,160,0.92)]">
+                        {visibilityHint}
                       </p>
                     ) : null}
                     {error ? (

@@ -30,8 +30,71 @@ function normalizeDuplicateHttpPrefixes(value: string) {
   return `${finalScheme}//${href.replace(/^\/+/, "")}`;
 }
 
+function normalizeSearchText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9#]+/g, " ")
+    .trim();
+}
+
+const INTERNAL_ANCHOR_ALIASES: Record<string, string> = {
+  bio: "#bio",
+  over: "#bio",
+  discografie: "#discografie",
+  muziek: "#muziek",
+  shows: "#shows",
+  show: "#shows",
+  agenda: "#shows",
+  kampvuur: "#kampvuurklanken",
+  kampvuurklanken: "#kampvuurklanken",
+  boekingen: "#boekingen",
+  bookings: "#boekingen",
+  pers: "#pers",
+  contact: "#contact"
+};
+
+function looksLikeEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
+function looksLikePhone(value: string) {
+  const normalized = value.replace(/[\s().-]+/g, "");
+  return /^\+?[0-9]{8,}$/.test(normalized);
+}
+
+function normalizePhoneHref(value: string) {
+  const normalized = value.replace(/[^\d+]/g, "");
+  if (normalized.startsWith("00")) {
+    return `+${normalized.slice(2)}`;
+  }
+  return normalized;
+}
+
+function normalizeEditorHrefInput(value: string) {
+  const href = normalizeDuplicateHttpPrefixes(value);
+  if (!href) return href;
+  if (/^(https?:\/\/|mailto:|tel:|#|\/)/i.test(href)) return href;
+
+  const normalizedAlias = INTERNAL_ANCHOR_ALIASES[normalizeSearchText(href)];
+  if (normalizedAlias) {
+    return normalizedAlias;
+  }
+
+  if (looksLikeEmail(href)) {
+    return `mailto:${href}`;
+  }
+
+  if (looksLikePhone(href)) {
+    return `tel:${normalizePhoneHref(href)}`;
+  }
+
+  return href;
+}
+
 function isValidHref(href: string) {
-  const value = normalizeDuplicateHttpPrefixes(href);
+  const value = normalizeEditorHrefInput(href);
   if (!value) return false;
   if (value.startsWith("#")) return true;
   if (value.startsWith("/")) return !value.startsWith("//");
@@ -41,13 +104,13 @@ function isValidHref(href: string) {
 }
 
 function sanitizeHref(href: string, fallback: string) {
-  const normalized = normalizeDuplicateHttpPrefixes(href);
+  const normalized = normalizeEditorHrefInput(href);
   return isValidHref(normalized) ? normalized : fallback;
 }
 
 function sanitizeOptionalHref(href: string | undefined, fallback = "") {
   if (typeof href !== "string") return fallback;
-  const value = normalizeDuplicateHttpPrefixes(href);
+  const value = normalizeEditorHrefInput(href);
   if (!value) return "";
   return isValidHref(value) ? value : fallback;
 }

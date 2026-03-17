@@ -75,6 +75,15 @@ function sanitizeText(value: string) {
   return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
 }
 
+function normalizeSearchText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9#]+/g, " ")
+    .trim();
+}
+
 function normalizeDuplicateHttpPrefixes(value: string) {
   let href = value.trim();
   const matches: string[] = [];
@@ -94,6 +103,22 @@ function normalizeDuplicateHttpPrefixes(value: string) {
   const finalScheme = matches[matches.length - 1];
   return `${finalScheme}//${href.replace(/^\/+/, "")}`;
 }
+
+const INTERNAL_ANCHOR_ALIASES: Record<string, string> = {
+  bio: "#bio",
+  over: "#bio",
+  discografie: "#discografie",
+  muziek: "#muziek",
+  shows: "#shows",
+  show: "#shows",
+  agenda: "#shows",
+  kampvuur: "#kampvuurklanken",
+  kampvuurklanken: "#kampvuurklanken",
+  boekingen: "#boekingen",
+  bookings: "#boekingen",
+  pers: "#pers",
+  contact: "#contact"
+};
 
 const OPTIONAL_EMPTY_TEXT_PATH_SUFFIXES = [".website", ".ticketsHref", ".infoHref"];
 
@@ -126,6 +151,72 @@ function isValidAbsoluteHttpUrl(value: string) {
   }
 }
 
+function looksLikeEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
+function looksLikePhone(value: string) {
+  const normalized = value.replace(/[\s().-]+/g, "");
+  return /^\+?[0-9]{8,}$/.test(normalized);
+}
+
+function normalizePhoneHref(value: string) {
+  const normalized = value.replace(/[^\d+]/g, "");
+  if (normalized.startsWith("00")) {
+    return `+${normalized.slice(2)}`;
+  }
+  return normalized;
+}
+
+function normalizeEditorHrefInput(value: string) {
+  const href = normalizeDuplicateHttpPrefixes(value);
+  if (!href) return href;
+  if (/^(https?:\/\/|mailto:|tel:|#|\/)/i.test(href)) return href;
+
+  const normalizedAlias = INTERNAL_ANCHOR_ALIASES[normalizeSearchText(href)];
+  if (normalizedAlias) {
+    return normalizedAlias;
+  }
+
+  if (looksLikeEmail(href)) {
+    return `mailto:${href}`;
+  }
+
+  if (looksLikePhone(href)) {
+    return `tel:${normalizePhoneHref(href)}`;
+  }
+
+  return href;
+}
+
+function invalidUrlMessage(path: string, fieldKey: string) {
+  if (fieldKey === "ticketsHref") {
+    return "De Tickets-knop verschijnt pas als hier een geldige link staat.";
+  }
+  if (fieldKey === "infoHref") {
+    return "De Extra info-knop verschijnt pas als hier een geldige link staat.";
+  }
+  if (fieldKey === "kitHref") {
+    return "De perskit-knop werkt alleen met een geldige download- of paginalink.";
+  }
+  if (fieldKey === "embedUrl") {
+    return "Het Spotify afspeelvak werkt alleen met een geldige Spotify embed-link.";
+  }
+  if (fieldKey === "youtubeHref") {
+    return "Het YouTube-icoon in de footer wordt alleen getoond met een geldige link.";
+  }
+  if (fieldKey === "instagramHref") {
+    return "Het Instagram-icoon in de footer wordt alleen getoond met een geldige link.";
+  }
+  if (fieldKey === "website") {
+    return "De websiteknop verschijnt pas als hier een geldige link staat.";
+  }
+  if (path === "content.discography.featuredSingle.href") {
+    return "De knop in de pop-up muziekbalk werkt alleen met een geldige link.";
+  }
+  return "Deze knop of link werkt alleen met een geldige link.";
+}
+
 function isValidEditorHref(value: string) {
   const href = value.trim();
   if (!href) return false;
@@ -148,7 +239,7 @@ function validateAndSanitizeByTemplate(input: unknown, template: unknown, path: 
     }
 
     const fieldKey = getFieldKeyFromPath(path);
-    const nextValue = URL_FIELD_KEYS.has(fieldKey) ? normalizeDuplicateHttpPrefixes(sanitizeText(input)) : sanitizeText(input);
+    const nextValue = URL_FIELD_KEYS.has(fieldKey) ? normalizeEditorHrefInput(sanitizeText(input)) : sanitizeText(input);
     const isOptionalPath = isOptionalEmptyTextPath(path);
     const isEssentialPath = isEssentialRequiredTextPath(path);
     if (!isOptionalPath && isEssentialPath && nextValue.length === 0) {
@@ -159,7 +250,7 @@ function validateAndSanitizeByTemplate(input: unknown, template: unknown, path: 
     }
 
     if (URL_FIELD_KEYS.has(fieldKey) && nextValue.length > 0 && !isValidEditorHref(nextValue)) {
-      addFieldError(errors, path, "Gebruik een geldige link (https://..., /pad of #anker).");
+      addFieldError(errors, path, invalidUrlMessage(path, fieldKey));
     }
     return nextValue;
   }

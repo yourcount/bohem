@@ -1,21 +1,7 @@
 import type { SiteContent } from "@/lib/types";
+import { filterFutureShows, parseDutchShowDate } from "@/lib/content/shows";
 
 const DEFAULT_SITE_URL = "https://www.musicbybohem.nl";
-
-const dutchMonthMap: Record<string, string> = {
-  jan: "01",
-  feb: "02",
-  mrt: "03",
-  apr: "04",
-  mei: "05",
-  jun: "06",
-  jul: "07",
-  aug: "08",
-  sep: "09",
-  okt: "10",
-  nov: "11",
-  dec: "12"
-};
 
 export function getSiteUrl(): string {
   return (process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL).replace(/\/+$/, "");
@@ -24,16 +10,6 @@ export function getSiteUrl(): string {
 export function absoluteUrl(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
   return `${getSiteUrl()}${path.startsWith("/") ? path : `/${path}`}`;
-}
-
-function parseShowDate(dateLabel: string): string | null {
-  const match = dateLabel.toLowerCase().match(/^(\d{1,2})\s+([a-z]{3})\s+(\d{4})$/);
-  if (!match) return null;
-  const [, dayRaw, monthRaw, year] = match;
-  const month = dutchMonthMap[monthRaw];
-  if (!month) return null;
-  const day = dayRaw.padStart(2, "0");
-  return `${year}-${month}-${day}`;
 }
 
 export function buildHomeJsonLd(content: SiteContent) {
@@ -45,9 +21,9 @@ export function buildHomeJsonLd(content: SiteContent) {
   ].filter((value, index, array) => array.indexOf(value) === index);
 
   const events =
-    content.bookings.upcomingShows
+    filterFutureShows(content.bookings.upcomingShows)
       ?.map((show) => {
-        const startDate = parseShowDate(show.date);
+        const startDate = parseDutchShowDate(show.date);
         if (!startDate) return null;
         const primaryShowUrl = show.ticketsHref?.trim() || show.infoHref?.trim() || "";
         return {

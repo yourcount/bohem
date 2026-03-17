@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { requireBackendAdmin } from "@/lib/auth/guards";
 import { readRuntimeCacheStatus } from "@/lib/cache/runtime-cache";
+import { filterFutureShows } from "@/lib/content/shows";
 import { listRecentCacheInvalidations, readCacheSettings } from "@/lib/db/cache-management-db";
 import { readFullSiteContent } from "@/lib/db/full-site-content-db";
 import { listFeatureFlags, readTechnicalSettings } from "@/lib/db/system-controls-db";
@@ -77,7 +78,8 @@ export async function GET() {
     const hasAboutSection = hasSectionContent(siteContent.about);
     const hasDiscographySection = flags.enable_discography_section && hasSectionContent(siteContent.discography);
     const hasMusicExperienceSection = hasSectionContent(siteContent.musicExperience);
-    const hasShows = (siteContent.bookings.upcomingShows?.length ?? 0) > 0;
+    const visibleUpcomingShows = filterFutureShows(siteContent.bookings.upcomingShows);
+    const hasShows = visibleUpcomingShows.length > 0;
     const hasKampvuurSection = flags.enable_kampvuur_section && hasSectionContent(siteContent.kampvuur);
     const hasBookingsSection = hasSectionContent(siteContent.bookings);
     const hasContactSection = hasSectionContent(siteContent.contact);
@@ -127,7 +129,7 @@ export async function GET() {
         key: "shows",
         label: "Volgende shows",
         state: hasShows ? "visible" : "hidden",
-        reason: hasShows ? `${siteContent.bookings.upcomingShows?.length ?? 0} show(s) gepland.` : "Er zijn geen shows ingevuld."
+        reason: hasShows ? `${visibleUpcomingShows.length} toekomstige show(s) zichtbaar.` : "Er zijn geen toekomstige shows zichtbaar."
       },
       {
         key: "kampvuur",
@@ -185,7 +187,7 @@ export async function GET() {
     if (!blobConfigured && process.env.VERCEL) warnings.push("Vercel Blob is niet geconfigureerd. Content-opslag is dan niet persistent.");
     if (!hasShows) warnings.push("Er zijn nu geen volgende shows ingevuld. De shows-sectie blijft verborgen.");
 
-    const showsWithoutCta = (siteContent.bookings.upcomingShows ?? []).filter(
+    const showsWithoutCta = visibleUpcomingShows.filter(
       (show) => !hasText(show.ticketsHref) && !hasText(show.infoHref)
     ).length;
     if (showsWithoutCta > 0) warnings.push(`${showsWithoutCta} show(s) missen zowel een kaartjeslink als extra infolink.`);

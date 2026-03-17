@@ -14,6 +14,7 @@ import { SectionMotifDivider } from "@/components/ui/SectionMotifDivider";
 import { StickyListenBar } from "@/components/ui/StickyListenBar";
 import { ensureShowsNavigationItem } from "@/lib/content/navigation";
 import { getLiveSiteContent } from "@/lib/content/live-content";
+import { filterFutureShows } from "@/lib/content/shows";
 import { getSeoSettingsSafe, resolveHomeJsonLd } from "@/lib/seo-settings";
 import { getFeatureFlagsSafe } from "@/lib/system/feature-flags";
 
@@ -49,13 +50,14 @@ function hasSectionContent(value: unknown): boolean {
 
 export default async function HomePage() {
   const siteContent = await getLiveSiteContent();
+  const visibleUpcomingShows = filterFutureShows(siteContent.bookings.upcomingShows);
   const flags = await getFeatureFlagsSafe();
   const seoSettings = await getSeoSettingsSafe();
   const jsonLd = resolveHomeJsonLd(siteContent, seoSettings);
   const hasAboutSection = hasSectionContent(siteContent.about);
   const hasDiscographySection = flags.enable_discography_section && hasSectionContent(siteContent.discography);
   const hasMusicExperienceSection = hasSectionContent(siteContent.musicExperience);
-  const hasShows = (siteContent.bookings.upcomingShows?.length ?? 0) > 0;
+  const hasShows = visibleUpcomingShows.length > 0;
   const hasKampvuurSection = flags.enable_kampvuur_section && hasSectionContent(siteContent.kampvuur);
   const hasBookingsSection = hasSectionContent(siteContent.bookings);
   const hasContactSection = hasSectionContent(siteContent.contact);
@@ -110,7 +112,7 @@ export default async function HomePage() {
         ) : null}
         {hasShows ? (
           <ShowsSection
-            shows={siteContent.bookings.upcomingShows ?? []}
+            shows={visibleUpcomingShows}
             eyebrow={siteContent.bookings.showsEyebrow}
             title={siteContent.bookings.showsTitle}
             badgeLabel={siteContent.bookings.showsBadgeLabel}

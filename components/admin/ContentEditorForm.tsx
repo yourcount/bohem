@@ -1378,6 +1378,20 @@ export function ContentEditorForm() {
     setVisualSelectedPath(path);
   };
 
+  const jumpToEditorTarget = (sectionTitle: string, path?: string) => {
+    if (!path) {
+      onJumpToSection(sectionTitle);
+      return;
+    }
+
+    if (editorMode === "visual") {
+      selectVisualField(sectionTitle, path);
+      return;
+    }
+
+    focusFieldPath(sectionTitle, path);
+  };
+
   const visualSectionFields = visualSelectedSection ? groupedFieldsMap.get(visualSelectedSection) ?? [] : [];
   const visualSelectedField =
     visualSelectedPath && visualSectionFields.length > 0
@@ -1432,25 +1446,82 @@ export function ContentEditorForm() {
           Visuele modus
         </button>
       </div>
-      <div className="mb-4 rounded-xl border border-[rgba(67,135,133,0.45)] bg-[rgba(18,30,46,0.55)] p-4 text-sm text-[#e7d7c1]">
-        <p className="font-semibold text-[#f8f5f1]">Inhoud wijzigen in 2 minuten</p>
-        <ol className="mt-2 list-decimal space-y-1 pl-5 text-xs sm:text-sm">
-          {editorMode === "visual" ? (
-            <>
-              <li>Kies links een sectie en klik in de preview op het onderdeel dat je wilt aanpassen.</li>
-              <li>Pas rechts tekst, links of foto&apos;s aan.</li>
-              <li>Klik onderaan op <strong>Opslaan</strong>.</li>
-              <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
-            </>
-          ) : (
-            <>
-              <li>Kies een sectie in het sectiemenu.</li>
-              <li>Pas tekst, links of foto&apos;s aan.</li>
-              <li>Klik onderaan op <strong>Opslaan</strong>.</li>
-              <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
-            </>
-          )}
-        </ol>
+      <div className="mb-4 grid gap-4 rounded-xl border border-[rgba(67,135,133,0.45)] bg-[rgba(18,30,46,0.55)] p-4 text-sm text-[#e7d7c1] md:grid-cols-2">
+        <div>
+          <p className="font-semibold text-[#f8f5f1]">Inhoud wijzigen in 2 minuten</p>
+          <ol className="mt-2 list-decimal space-y-1 pl-5 text-xs sm:text-sm">
+            {editorMode === "visual" ? (
+              <>
+                <li>Kies links een sectie en klik in de preview op het onderdeel dat je wilt aanpassen.</li>
+                <li>Pas rechts tekst, links of foto&apos;s aan.</li>
+                <li>Klik onderaan op <strong>Opslaan</strong>.</li>
+                <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
+              </>
+            ) : (
+              <>
+                <li>Kies een sectie in het sectiemenu.</li>
+                <li>Pas tekst, links of foto&apos;s aan.</li>
+                <li>Klik onderaan op <strong>Opslaan</strong>.</li>
+                <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
+              </>
+            )}
+          </ol>
+        </div>
+        <div>
+          <p className="font-semibold text-[#f8f5f1]">Aandachtspunten voor inhoud</p>
+          <ul className="mt-2 space-y-3 text-xs sm:text-sm">
+            <li className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3">
+              <p>Laat je een knoplink leeg, dan wordt die knop niet op de site getoond.</p>
+              <button
+                type="button"
+                onClick={() => jumpToEditorTarget(SHOWS_SECTION_TITLE, "bookings.upcomingShows.0.ticketsHref")}
+                className="mt-2 inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+              >
+                Ga naar shows en knoppen
+              </button>
+            </li>
+            <li className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3">
+              <p>Laat je alle inhoud van een blok leeg, dan verdwijnt dat blok op de site.</p>
+              <button
+                type="button"
+                onClick={() => jumpToEditorTarget("Onderaan de pagina en socials", "footer.instagramHref")}
+                className="mt-2 inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+              >
+                Ga naar footer en socials
+              </button>
+            </li>
+            <li className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3">
+              <p>Shows met een datum in het verleden blijven in de editor staan, maar worden niet meer live getoond.</p>
+              <button
+                type="button"
+                onClick={() => jumpToEditorTarget(SHOWS_SECTION_TITLE, "bookings.upcomingShows.0.date")}
+                className="mt-2 inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+              >
+                Ga naar showdatums
+              </button>
+            </li>
+            <li className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3">
+              <p>Showdatums worden bij opslaan netjes gemaakt, bijvoorbeeld <strong>17 mrt</strong> naar <strong>17 maart {new Date().getFullYear()}</strong>.</p>
+              <button
+                type="button"
+                onClick={() => jumpToEditorTarget(SHOWS_SECTION_TITLE, "bookings.upcomingShows.0.date")}
+                className="mt-2 inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+              >
+                Ga naar datumveld
+              </button>
+            </li>
+            <li className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3">
+              <p>Externe links openen op de site in een nieuw tabblad. Interne links zoals <strong>#contact</strong> blijven op dezelfde pagina.</p>
+              <button
+                type="button"
+                onClick={() => jumpToEditorTarget("Discografie", "discography.featuredSingle.href")}
+                className="mt-2 inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+              >
+                Ga naar linkveld
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div

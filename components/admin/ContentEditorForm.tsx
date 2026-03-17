@@ -1127,16 +1127,12 @@ export function ContentEditorForm() {
       if (!next.bookings.upcomingShows) {
         next.bookings.upcomingShows = [];
       }
-      const firstTicketsHref = next.bookings.upcomingShows[0]?.ticketsHref || "";
-      const firstInfoHref = next.bookings.upcomingShows[0]?.infoHref || "";
-      const nextDate = new Date();
-      const month = nextDate.toLocaleDateString("nl-NL", { month: "short" }).replace(".", "");
       const newShow: UpcomingShow = {
-        date: `${String(nextDate.getDate()).padStart(2, "0")} ${month} ${nextDate.getFullYear()}`,
-        venue: "Nieuwe locatie",
-        city: "Plaats",
-        ticketsHref: firstTicketsHref,
-        infoHref: firstInfoHref
+        date: "",
+        venue: "",
+        city: "",
+        ticketsHref: "",
+        infoHref: ""
       };
       next.bookings.upcomingShows.push(newShow);
       nextIndex = next.bookings.upcomingShows.length - 1;

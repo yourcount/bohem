@@ -89,6 +89,11 @@ type AttentionPoint = {
   path?: string;
   ctaLabel: string;
 };
+type GuideStep = {
+  id: string;
+  title: string;
+  body: ReactNode;
+};
 const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][number]["format"]> = [
   "Single",
   "EP",
@@ -531,6 +536,8 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
   const [activeSearchIndex, setActiveSearchIndex] = useState(-1);
   const [highlightedFieldPath, setHighlightedFieldPath] = useState<string | null>(null);
   const [dismissedAttentionPointIds, setDismissedAttentionPointIds] = useState<string[]>([]);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [guideStepIndex, setGuideStepIndex] = useState(0);
 
   const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
   const fieldContainerRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -541,6 +548,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
   const showItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
   const searchHighlightTimeoutRef = useRef<number | null>(null);
   const attentionStorageKey = `bohem-editor-attention-dismissed:${currentUserEmail.toLowerCase()}`;
+  const guideStorageKey = `bohem-editor-guide-seen:${currentUserEmail.toLowerCase()}`;
 
   const scrollReleaseIntoView = (index: number) => {
     requestAnimationFrame(() => {
@@ -860,6 +868,20 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
     if (typeof window === "undefined") return;
     window.localStorage.setItem(attentionStorageKey, JSON.stringify(dismissedAttentionPointIds));
   }, [attentionStorageKey, dismissedAttentionPointIds]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const hasSeenGuide = window.localStorage.getItem(guideStorageKey) === "seen";
+      if (!hasSeenGuide) {
+        setIsGuideOpen(true);
+        setGuideStepIndex(0);
+      }
+    } catch {
+      setIsGuideOpen(true);
+      setGuideStepIndex(0);
+    }
+  }, [guideStorageKey]);
 
   const isPristine = useMemo(() => {
     if (!content || !initialContent) return true;
@@ -1519,10 +1541,65 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
 
   const visibleAttentionPoints = attentionPoints.filter((item) => !dismissedAttentionPointIds.includes(item.id));
 
+  const guideSteps = useMemo<GuideStep[]>(
+    () => [
+      {
+        id: "section-menu",
+        title: "1. Kies eerst een onderdeel",
+        body: (
+          <>
+            Gebruik het sectiemenu om snel naar een onderdeel van de site te gaan, zoals <strong>Releases</strong>,{" "}
+            <strong>Shows</strong> of <strong>Contact</strong>. Je hoeft dus niet eerst lang te scrollen.
+          </>
+        )
+      },
+      {
+        id: "edit-mode",
+        title: "2. Pas tekst, links en foto&apos;s aan",
+        body: (
+          <>
+            In <strong>Formuliermodus</strong> werk je veld voor veld. In <strong>Visuele modus</strong> klik je op het onderdeel in de
+            preview. Kies de manier die voor jou het prettigst werkt.
+          </>
+        )
+      },
+      {
+        id: "save-preview",
+        title: "3. Sla op en controleer je wijziging",
+        body: (
+          <>
+            Na je wijziging klik je op <strong>Opslaan</strong>. Gebruik daarna <strong>Voorbeeld</strong> om te controleren of de site
+            er goed uitziet.
+          </>
+        )
+      },
+      {
+        id: "search-help",
+        title: "4. Kom je iets niet meteen tegen?",
+        body: (
+          <>
+            Gebruik de zoekbalk in de editor en de aandachtspunten bovenaan. Zoek gerust op gewone woorden zoals{" "}
+            <strong>hoofdfoto</strong>, <strong>shows</strong>, <strong>spotify</strong> of <strong>footer</strong>.
+          </>
+        )
+      }
+    ],
+    []
+  );
+  const activeGuideStep = guideSteps[guideStepIndex] ?? guideSteps[0];
+
   useEffect(() => {
     const validIds = new Set(attentionPoints.map((item) => item.id));
     setDismissedAttentionPointIds((previous) => previous.filter((id) => validIds.has(id)));
   }, [attentionPoints]);
+
+  const closeGuide = () => {
+    setIsGuideOpen(false);
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(guideStorageKey, "seen");
+    } catch {}
+  };
 
   const visualSectionFields = visualSelectedSection ? groupedFieldsMap.get(visualSelectedSection) ?? [] : [];
   const visualSelectedField =
@@ -1548,10 +1625,26 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
       aria-labelledby="content-editor-title"
       className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-5 sm:p-6"
     >
-      <h2 id="content-editor-title" className="mb-2 font-display text-3xl">
-        Website-inhoud
-      </h2>
-      <p className="mb-4 text-sm text-[#d9c6ac]">Pas hier alle zichtbare website-inhoud aan.</p>
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 id="content-editor-title" className="mb-2 font-display text-3xl">
+            Website-inhoud
+          </h2>
+          <p className="text-sm text-[#d9c6ac]">Pas hier alle zichtbare website-inhoud aan.</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setGuideStepIndex(0);
+            setIsGuideOpen(true);
+          }}
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-line-muted)] text-lg font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+          aria-label="Uitleg over deze editor openen"
+          title="Uitleg over deze editor"
+        >
+          ?
+        </button>
+      </div>
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <button
           type="button"
@@ -1578,6 +1671,94 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
           Visuele modus
         </button>
       </div>
+
+      {isGuideOpen && activeGuideStep ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.72)] p-4" role="dialog" aria-modal="true" aria-labelledby="editor-guide-title">
+          <div className="w-full max-w-2xl rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.98)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.45)] sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-accent-amber)]">Eerste keer in de editor</p>
+                <h3 id="editor-guide-title" className="mt-2 font-display text-3xl text-[var(--color-text-primary)]">
+                  {activeGuideStep.title}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={closeGuide}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-line-muted)] text-xl text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                aria-label="Uitleg sluiten"
+              >
+                ×
+              </button>
+            </div>
+
+            <p className="mt-4 max-w-[62ch] text-sm leading-7 text-[#e7d7c1]">{activeGuideStep.body}</p>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              {guideSteps.map((step, index) => (
+                <button
+                  key={step.id}
+                  type="button"
+                  onClick={() => setGuideStepIndex(index)}
+                  className={`inline-flex rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    index === guideStepIndex
+                      ? "border-transparent bg-[var(--color-accent-amber)] text-[var(--color-bg-deep)]"
+                      : "border-[var(--color-line-muted)] text-[#d9c6ac] hover:bg-[rgba(244,233,220,0.08)]"
+                  }`}
+                >
+                  Stap {index + 1}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-6 grid gap-3 rounded-xl border border-[rgba(67,135,133,0.28)] bg-[rgba(24,41,63,0.38)] p-4 text-sm text-[#d9c6ac] sm:grid-cols-2">
+              <div>
+                <p className="font-semibold text-[#f8f5f1]">Handig om te weten</p>
+                <p className="mt-2">
+                  Je kunt deze uitleg altijd opnieuw openen met het <strong>vraagteken rechtsboven</strong>.
+                </p>
+              </div>
+              <div>
+                <p className="font-semibold text-[#f8f5f1]">Belangrijk</p>
+                <p className="mt-2">
+                  Je wijzigingen worden pas live nadat je op <strong>Opslaan</strong> hebt geklikt.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setGuideStepIndex((current) => Math.max(0, current - 1))}
+                disabled={guideStepIndex === 0}
+                className="inline-flex rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Vorige stap
+              </button>
+              <div className="flex flex-wrap gap-2">
+                {guideStepIndex < guideSteps.length - 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => setGuideStepIndex((current) => Math.min(guideSteps.length - 1, current + 1))}
+                    className="inline-flex rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2 text-sm font-semibold text-[var(--color-bg-deep)] transition-opacity hover:opacity-90"
+                  >
+                    Volgende stap
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={closeGuide}
+                    className="inline-flex rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2 text-sm font-semibold text-[var(--color-bg-deep)] transition-opacity hover:opacity-90"
+                  >
+                    Aan de slag
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <div className="mb-4 grid gap-4 rounded-xl border border-[rgba(67,135,133,0.45)] bg-[rgba(18,30,46,0.55)] p-4 text-sm text-[#e7d7c1] md:grid-cols-2">
         <div>
           <p className="font-semibold text-[#f8f5f1]">Inhoud wijzigen in 2 minuten</p>

@@ -1,4 +1,5 @@
 import { siteContent } from "@/lib/content";
+import { normalizeDutchShowDateInput } from "@/lib/content/shows";
 import type { SiteContent } from "@/lib/types";
 
 function isValidAbsoluteHttpUrl(value: string) {
@@ -239,7 +240,7 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
       ...(Array.isArray(content.bookings.upcomingShows) && content.bookings.upcomingShows.length > 0
         ? {
             upcomingShows: content.bookings.upcomingShows.map((show, index) => ({
-              date: show.date,
+              date: normalizeDutchShowDateInput(show.date),
               venue: show.venue,
               city: show.city,
               ticketsHref: sanitizeOptionalHref(show.ticketsHref, siteContent.bookings.upcomingShows?.[index]?.ticketsHref ?? ""),

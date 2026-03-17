@@ -182,3 +182,4 @@ Je bent klaar om te starten als:
 
 - Gebruik [`input/example.v3.run.json`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/input/example.v3.run.json) als generiek startpunt voor nieuwe projecten.
 - Zie [`examples/bohem-dry-run.md`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/examples/bohem-dry-run.md) en [`input/bohem.run.json`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/input/bohem.run.json) als leer- en referentiecase.
+- Voor een concrete Bohèm multi-worker uitvoeringsprompt, zie [`examples/bohem-multi-worker-instruction.md`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/examples/bohem-multi-worker-instruction.md).

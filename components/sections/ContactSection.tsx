@@ -151,6 +151,40 @@ export function ContactSection({ contact }: ContactSectionProps) {
   );
   const fieldLabelMap = useMemo(() => Object.fromEntries(contact.fields.map((field) => [field.id, field.label])), [contact.fields]);
 
+  const FeedbackMessage = ({ className = "" }: { className?: string }) => {
+    if (submitError) {
+      return (
+        <p role="alert" className={`text-sm text-[#ffb4a8] ${className}`.trim()}>
+          {submitError}
+        </p>
+      );
+    }
+    if (submitSuccess) {
+      return (
+        <p aria-live="polite" className={`text-sm text-[#b6efb9] ${className}`.trim()}>
+          <span aria-hidden="true" className="success-pop">
+            ✓
+          </span>
+          {submitSuccess}
+        </p>
+      );
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    if ((submitError || submitSuccess) && mobileStep !== 2) {
+      setMobileStep(2);
+    }
+  }, [mobileStep, submitError, submitSuccess]);
+
+  useEffect(() => {
+    if (mobileStep === 1 && (submitError || submitSuccess)) {
+      setSubmitError("");
+      setSubmitSuccess("");
+    }
+  }, [mobileStep, submitError, submitSuccess]);
+
   useEffect(() => {
     if (!turnstileEnabled) return;
     const observer = new IntersectionObserver(
@@ -282,6 +316,8 @@ export function ContactSection({ contact }: ContactSectionProps) {
     });
 
     if (isStepOneValid) {
+      setSubmitError("");
+      setSubmitSuccess("");
       setMobileStep(2);
     }
   };
@@ -396,7 +432,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
         </Reveal>
 
         <Reveal delayMs={120}>
-          <form className="grid max-w-[820px] gap-3 md:hidden" action="#" method="post" onSubmit={handleSubmit} data-form-mode="mobile">
+      <form className="grid max-w-[820px] gap-3 md:hidden" action="#" method="post" onSubmit={handleSubmit} data-form-mode="mobile">
             <div className="mb-1 flex items-center justify-between text-xs uppercase tracking-[0.12em] text-[#d6be9f]">
               <span>Stap {mobileStep} van 2</span>
               <span>{mobileStep === 1 ? "Contact" : "Bericht"}</span>
@@ -441,33 +477,29 @@ export function ContactSection({ contact }: ContactSectionProps) {
                     onValueChange={(nextValue) => setMobileFormValues((prev) => ({ ...prev, message: nextValue }))}
                   />
                 ) : null}
-                <div className="mt-2 grid gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setMobileStep(1)}
-                    className="inline-flex w-full items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-3 text-sm font-semibold transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-                  >
-                    Terug
-                  </button>
-                  {submitError ? (
-                    <p role="alert" className="text-sm text-[#ffb4a8]">
-                      {submitError}
-                    </p>
-                  ) : null}
-                  {submitSuccess ? (
-                    <p aria-live="polite" className="text-sm text-[#b6efb9]">
-                      <span aria-hidden="true" className="success-pop">✓</span>
-                      {submitSuccess}
-                    </p>
-                  ) : null}
-                  <button
-                    type="submit"
-                    data-cta="contact_mobile_submit"
-                    disabled={isSubmitting}
-                    className="cta-glow inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
-                  >
-                    {isSubmitting ? submittingLabel : contact.ctaLabel}
-                  </button>
+                <div className="mt-3 flex flex-col gap-2">
+                  <FeedbackMessage className="leading-relaxed" />
+                  <div className="grid gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSubmitError("");
+                        setSubmitSuccess("");
+                        setMobileStep(1);
+                      }}
+                      className="inline-flex w-full items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-3 text-sm font-semibold transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                    >
+                      Terug
+                    </button>
+                    <button
+                      type="submit"
+                      data-cta="contact_mobile_submit"
+                      disabled={isSubmitting}
+                      className="cta-glow inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+                    >
+                      {isSubmitting ? submittingLabel : contact.ctaLabel}
+                    </button>
+                  </div>
                 </div>
                 {turnstileEnabled && canRenderMobileTurnstile ? (
                   <div className="mt-1">
@@ -507,17 +539,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                 <FormField field={field} idPrefix="desktop" subjectOptions={subjectOptions} />
               </div>
             ))}
-            {submitError ? (
-              <p role="alert" className="md:col-span-2 text-sm text-[#ffb4a8]">
-                {submitError}
-              </p>
-            ) : null}
-            {submitSuccess ? (
-              <p aria-live="polite" className="md:col-span-2 text-sm text-[#b6efb9]">
-                <span aria-hidden="true" className="success-pop">✓</span>
-                {submitSuccess}
-              </p>
-            ) : null}
+            <FeedbackMessage className="md:col-span-2" />
             <button
               type="submit"
               data-cta="contact_desktop_submit"

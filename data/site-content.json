@@ -427,6 +427,8 @@
     }
   },
   "footer": {
-    "copyright": "Bohèm"
+    "copyright": "Bohèm",
+    "youtubeHref": "https://www.youtube.com/@VideoBoh%C3%A8m",
+    "instagramHref": "https://www.instagram.com/musicbybohem/?__d=1%2F"
   }
 }

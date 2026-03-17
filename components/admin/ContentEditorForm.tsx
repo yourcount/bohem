@@ -50,7 +50,7 @@ const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][numbe
 ];
 const DISC_SECTION_TITLE = "Releases beheren";
 const SHOWS_SECTION_TITLE = "Volgende shows beheren";
-const HIDDEN_EDITOR_SECTIONS = new Set(["footer", "brand"]);
+const HIDDEN_EDITOR_SECTIONS = new Set(["brand"]);
 const HIDDEN_EDITOR_PATHS = new Set(["hero.eyebrow", "bookings.cta.variant"]);
 const HIDDEN_EDITOR_PATH_PREFIXES = [
   "meta.",
@@ -74,7 +74,7 @@ const sectionLabels: Record<string, string> = {
   kampvuur: "Kampvuurklanken",
   bookings: "Boekingen",
   contact: "Contact",
-  footer: "Footer"
+  footer: "Footer & socials"
 };
 
 const keyLabels: Record<string, string> = {
@@ -102,6 +102,8 @@ const keyLabels: Record<string, string> = {
   responseTimeText: "Reactietijd",
   intakeHint: "Formulier hint",
   copyright: "Footertekst",
+  youtubeHref: "YouTube link",
+  instagramHref: "Instagram link",
   format: "Type release",
   year: "Jaar",
   note: "Toelichting",
@@ -122,7 +124,9 @@ const helperByKey: Record<string, string> = {
   contactEmail: "Gebruik een geldig e-mailadres.",
   contactPhone: "Gebruik internationaal formaat, bijvoorbeeld +31 6...",
   alt: "Beschrijf kort wat er op de foto te zien is (toegankelijkheid).",
-  embedUrl: "Spotify embed URL, bijvoorbeeld https://open.spotify.com/embed/..."
+  embedUrl: "Spotify embed URL, bijvoorbeeld https://open.spotify.com/embed/...",
+  youtubeHref: "Gebruik een volledige link naar het YouTube-profiel.",
+  instagramHref: "Gebruik een volledige link naar het Instagram-profiel."
 };
 
 function pathParts(path: string) {
@@ -137,6 +141,9 @@ function prettifyPart(part: string) {
 }
 
 function helperForPath(path: string) {
+  if (path.startsWith("navigation.") && path.endsWith(".href")) {
+    return "Gebruik een volledige link (https://...), een pagina-anker (#contact) of #shows als je de shows-sectie in het menu wilt tonen.";
+  }
   if (path.includes("emailTemplates.")) {
     return "Je kunt placeholders gebruiken: {{name}}, {{email}}, {{phone}}, {{subject}}, {{message}}.";
   }

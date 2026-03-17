@@ -30,7 +30,7 @@ export default async function AdminHomePage() {
             Uitloggen
           </button>
         </form>
-        {session.role === "ADMIN" || session.role === "SUPER_ADMIN" ? (
+        {session.role === "SUPER_ADMIN" ? (
           <Link href="/admin/backend" className="text-sm underline underline-offset-2">
             Naar Admin Backend
           </Link>

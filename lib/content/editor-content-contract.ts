@@ -1,4 +1,5 @@
 import { siteContent } from "@/lib/content";
+import { ensureShowsNavigationItem } from "@/lib/content/navigation";
 import { sanitizeSiteContent } from "@/lib/content/sanitize-site-content";
 import type { SiteContent } from "@/lib/types";
 
@@ -88,7 +89,7 @@ function isEssentialRequiredTextPath(path: string) {
   return ESSENTIAL_REQUIRED_TEXT_SUFFIXES.some((suffix) => path.endsWith(suffix));
 }
 
-const URL_FIELD_KEYS = new Set(["href", "website", "ticketsHref", "infoHref", "kitHref", "embedUrl"]);
+const URL_FIELD_KEYS = new Set(["href", "website", "ticketsHref", "infoHref", "kitHref", "embedUrl", "youtubeHref", "instagramHref"]);
 
 function getFieldKeyFromPath(path: string) {
   const clean = path.replace(/^content\./, "");
@@ -212,7 +213,9 @@ function stripDisallowedReleaseLinksFromDiscography(content: EditorContent): Edi
 
   return {
     brand: normalized.brand,
-    navigation: normalized.navigation,
+    navigation: ensureShowsNavigationItem(normalized.navigation, {
+      hasShows: (normalized.bookings.upcomingShows?.length ?? 0) > 0
+    }),
     hero: normalized.hero,
     about: normalized.about,
     discography: {

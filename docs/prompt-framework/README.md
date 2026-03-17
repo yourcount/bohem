@@ -12,6 +12,7 @@ Het framework begon documentgedreven in v1. Vanaf v3 is er daarnaast een lokale 
 ## Snel starten
 
 Voor een directe operator-ingang voor nieuwe projecten, gebruik [`QUICKSTART.md`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/QUICKSTART.md).
+Voor een Bohèm-specifieke multi-worker uitvoeringsprompt, gebruik [`examples/bohem-multi-worker-instruction.md`](/Users/Tijmen/Documents/bohem/docs/prompt-framework/examples/bohem-multi-worker-instruction.md).
 
 ## v3 CLI
 

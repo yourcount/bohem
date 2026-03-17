@@ -231,5 +231,7 @@ export type SiteContent = {
   };
   footer: {
     copyright: string;
+    youtubeHref?: string;
+    instagramHref?: string;
   };
 };

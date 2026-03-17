@@ -12,6 +12,7 @@ import { MobileStickyCta } from "@/components/ui/MobileStickyCta";
 import { ScrollExperience } from "@/components/ui/ScrollExperience";
 import { SectionMotifDivider } from "@/components/ui/SectionMotifDivider";
 import { StickyListenBar } from "@/components/ui/StickyListenBar";
+import { ensureShowsNavigationItem } from "@/lib/content/navigation";
 import { getLiveSiteContent } from "@/lib/content/live-content";
 import { getSeoSettingsSafe, resolveHomeJsonLd } from "@/lib/seo-settings";
 import { getFeatureFlagsSafe } from "@/lib/system/feature-flags";
@@ -73,28 +74,7 @@ export default async function HomePage() {
     return true;
   });
 
-  const hasShowsNav = baseNavigation.some((item) => item.href === "#shows");
-  const navigation =
-    hasShows && !hasShowsNav
-      ? (() => {
-          const next = [...baseNavigation];
-          const musicIndex = next.findIndex((item) => item.href === "#muziek");
-          const campfireIndex = next.findIndex((item) => item.href === "#kampvuurklanken");
-          const bookingIndex = next.findIndex((item) => item.href === "#boekingen");
-
-          let insertIndex = next.length;
-          if (musicIndex >= 0) {
-            insertIndex = musicIndex + 1;
-          } else if (campfireIndex >= 0) {
-            insertIndex = campfireIndex;
-          } else if (bookingIndex >= 0) {
-            insertIndex = bookingIndex;
-          }
-
-          next.splice(insertIndex, 0, { label: "Shows", href: "#shows" });
-          return next;
-        })()
-      : baseNavigation;
+  const navigation = ensureShowsNavigationItem(baseNavigation, { hasShows });
 
   return (
     <>

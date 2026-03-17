@@ -1608,7 +1608,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
 
   const guideTargetClass = (targetKey: GuideTargetKey) =>
     isGuideTargetActive(targetKey)
-      ? "relative rounded-2xl ring-2 ring-[var(--color-accent-amber)] ring-offset-4 ring-offset-[rgba(8,12,18,0.45)] shadow-[0_0_0_1px_rgba(242,139,14,0.45),0_22px_45px_rgba(0,0,0,0.4)]"
+      ? "pointer-events-none relative rounded-2xl ring-2 ring-[var(--color-accent-amber)] ring-offset-4 ring-offset-[rgba(8,12,18,0.45)] shadow-[0_0_0_1px_rgba(242,139,14,0.45),0_22px_45px_rgba(0,0,0,0.4)]"
       : "";
 
   useEffect(() => {

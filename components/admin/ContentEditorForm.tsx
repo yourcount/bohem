@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import Image from "next/image";
 
 import type { SiteContent } from "@/lib/types";
@@ -81,6 +81,13 @@ type SearchTarget =
 
 type StatusTone = "neutral" | "success" | "error";
 type EditorMode = "form" | "visual";
+type AttentionPoint = {
+  id: string;
+  text: ReactNode;
+  sectionTitle: string;
+  path?: string;
+  ctaLabel: string;
+};
 const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][number]["format"]> = [
   "Single",
   "EP",
@@ -485,7 +492,7 @@ function normalizeEditorContent(content: EditorManagedContent): EditorManagedCon
   return structuredClone(content);
 }
 
-export function ContentEditorForm() {
+export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: string }) {
   const [editorMode, setEditorMode] = useState<EditorMode>("form");
   const [content, setContent] = useState<EditorManagedContent | null>(null);
   const [initialContent, setInitialContent] = useState<EditorManagedContent | null>(null);
@@ -517,6 +524,7 @@ export function ContentEditorForm() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSearchIndex, setActiveSearchIndex] = useState(-1);
   const [highlightedFieldPath, setHighlightedFieldPath] = useState<string | null>(null);
+  const [dismissedAttentionPointIds, setDismissedAttentionPointIds] = useState<string[]>([]);
 
   const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
   const fieldContainerRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -526,6 +534,7 @@ export function ContentEditorForm() {
   const releaseItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
   const showItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
   const searchHighlightTimeoutRef = useRef<number | null>(null);
+  const attentionStorageKey = `bohem-editor-attention-dismissed:${currentUserEmail.toLowerCase()}`;
 
   const scrollReleaseIntoView = (index: number) => {
     requestAnimationFrame(() => {
@@ -826,6 +835,25 @@ export function ContentEditorForm() {
   useEffect(() => {
     setActiveSearchIndex(searchResults.length > 0 ? 0 : -1);
   }, [searchResults.length]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(attentionStorageKey);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as string[];
+      if (Array.isArray(parsed)) {
+        setDismissedAttentionPointIds(parsed.filter((value) => typeof value === "string"));
+      }
+    } catch {
+      setDismissedAttentionPointIds([]);
+    }
+  }, [attentionStorageKey]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(attentionStorageKey, JSON.stringify(dismissedAttentionPointIds));
+  }, [attentionStorageKey, dismissedAttentionPointIds]);
 
   const isPristine = useMemo(() => {
     if (!content || !initialContent) return true;
@@ -1392,6 +1420,46 @@ export function ContentEditorForm() {
     focusFieldPath(sectionTitle, path);
   };
 
+  const attentionPoints: AttentionPoint[] = [
+    {
+      id: "empty-links-hide-buttons",
+      text: <>Laat je een knoplink leeg, dan wordt die knop niet op de site getoond.</>,
+      sectionTitle: SHOWS_SECTION_TITLE,
+      path: "bookings.upcomingShows.0.ticketsHref",
+      ctaLabel: "Ga naar shows en knoppen"
+    },
+    {
+      id: "empty-blocks-hide",
+      text: <>Laat je alle inhoud van een blok leeg, dan verdwijnt dat blok op de site.</>,
+      sectionTitle: "Onderaan de pagina en socials",
+      path: "footer.instagramHref",
+      ctaLabel: "Ga naar footer en socials"
+    },
+    {
+      id: "past-shows-hidden",
+      text: <>Shows met een datum in het verleden blijven in de editor staan, maar worden niet meer live getoond.</>,
+      sectionTitle: SHOWS_SECTION_TITLE,
+      path: "bookings.upcomingShows.0.date",
+      ctaLabel: "Ga naar showdatums"
+    },
+    {
+      id: "show-dates-normalized",
+      text: <>Showdatums worden bij opslaan netjes gemaakt, bijvoorbeeld <strong>17 mrt</strong> naar <strong>17 maart {new Date().getFullYear()}</strong>.</>,
+      sectionTitle: SHOWS_SECTION_TITLE,
+      path: "bookings.upcomingShows.0.date",
+      ctaLabel: "Ga naar datumveld"
+    },
+    {
+      id: "external-links-new-tab",
+      text: <>Externe links openen op de site in een nieuw tabblad. Interne links zoals <strong>#contact</strong> blijven op dezelfde pagina.</>,
+      sectionTitle: "Discografie",
+      path: "discography.featuredSingle.href",
+      ctaLabel: "Ga naar linkveld"
+    }
+  ];
+
+  const visibleAttentionPoints = attentionPoints.filter((item) => !dismissedAttentionPointIds.includes(item.id));
+
   const visualSectionFields = visualSelectedSection ? groupedFieldsMap.get(visualSelectedSection) ?? [] : [];
   const visualSelectedField =
     visualSelectedPath && visualSectionFields.length > 0
@@ -1468,59 +1536,54 @@ export function ContentEditorForm() {
           </ol>
         </div>
         <div>
-          <p className="font-semibold text-[#f8f5f1]">Aandachtspunten voor inhoud</p>
-          <ul className="mt-2 space-y-3 text-xs sm:text-sm">
-            <li className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3">
-              <p>Laat je een knoplink leeg, dan wordt die knop niet op de site getoond.</p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-semibold text-[#f8f5f1]">Aandachtspunten voor inhoud</p>
+            {visibleAttentionPoints.length > 1 ? (
               <button
                 type="button"
-                onClick={() => jumpToEditorTarget(SHOWS_SECTION_TITLE, "bookings.upcomingShows.0.ticketsHref")}
-                className="mt-2 inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                onClick={() => setDismissedAttentionPointIds(attentionPoints.map((item) => item.id))}
+                className="inline-flex rounded-full border border-[rgba(244,233,220,0.16)] px-3 py-1.5 text-[11px] font-semibold text-[#d9c6ac] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
               >
-                Ga naar shows en knoppen
+                Negeer alle punten
               </button>
-            </li>
-            <li className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3">
-              <p>Laat je alle inhoud van een blok leeg, dan verdwijnt dat blok op de site.</p>
+            ) : null}
+          </div>
+          {visibleAttentionPoints.length > 0 ? (
+            <ul className="mt-2 space-y-3 text-xs sm:text-sm">
+              {visibleAttentionPoints.map((item) => (
+                <li key={item.id} className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3">
+                  <p>{item.text}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => jumpToEditorTarget(item.sectionTitle, item.path)}
+                      className="inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                    >
+                      {item.ctaLabel}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDismissedAttentionPointIds((prev) => (prev.includes(item.id) ? prev : [...prev, item.id]))}
+                      className="inline-flex rounded-full border border-[rgba(244,233,220,0.16)] px-3 py-1.5 text-[11px] font-semibold text-[#d9c6ac] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                    >
+                      Negeren
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="mt-2 rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3 text-xs sm:text-sm">
+              <p>Je hebt alle aandachtspunten voor jouw account verborgen.</p>
               <button
                 type="button"
-                onClick={() => jumpToEditorTarget("Onderaan de pagina en socials", "footer.instagramHref")}
+                onClick={() => setDismissedAttentionPointIds([])}
                 className="mt-2 inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
               >
-                Ga naar footer en socials
+                Toon aandachtspunten opnieuw
               </button>
-            </li>
-            <li className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3">
-              <p>Shows met een datum in het verleden blijven in de editor staan, maar worden niet meer live getoond.</p>
-              <button
-                type="button"
-                onClick={() => jumpToEditorTarget(SHOWS_SECTION_TITLE, "bookings.upcomingShows.0.date")}
-                className="mt-2 inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-              >
-                Ga naar showdatums
-              </button>
-            </li>
-            <li className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3">
-              <p>Showdatums worden bij opslaan netjes gemaakt, bijvoorbeeld <strong>17 mrt</strong> naar <strong>17 maart {new Date().getFullYear()}</strong>.</p>
-              <button
-                type="button"
-                onClick={() => jumpToEditorTarget(SHOWS_SECTION_TITLE, "bookings.upcomingShows.0.date")}
-                className="mt-2 inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-              >
-                Ga naar datumveld
-              </button>
-            </li>
-            <li className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3">
-              <p>Externe links openen op de site in een nieuw tabblad. Interne links zoals <strong>#contact</strong> blijven op dezelfde pagina.</p>
-              <button
-                type="button"
-                onClick={() => jumpToEditorTarget("Discografie", "discography.featuredSingle.href")}
-                className="mt-2 inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-              >
-                Ga naar linkveld
-              </button>
-            </li>
-          </ul>
+            </div>
+          )}
         </div>
       </div>
 

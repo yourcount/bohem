@@ -40,7 +40,7 @@ export default async function AdminHomePage() {
         </Link>
       </div>
 
-      <ContentEditorForm />
+      <ContentEditorForm currentUserEmail={session.email} />
     </main>
   );
 }

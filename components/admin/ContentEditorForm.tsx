@@ -1104,11 +1104,11 @@ export function ContentEditorForm() {
       if (!prev) return prev;
       const next = structuredClone(prev);
       next.discography.releases.push({
-        title: "Nieuwe release",
-        year: String(new Date().getFullYear()),
+        title: "",
+        year: "",
         format: "Single",
         note: "",
-        links: [{ label: "Luister op Spotify", href: "https://" }]
+        links: []
       });
       nextIndex = next.discography.releases.length - 1;
       return next;

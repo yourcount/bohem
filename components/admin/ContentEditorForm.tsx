@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ChangeEvent, type ReactNode } from "react";
 import Image from "next/image";
 
 import { filterFutureShows, normalizeDutchShowDateInput, parseDutchShowDate } from "@/lib/content/shows";
@@ -96,6 +96,7 @@ type GuideStep = {
   body: ReactNode;
   targetKey: GuideTargetKey;
 };
+type GuideCardPosition = CSSProperties;
 const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][number]["format"]> = [
   "Single",
   "EP",
@@ -540,6 +541,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
   const [dismissedAttentionPointIds, setDismissedAttentionPointIds] = useState<string[]>([]);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [guideStepIndex, setGuideStepIndex] = useState(0);
+  const [guideCardPosition, setGuideCardPosition] = useState<GuideCardPosition>({});
 
   const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
   const fieldContainerRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -549,6 +551,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
   const modeSwitcherRef = useRef<HTMLDivElement | null>(null);
   const searchPanelRef = useRef<HTMLDivElement | null>(null);
   const saveBarRef = useRef<HTMLDivElement | null>(null);
+  const guideCardRef = useRef<HTMLDivElement | null>(null);
   const releaseItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
   const showItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
   const searchHighlightTimeoutRef = useRef<number | null>(null);
@@ -1604,6 +1607,59 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
     return saveBarRef.current;
   };
 
+  const calculateGuideCardPosition = (targetKey: GuideTargetKey): GuideCardPosition => {
+    const targetNode = getGuideTargetNode(targetKey);
+    const cardNode = guideCardRef.current;
+    if (!targetNode || !cardNode || typeof window === "undefined") {
+      return {};
+    }
+
+    const rect = targetNode.getBoundingClientRect();
+    const cardRect = cardNode.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const padding = 16;
+    const gap = 18;
+
+    const clampLeft = (value: number) =>
+      Math.min(Math.max(value, padding), Math.max(padding, viewportWidth - cardRect.width - padding));
+    const clampTop = (value: number) =>
+      Math.min(Math.max(value, padding), Math.max(padding, viewportHeight - cardRect.height - padding));
+
+    if (targetKey === "save-bar") {
+      const top = rect.top - cardRect.height - gap;
+      return {
+        position: "fixed",
+        left: clampLeft(rect.left),
+        top: clampTop(top),
+        width: `min(${cardRect.width || 420}px, calc(100vw - 32px))`
+      };
+    }
+
+    if (targetKey === "mode-switcher" || targetKey === "search-panel") {
+      const preferredTop = rect.top - cardRect.height - gap;
+      const fallbackTop = rect.bottom + gap;
+      const top = preferredTop >= padding ? preferredTop : fallbackTop;
+      return {
+        position: "fixed",
+        left: clampLeft(rect.left),
+        top: clampTop(top),
+        width: `min(${cardRect.width || 420}px, calc(100vw - 32px))`
+      };
+    }
+
+    const preferredLeft = rect.right + gap;
+    const fitsRight = preferredLeft + cardRect.width <= viewportWidth - padding;
+    const left = fitsRight ? preferredLeft : rect.left;
+    const preferredTop = rect.top;
+    return {
+      position: "fixed",
+      left: clampLeft(left),
+      top: clampTop(preferredTop),
+      width: `min(${cardRect.width || 420}px, calc(100vw - 32px))`
+    };
+  };
+
   const isGuideTargetActive = (targetKey: GuideTargetKey) => isGuideOpen && activeGuideStep?.targetKey === targetKey;
 
   const guideTargetClass = (targetKey: GuideTargetKey) =>
@@ -1624,6 +1680,28 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
     requestAnimationFrame(() => {
       node.scrollIntoView({ behavior: "smooth", block: "center" });
     });
+  }, [activeGuideStep, isGuideOpen]);
+
+  useEffect(() => {
+    if (!isGuideOpen || !activeGuideStep || typeof window === "undefined") return;
+
+    const updateGuidePosition = () => {
+      setGuideCardPosition(calculateGuideCardPosition(activeGuideStep.targetKey));
+    };
+
+    const frame = window.requestAnimationFrame(() => {
+      updateGuidePosition();
+      window.setTimeout(updateGuidePosition, 180);
+    });
+
+    window.addEventListener("resize", updateGuidePosition);
+    window.addEventListener("scroll", updateGuidePosition, { passive: true });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("resize", updateGuidePosition);
+      window.removeEventListener("scroll", updateGuidePosition);
+    };
   }, [activeGuideStep, isGuideOpen]);
 
   const closeGuide = () => {
@@ -1648,6 +1726,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
     return <p className="text-[#ffb4a8]">Geen content gevonden om te bewerken.</p>;
   }
 
+  const isGuideCardPositioned = typeof guideCardPosition.top === "number" && typeof guideCardPosition.left === "number";
   const statusColorClass =
     statusTone === "success" ? "text-[#b6efb9]" : statusTone === "error" ? "text-[#ffb4a8]" : "text-[#d9c6ac]";
   const editorInputClass =
@@ -1706,11 +1785,19 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
       </div>
 
       {isGuideOpen && activeGuideStep ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)] p-4" role="dialog" aria-modal="true" aria-labelledby="editor-guide-title">
-          <div className="relative z-[70] w-full max-w-2xl rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.98)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.45)] sm:p-6">
+        <>
+          <div className="pointer-events-none fixed inset-0 z-50 bg-[rgba(0,0,0,0.42)]" aria-hidden="true" />
+          <div
+            ref={guideCardRef}
+            style={guideCardPosition}
+            className={`fixed z-[70] w-[min(420px,calc(100vw-32px))] rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.98)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.45)] transition-opacity sm:p-6 ${isGuideCardPositioned ? "opacity-100" : "opacity-0"}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="editor-guide-title"
+          >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-accent-amber)]">Eerste keer in de editor</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-accent-amber)]">Editor uitleg</p>
                 <h3 id="editor-guide-title" className="mt-2 font-display text-3xl text-[var(--color-text-primary)]">
                   {activeGuideStep.title}
                 </h3>
@@ -1725,7 +1812,8 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
               </button>
             </div>
 
-            <p className="mt-4 max-w-[62ch] text-sm leading-7 text-[#e7d7c1]">{activeGuideStep.body}</p>
+            <p className="mt-4 text-sm leading-7 text-[#e7d7c1]">{activeGuideStep.body}</p>
+            <p className="mt-3 text-xs text-[#d9c6ac]">Kijk naar het gemarkeerde onderdeel. Dat is wat deze stap bedoelt.</p>
 
             <div className="mt-5 flex flex-wrap gap-2">
               {guideSteps.map((step, index) => (
@@ -1744,19 +1832,9 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
               ))}
             </div>
 
-            <div className="mt-6 grid gap-3 rounded-xl border border-[rgba(67,135,133,0.28)] bg-[rgba(24,41,63,0.38)] p-4 text-sm text-[#d9c6ac] sm:grid-cols-2">
-              <div>
-                <p className="font-semibold text-[#f8f5f1]">Handig om te weten</p>
-                <p className="mt-2">
-                  Je kunt deze uitleg altijd opnieuw openen met het <strong>vraagteken rechtsboven</strong>.
-                </p>
-              </div>
-              <div>
-                <p className="font-semibold text-[#f8f5f1]">Belangrijk</p>
-                <p className="mt-2">
-                  Je wijzigingen worden pas live nadat je op <strong>Opslaan</strong> hebt geklikt.
-                </p>
-              </div>
+            <div className="mt-5 rounded-xl border border-[rgba(67,135,133,0.28)] bg-[rgba(24,41,63,0.38)] p-4 text-sm text-[#d9c6ac]">
+              <p className="font-semibold text-[#f8f5f1]">Belangrijk</p>
+              <p className="mt-2">Tijdens deze uitleg kun je nog niets aanpassen. Sluit of voltooi eerst de tutorial.</p>
             </div>
 
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
@@ -1789,7 +1867,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
               </div>
             </div>
           </div>
-        </div>
+        </>
       ) : null}
 
       <div className="mb-4 grid gap-4 rounded-xl border border-[rgba(67,135,133,0.45)] bg-[rgba(18,30,46,0.55)] p-4 text-sm text-[#e7d7c1] md:grid-cols-2">

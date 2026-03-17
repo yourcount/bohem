@@ -1555,7 +1555,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
       },
       {
         id: "edit-mode",
-        title: "2. Pas tekst, links en foto&apos;s aan",
+        title: "2. Pas tekst, links en foto's aan",
         body: (
           <>
             In <strong>Formuliermodus</strong> werk je veld voor veld. In <strong>Visuele modus</strong> klik je op het onderdeel in de
@@ -1766,14 +1766,14 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
             {editorMode === "visual" ? (
               <>
                 <li>Kies links een sectie en klik in de preview op het onderdeel dat je wilt aanpassen.</li>
-                <li>Pas rechts tekst, links of foto&apos;s aan.</li>
+                <li>Pas rechts tekst, links of foto's aan.</li>
                 <li>Klik onderaan op <strong>Opslaan</strong>.</li>
                 <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
               </>
             ) : (
               <>
                 <li>Kies een sectie in het sectiemenu.</li>
-                <li>Pas tekst, links of foto&apos;s aan.</li>
+                <li>Pas tekst, links of foto's aan.</li>
                 <li>Klik onderaan op <strong>Opslaan</strong>.</li>
                 <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
               </>
@@ -2930,7 +2930,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
                     onChange={(event) => setMediaKind(event.target.value === "all" ? "all" : "photo")}
                     className="mt-1 w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-sm text-[var(--color-text-primary)]"
                   >
-                    <option value="photo">Alleen foto&apos;s</option>
+                    <option value="photo">Alleen foto's</option>
                     <option value="all">Alle assets</option>
                   </select>
                 </label>

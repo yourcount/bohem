@@ -103,7 +103,15 @@
       "description": "Vroeger zet direct de toon: samen zijn, maar elkaar niet meer kunnen bereiken als het stil wordt tussen twee mensen.",
       "href": "https://open.spotify.com/track/2TaHQl5PVOSHIs1xCjbD1W?si=117282ba1c4740b1",
       "embedUrl": "https://open.spotify.com/embed/track/2TaHQl5PVOSHIs1xCjbD1W?utm_source=generator",
-      "ctaLabel": "Luister op Spotify"
+      "ctaLabel": "Luister op Spotify",
+      "image": {
+        "src": "/images/music/vroeger-cover.webp",
+        "alt": "Cover art van de single Vroeger",
+        "width": 640,
+        "height": 640,
+        "focusX": 50,
+        "focusY": 50
+      }
     },
     "artistEyebrow": "Streaming",
     "artist": {

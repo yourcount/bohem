@@ -126,8 +126,14 @@ export default async function HomePage() {
       {flags.enable_sticky_listen_bar && hasDiscographySection && hasSectionContent(siteContent.discography.featuredSingle) ? (
         <StickyListenBar
           visibleSectionIds={["bio", "discografie"]}
+          eyebrow={siteContent.discography.featuredSingleEyebrow || "Nu luisteren"}
           trackTitle={siteContent.discography.featuredSingle.title}
           trackHref={siteContent.discography.featuredSingle.href}
+          ctaLabel={siteContent.discography.featuredSingle.ctaLabel || "Speel op Spotify"}
+          artworkSrc={siteContent.discography.featuredSingle.image?.src || "/images/music/vroeger-cover.webp"}
+          artworkAlt={siteContent.discography.featuredSingle.image?.alt || siteContent.discography.featuredSingle.title}
+          artworkFocusX={siteContent.discography.featuredSingle.image?.focusX}
+          artworkFocusY={siteContent.discography.featuredSingle.image?.focusY}
         />
       ) : null}
       {flags.enable_mobile_sticky_cta && hasBookingsSection && hasText(siteContent.bookings.cta.label) && hasText(siteContent.bookings.cta.href) ? (

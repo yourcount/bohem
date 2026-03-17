@@ -65,16 +65,16 @@ const HIDDEN_EDITOR_PATH_PREFIXES = [
 ];
 
 const sectionLabels: Record<string, string> = {
-  brand: "Hero",
+  brand: "Bovenaan de pagina",
   navigation: "Navigatie",
-  hero: "Hero",
+  hero: "Bovenaan de pagina",
   about: "Over Bohèm",
   discography: "Discografie",
   musicExperience: "Muziekbeleving",
   kampvuur: "Kampvuurklanken",
   bookings: "Boekingen",
   contact: "Contact",
-  footer: "Footer & socials"
+  footer: "Onderaan de pagina en socials"
 };
 
 const keyLabels: Record<string, string> = {
@@ -82,6 +82,8 @@ const keyLabels: Record<string, string> = {
   label: "Label",
   href: "Link",
   eyebrow: "Boventitel",
+  featuredSingleEyebrow: "Boventitel boven uitgelichte single",
+  artistEyebrow: "Boventitel boven artiestblok",
   headline: "Hoofdtitel",
   subhead: "Subtitel",
   src: "Afbeelding",
@@ -90,7 +92,8 @@ const keyLabels: Record<string, string> = {
   text: "Tekst",
   website: "Persoonlijke website",
   body: "Tekstblok",
-  quote: "Quote",
+  quote: "Quote die zichtbaar wordt",
+  source: "Naam onder quote",
   city: "Plaats",
   venue: "Locatie",
   date: "Datum",
@@ -108,14 +111,19 @@ const keyLabels: Record<string, string> = {
   year: "Jaar",
   note: "Toelichting",
   embedUrl: "Spotify embed link",
-  emailTemplates: "E-mail templates",
-  admin: "Admin mail",
-  sender: "Bevestigingsmail",
-  preheader: "Preheader"
+  ctaLabel: "Knoptekst",
+  showsBadgeLabel: "Label boven shows",
+  bookabilityTitle: "Titel boven beschikbaarheid",
+  requestStepsTitle: "Titel boven aanvraagstappen",
+  availabilityText: "Kleine tekst onder aanvraagstappen",
+  emailTemplates: "E-mailberichten",
+  admin: "Mail naar Bohèm",
+  sender: "Bevestiging naar afzender",
+  preheader: "Korte tekst bovenin de mail"
 };
 
 const helperByKey: Record<string, string> = {
-  href: "Gebruik een volledige link (https://...) of een pagina-anker (#contact).",
+  href: "Hiermee bepaal je waar deze knop of link naartoe gaat. Gebruik een volledige link (https://...) of een pagina-anker (#contact).",
   ticketsHref: "Voorbeeld: https://ticketshop.nl/event of #contact. Laat leeg om de knop te verbergen.",
   infoHref: "Voorbeeld: https://jouwsite.nl/meer-info of #contact. Laat leeg om de knop te verbergen.",
   website: "Gebruik een volledige link, bijvoorbeeld https://arthurbont.nl.",
@@ -123,10 +131,34 @@ const helperByKey: Record<string, string> = {
   email: "Gebruik een geldig e-mailadres.",
   contactEmail: "Gebruik een geldig e-mailadres.",
   contactPhone: "Gebruik internationaal formaat, bijvoorbeeld +31 6...",
-  alt: "Beschrijf kort wat er op de foto te zien is (toegankelijkheid).",
-  embedUrl: "Spotify embed URL, bijvoorbeeld https://open.spotify.com/embed/...",
+  alt: "Beschrijf kort wat er op de foto te zien is. Deze tekst helpt ook bij toegankelijkheid.",
+  embedUrl: "Dit vult het Spotify afspeelvak op de site. Plak hier de Spotify embed-link.",
   youtubeHref: "Gebruik een volledige link naar het YouTube-profiel.",
   instagramHref: "Gebruik een volledige link naar het Instagram-profiel."
+};
+
+const PATH_LABELS: Record<string, string> = {
+  "discography.featuredSingle.href": "Link van de sticky luisterknop",
+  "discography.featuredSingle.ctaLabel": "Knoptekst van de sticky luisterknop",
+  "discography.featuredSingle.image.src": "Cover van de sticky luisterbalk",
+  "discography.featuredSingle.image.alt": "Omschrijving van de sticky cover",
+  "hero.image.src": "Hero-foto",
+  "hero.image.alt": "Omschrijving van de hero-foto",
+  "musicExperience.image.src": "Foto bij muziekbeleving",
+  "musicExperience.image.alt": "Omschrijving van de foto bij muziekbeleving",
+  "bookings.coverKoffer.image.src": "Foto bij coverkoffer",
+  "bookings.coverKoffer.image.alt": "Omschrijving van de coverkoffer-foto",
+  "footer.youtubeHref": "YouTube-link in de footer",
+  "footer.instagramHref": "Instagram-link in de footer"
+};
+
+const PATH_HELPERS: Record<string, string> = {
+  "discography.featuredSingle.href": "Deze link opent als iemand in de sticky luisterbalk op de knop klikt.",
+  "discography.featuredSingle.ctaLabel": "Deze tekst staat op de knop in de sticky luisterbalk.",
+  "discography.featuredSingle.image.src": "Deze cover wordt in de sticky luisterbalk getoond zodra die zichtbaar wordt.",
+  "discography.featuredSingle.image.alt": "Korte beschrijving van de cover in de sticky luisterbalk.",
+  "footer.youtubeHref": "Als je dit leeg laat, wordt het YouTube-icoon in de footer niet getoond.",
+  "footer.instagramHref": "Als je dit leeg laat, wordt het Instagram-icoon in de footer niet getoond."
 };
 
 function pathParts(path: string) {
@@ -141,6 +173,9 @@ function prettifyPart(part: string) {
 }
 
 function helperForPath(path: string) {
+  if (PATH_HELPERS[path]) {
+    return PATH_HELPERS[path];
+  }
   if (path.startsWith("navigation.") && path.endsWith(".href")) {
     return "Gebruik een volledige link (https://...), een pagina-anker (#contact) of #shows als je de shows-sectie in het menu wilt tonen.";
   }
@@ -153,6 +188,9 @@ function helperForPath(path: string) {
 }
 
 function labelForPath(path: string) {
+  if (PATH_LABELS[path]) {
+    return PATH_LABELS[path];
+  }
   const parts = pathParts(path);
   if (parts.length === 0) return path;
   const leaf = parts[parts.length - 1] ?? "";

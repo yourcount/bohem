@@ -48,6 +48,13 @@ export function sanitizeNavigationItems(items: SiteContent["navigation"]): SiteC
 export function sanitizeSiteContent(content: SiteContent): SiteContent {
   const fallbackReleases = siteContent.discography.releases;
   const fallbackMailTemplates = siteContent.contact.emailTemplates;
+  const featuredSingleImage: SiteContent["discography"]["featuredSingle"]["image"] =
+    siteContent.discography.featuredSingle.image || content.discography.featuredSingle.image
+      ? ({
+          ...siteContent.discography.featuredSingle.image,
+          ...content.discography.featuredSingle.image
+        } as SiteContent["discography"]["featuredSingle"]["image"])
+      : undefined;
 
   return {
     ...content,
@@ -92,7 +99,9 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
     discography: {
       ...content.discography,
       featuredSingle: {
+        ...siteContent.discography.featuredSingle,
         ...content.discography.featuredSingle,
+        ...(featuredSingleImage ? { image: featuredSingleImage } : {}),
         href: sanitizeHref(content.discography.featuredSingle.href, siteContent.discography.featuredSingle.href)
       },
       artist: {

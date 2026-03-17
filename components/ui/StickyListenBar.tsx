@@ -6,14 +6,26 @@ import Image from "next/image";
 
 type StickyListenBarProps = {
   visibleSectionIds: string[];
+  eyebrow: string;
   trackTitle: string;
   trackHref: string;
+  ctaLabel: string;
+  artworkSrc: string;
+  artworkAlt: string;
+  artworkFocusX?: number;
+  artworkFocusY?: number;
 };
 
 export function StickyListenBar({
   visibleSectionIds,
+  eyebrow,
   trackTitle,
-  trackHref
+  trackHref,
+  ctaLabel,
+  artworkSrc,
+  artworkAlt,
+  artworkFocusX = 50,
+  artworkFocusY = 50
 }: StickyListenBarProps) {
   const [isEligible, setIsEligible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -64,7 +76,7 @@ export function StickyListenBar({
             <div className="sticky-listen-vinyl-label">B</div>
           </div>
           <div className="sticky-listen-content">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#f3d7b0]">Nu luisteren</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#f3d7b0]">{eyebrow}</p>
             <p className="sticky-listen-title">{trackTitle}</p>
           </div>
         </div>
@@ -72,11 +84,12 @@ export function StickyListenBar({
         <div className="sticky-listen-right">
           <figure className="sticky-listen-cover" aria-label="Single artwork">
             <Image
-              src="/images/music/vroeger-cover.webp"
-              alt="Cover art van de single Vroeger"
+              src={artworkSrc}
+              alt={artworkAlt}
               width={148}
               height={148}
               className="h-full w-full object-cover"
+              style={{ objectPosition: `${artworkFocusX}% ${artworkFocusY}%` }}
               loading="lazy"
               sizes="148px"
               quality={76}
@@ -89,7 +102,7 @@ export function StickyListenBar({
             data-cta="listenbar_spotify_play"
             className="sticky-listen-button inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
           >
-            Speel op Spotify
+            {ctaLabel}
           </Link>
         </div>
       </aside>

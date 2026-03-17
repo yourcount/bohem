@@ -76,6 +76,10 @@ export type SiteContent = {
       href: string;
       embedUrl: string;
       ctaLabel?: string;
+      image?: ImageAsset & {
+        width: number;
+        height: number;
+      };
     };
     artistEyebrow?: string;
     artist: {

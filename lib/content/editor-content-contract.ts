@@ -75,6 +75,26 @@ function sanitizeText(value: string) {
   return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
 }
 
+function normalizeDuplicateHttpPrefixes(value: string) {
+  let href = value.trim();
+  const matches: string[] = [];
+
+  while (true) {
+    const match = href.match(/^(https?:)(\/\/)?/i);
+    if (!match) break;
+    matches.push(match[1].toLowerCase());
+    href = href.slice(match[0].length);
+    if (!/^(https?:)(\/\/)?/i.test(href)) break;
+  }
+
+  if (matches.length <= 1) {
+    return value.trim();
+  }
+
+  const finalScheme = matches[matches.length - 1];
+  return `${finalScheme}//${href.replace(/^\/+/, "")}`;
+}
+
 const OPTIONAL_EMPTY_TEXT_PATH_SUFFIXES = [".website", ".ticketsHref", ".infoHref"];
 
 function isOptionalEmptyTextPath(path: string) {
@@ -127,7 +147,8 @@ function validateAndSanitizeByTemplate(input: unknown, template: unknown, path: 
       return template;
     }
 
-    const nextValue = sanitizeText(input);
+    const fieldKey = getFieldKeyFromPath(path);
+    const nextValue = URL_FIELD_KEYS.has(fieldKey) ? normalizeDuplicateHttpPrefixes(sanitizeText(input)) : sanitizeText(input);
     const isOptionalPath = isOptionalEmptyTextPath(path);
     const isEssentialPath = isEssentialRequiredTextPath(path);
     if (!isOptionalPath && isEssentialPath && nextValue.length === 0) {
@@ -137,7 +158,6 @@ function validateAndSanitizeByTemplate(input: unknown, template: unknown, path: 
       addFieldError(errors, path, "Deze tekst is te lang.");
     }
 
-    const fieldKey = getFieldKeyFromPath(path);
     if (URL_FIELD_KEYS.has(fieldKey) && nextValue.length > 0 && !isValidEditorHref(nextValue)) {
       addFieldError(errors, path, "Gebruik een geldige link (https://..., /pad of #anker).");
     }

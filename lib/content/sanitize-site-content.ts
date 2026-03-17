@@ -10,8 +10,28 @@ function isValidAbsoluteHttpUrl(value: string) {
   }
 }
 
+function normalizeDuplicateHttpPrefixes(value: string) {
+  let href = value.trim();
+  const matches: string[] = [];
+
+  while (true) {
+    const match = href.match(/^(https?:)(\/\/)?/i);
+    if (!match) break;
+    matches.push(match[1].toLowerCase());
+    href = href.slice(match[0].length);
+    if (!/^(https?:)(\/\/)?/i.test(href)) break;
+  }
+
+  if (matches.length <= 1) {
+    return value.trim();
+  }
+
+  const finalScheme = matches[matches.length - 1];
+  return `${finalScheme}//${href.replace(/^\/+/, "")}`;
+}
+
 function isValidHref(href: string) {
-  const value = href.trim();
+  const value = normalizeDuplicateHttpPrefixes(href);
   if (!value) return false;
   if (value.startsWith("#")) return true;
   if (value.startsWith("/")) return !value.startsWith("//");
@@ -21,12 +41,13 @@ function isValidHref(href: string) {
 }
 
 function sanitizeHref(href: string, fallback: string) {
-  return isValidHref(href) ? href.trim() : fallback;
+  const normalized = normalizeDuplicateHttpPrefixes(href);
+  return isValidHref(normalized) ? normalized : fallback;
 }
 
 function sanitizeOptionalHref(href: string | undefined, fallback = "") {
   if (typeof href !== "string") return fallback;
-  const value = href.trim();
+  const value = normalizeDuplicateHttpPrefixes(href);
   if (!value) return "";
   return isValidHref(value) ? value : fallback;
 }

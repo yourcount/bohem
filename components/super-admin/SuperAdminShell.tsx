@@ -319,89 +319,6 @@ export function SuperAdminShell() {
         </section>
       ) : null}
 
-      {overview ? (
-        <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-          <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
-            <h2 className="font-display text-2xl">Frontend-impact</h2>
-            <p className="mt-1 text-sm text-[#d9c6ac]">Welke onderdelen nu zichtbaar zijn op de site en waarom.</p>
-            <ul className="mt-4 grid gap-3">
-              {overview.frontendImpact.map((item) => (
-                <li key={item.key} className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-semibold text-[var(--color-text-primary)]">{item.label}</p>
-                    <span
-                      className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] ${
-                        item.state === "visible" ? "bg-[rgba(88,171,119,0.16)] text-[#b6efb9]" : "bg-[rgba(255,180,168,0.14)] text-[#ffb4a8]"
-                      }`}
-                    >
-                      {item.state === "visible" ? "Zichtbaar" : "Verborgen"}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm text-[#d9c6ac]">{item.reason}</p>
-                </li>
-              ))}
-            </ul>
-          </article>
-
-          <div className="grid gap-6">
-            <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
-              <h2 className="font-display text-2xl">Contact & mail health</h2>
-              <p className="mt-1 text-sm text-[#d9c6ac]">Snelle check of formulierbeveiliging en mailverzending operationeel zijn geconfigureerd.</p>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
-                  <p className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Turnstile</p>
-                  <p className="mt-2 text-lg font-semibold">{overview.contactHealth.turnstile.enabled ? "Actief" : "Uit"}</p>
-                  <p className="mt-1 text-sm text-[#d9c6ac]">Site key: {formatYesNo(overview.contactHealth.turnstile.hasSiteKey)} · Secret: {formatYesNo(overview.contactHealth.turnstile.hasSecretKey)}</p>
-                </div>
-                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
-                  <p className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Mailgun</p>
-                  <p className="mt-2 text-lg font-semibold">{overview.contactHealth.mailgun.configured ? "Actief" : "Onvolledig"}</p>
-                  <p className="mt-1 text-sm text-[#d9c6ac]">Regio: {overview.contactHealth.mailgun.region} · Inbox: {overview.contactHealth.inbox}</p>
-                </div>
-              </div>
-              <ul className="mt-4 space-y-2 text-sm text-[#d9c6ac]">
-                <li>API-sleutel: {formatYesNo(overview.contactHealth.mailgun.hasApiKey)}</li>
-                <li>Domein: {formatYesNo(overview.contactHealth.mailgun.hasDomain)}</li>
-                <li>Afzenderadres: {formatYesNo(overview.contactHealth.mailgun.hasFromEmail)}</li>
-                <li>Ontvangstadres: {formatYesNo(overview.contactHealth.mailgun.hasToEmail)}</li>
-                <li>Afzendernaam: {formatYesNo(overview.contactHealth.mailgun.hasFromName)}</li>
-              </ul>
-            </article>
-
-            <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
-              <h2 className="font-display text-2xl">Configuratie-overzicht</h2>
-              <p className="mt-1 text-sm text-[#d9c6ac]">Snelle productiecheck voor URL, opslag, analytics en secrets.</p>
-              <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
-                  <dt className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Site URL</dt>
-                  <dd className="mt-2 break-all text-sm font-semibold">{overview.configurationSummary.siteUrl}</dd>
-                </div>
-                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
-                  <dt className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Opslag</dt>
-                  <dd className="mt-2 text-sm font-semibold">{overview.configurationSummary.storage}</dd>
-                </div>
-                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
-                  <dt className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Blob geconfigureerd</dt>
-                  <dd className="mt-2 text-sm font-semibold">{formatYesNo(overview.configurationSummary.blobConfigured)}</dd>
-                </div>
-                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
-                  <dt className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Auth secret aanwezig</dt>
-                  <dd className="mt-2 text-sm font-semibold">{formatYesNo(overview.configurationSummary.authSecretSet)}</dd>
-                </div>
-                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
-                  <dt className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Analytics actief</dt>
-                  <dd className="mt-2 text-sm font-semibold">{formatYesNo(overview.configurationSummary.analyticsEnabled)}</dd>
-                </div>
-                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
-                  <dt className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Runtime</dt>
-                  <dd className="mt-2 text-sm font-semibold">{formatRuntimeLabel(overview.configurationSummary.runtime)}</dd>
-                </div>
-              </dl>
-            </article>
-          </div>
-        </section>
-      ) : null}
-
       <section className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
         <h2 className="font-display text-3xl">Domeinen</h2>
         <p className="mt-1 text-sm text-[#d9c6ac]">Kies een beheerdomein. Alleen ADMIN en SUPER_ADMIN hebben toegang.</p>
@@ -424,29 +341,7 @@ export function SuperAdminShell() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.1fr_1fr]">
-        <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
-          <h2 className="font-display text-2xl">Systeemstatus</h2>
-          {health ? (
-            <ul className="mt-4 space-y-2">
-              {health.checks.map((check) => (
-                <li key={check.name} className="rounded-lg border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="font-semibold">{check.name}</p>
-                    <span className={`text-xs font-bold ${check.status === "ok" ? "text-[#b6efb9]" : "text-[#ffb4a8]"}`}>
-                      {check.status.toUpperCase()}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm text-[#d9c6ac]">{check.detail}</p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-4 text-sm text-[#d9c6ac]">Status laden...</p>
-          )}
-        </article>
-
-        <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
+      <section className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="font-display text-2xl">Recente wijzigingen</h2>
@@ -538,11 +433,114 @@ export function SuperAdminShell() {
             <p className="mt-4 text-sm text-[#d9c6ac]">Audit events laden...</p>
           )}
           {audit && filteredAuditEvents.length === 0 ? <p className="mt-4 text-sm text-[#d9c6ac]">Geen wijzigingen gevonden voor deze filters.</p> : null}
-        </article>
       </section>
 
       {overview ? (
-        <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+        <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+          <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
+            <h2 className="font-display text-2xl">Frontend-impact</h2>
+            <p className="mt-1 text-sm text-[#d9c6ac]">Welke onderdelen nu zichtbaar zijn op de site en waarom.</p>
+            <ul className="mt-4 grid gap-3">
+              {overview.frontendImpact.map((item) => (
+                <li key={item.key} className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="font-semibold text-[var(--color-text-primary)]">{item.label}</p>
+                    <span
+                      className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] ${
+                        item.state === "visible" ? "bg-[rgba(88,171,119,0.16)] text-[#b6efb9]" : "bg-[rgba(255,180,168,0.14)] text-[#ffb4a8]"
+                      }`}
+                    >
+                      {item.state === "visible" ? "Zichtbaar" : "Verborgen"}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-[#d9c6ac]">{item.reason}</p>
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          <div className="grid gap-6">
+            <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
+              <h2 className="font-display text-2xl">Contact & mail health</h2>
+              <p className="mt-1 text-sm text-[#d9c6ac]">Snelle check of formulierbeveiliging en mailverzending operationeel zijn geconfigureerd.</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
+                  <p className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Turnstile</p>
+                  <p className="mt-2 text-lg font-semibold">{overview.contactHealth.turnstile.enabled ? "Actief" : "Uit"}</p>
+                  <p className="mt-1 text-sm text-[#d9c6ac]">Site key: {formatYesNo(overview.contactHealth.turnstile.hasSiteKey)} · Secret: {formatYesNo(overview.contactHealth.turnstile.hasSecretKey)}</p>
+                </div>
+                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
+                  <p className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Mailgun</p>
+                  <p className="mt-2 text-lg font-semibold">{overview.contactHealth.mailgun.configured ? "Actief" : "Onvolledig"}</p>
+                  <p className="mt-1 text-sm text-[#d9c6ac]">Regio: {overview.contactHealth.mailgun.region} · Inbox: {overview.contactHealth.inbox}</p>
+                </div>
+              </div>
+              <ul className="mt-4 space-y-2 text-sm text-[#d9c6ac]">
+                <li>API-sleutel: {formatYesNo(overview.contactHealth.mailgun.hasApiKey)}</li>
+                <li>Domein: {formatYesNo(overview.contactHealth.mailgun.hasDomain)}</li>
+                <li>Afzenderadres: {formatYesNo(overview.contactHealth.mailgun.hasFromEmail)}</li>
+                <li>Ontvangstadres: {formatYesNo(overview.contactHealth.mailgun.hasToEmail)}</li>
+                <li>Afzendernaam: {formatYesNo(overview.contactHealth.mailgun.hasFromName)}</li>
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
+              <h2 className="font-display text-2xl">Configuratie-overzicht</h2>
+              <p className="mt-1 text-sm text-[#d9c6ac]">Snelle productiecheck voor URL, opslag, analytics en secrets.</p>
+              <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
+                  <dt className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Site URL</dt>
+                  <dd className="mt-2 break-all text-sm font-semibold">{overview.configurationSummary.siteUrl}</dd>
+                </div>
+                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
+                  <dt className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Opslag</dt>
+                  <dd className="mt-2 text-sm font-semibold">{overview.configurationSummary.storage}</dd>
+                </div>
+                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
+                  <dt className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Blob geconfigureerd</dt>
+                  <dd className="mt-2 text-sm font-semibold">{formatYesNo(overview.configurationSummary.blobConfigured)}</dd>
+                </div>
+                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
+                  <dt className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Auth secret aanwezig</dt>
+                  <dd className="mt-2 text-sm font-semibold">{formatYesNo(overview.configurationSummary.authSecretSet)}</dd>
+                </div>
+                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
+                  <dt className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Analytics actief</dt>
+                  <dd className="mt-2 text-sm font-semibold">{formatYesNo(overview.configurationSummary.analyticsEnabled)}</dd>
+                </div>
+                <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
+                  <dt className="text-xs uppercase tracking-[0.08em] text-[#d9c6ac]">Runtime</dt>
+                  <dd className="mt-2 text-sm font-semibold">{formatRuntimeLabel(overview.configurationSummary.runtime)}</dd>
+                </div>
+              </dl>
+            </article>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+        <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
+          <h2 className="font-display text-2xl">Systeemstatus</h2>
+          {health ? (
+            <ul className="mt-4 space-y-2">
+              {health.checks.map((check) => (
+                <li key={check.name} className="rounded-lg border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-semibold">{check.name}</p>
+                    <span className={`text-xs font-bold ${check.status === "ok" ? "text-[#b6efb9]" : "text-[#ffb4a8]"}`}>
+                      {check.status.toUpperCase()}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-[#d9c6ac]">{check.detail}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-4 text-sm text-[#d9c6ac]">Status laden...</p>
+          )}
+        </article>
+
+        {overview ? (
           <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
             <h2 className="font-display text-2xl">Cache-overzicht</h2>
             <p className="mt-1 text-sm text-[#d9c6ac]">Samenvatting van runtime-cache en de laatste invalidaties, zodat je sneller ziet wat live al vernieuwd is.</p>
@@ -576,7 +574,11 @@ export function SuperAdminShell() {
               )}
             </ul>
           </article>
+        ) : null}
+      </section>
 
+      {overview ? (
+        <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
           <article className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5">
             <h2 className="font-display text-2xl">Gebruik voor superadmins</h2>
             <p className="mt-1 text-sm text-[#d9c6ac]">De home van de backend is nu vooral bedoeld als operationeel overzicht. Gebruik de domeinen hieronder voor detailbeheer.</p>

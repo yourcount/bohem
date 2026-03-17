@@ -3,6 +3,7 @@ import Image from "next/image";
 import type { SiteContent } from "@/lib/types";
 import { Reveal } from "@/components/ui/Reveal";
 import { getImageObjectPosition } from "@/lib/image-focus";
+import { getExternalLinkProps } from "@/lib/ui/link-target";
 
 type MusicExperienceSectionProps = {
   musicExperience: SiteContent["musicExperience"];
@@ -32,6 +33,7 @@ export function MusicExperienceSection({ musicExperience }: MusicExperienceSecti
             {hasCta ? (
               <a
                 href={musicExperience.cta.href}
+                {...getExternalLinkProps(musicExperience.cta.href)}
                 data-cta="music_experience_bookings"
                 className="inline-block border-0 font-bold text-[#f3d7b0] underline decoration-2 underline-offset-[3px] outline-none transition-colors hover:border-0 hover:text-[#ffd8a5] focus:border-0 focus:outline-none focus-visible:border-0 focus-visible:outline-none focus-visible:ring-0"
               >

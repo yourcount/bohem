@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Reveal } from "@/components/ui/Reveal";
 import type { SiteContent } from "@/lib/types";
+import { getExternalLinkProps } from "@/lib/ui/link-target";
 
 type ShowsSectionProps = {
   shows: NonNullable<SiteContent["bookings"]["upcomingShows"]>;
@@ -68,6 +69,7 @@ export function ShowsSection({ shows, eyebrow, title, badgeLabel }: ShowsSection
                       {hasText(show.ticketsHref) ? (
                         <Link
                           href={show.ticketsHref!}
+                          {...getExternalLinkProps(show.ticketsHref)}
                           data-cta={`show_tickets_${showSlug}`}
                           className="cta-glow ticket-burst inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2.5 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
                         >
@@ -77,6 +79,7 @@ export function ShowsSection({ shows, eyebrow, title, badgeLabel }: ShowsSection
                       {hasText(show.infoHref) ? (
                         <Link
                           href={show.infoHref!}
+                          {...getExternalLinkProps(show.infoHref)}
                           data-cta={`show_info_${showSlug}`}
                           className="inline-flex w-full items-center justify-center rounded-full border border-[rgba(242,139,14,0.52)] bg-transparent px-4 py-2.5 text-sm font-bold text-[#f3d7b0] transition-colors hover:bg-[rgba(242,139,14,0.16)] hover:text-[#f8f1e5]"
                         >

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { MouseEvent } from "react";
 import { scrollToAnchor } from "@/lib/ui/anchor-scroll";
+import { getExternalLinkProps } from "@/lib/ui/link-target";
 
 type ButtonLinkProps = {
   href: string;
@@ -29,6 +30,7 @@ export function ButtonLink({ href, children, variant = "primary", dataCta }: But
   return (
     <Link
       href={href}
+      {...getExternalLinkProps(href)}
       onClick={handleClick}
       data-cta={dataCta}
       className={`cta-glow inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-bold transition-colors ${variants[variant]}`}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { getExternalLinkProps } from "@/lib/ui/link-target";
 
 type StickyListenBarProps = {
   visibleSectionIds: string[];
@@ -97,8 +98,7 @@ export function StickyListenBar({
           </figure>
           <Link
             href={trackHref}
-            target="_blank"
-            rel="noopener noreferrer"
+            {...getExternalLinkProps(trackHref)}
             data-cta="listenbar_spotify_play"
             className="sticky-listen-button inline-flex items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-4 py-2 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
           >

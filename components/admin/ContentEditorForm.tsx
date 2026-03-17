@@ -89,10 +89,12 @@ type AttentionPoint = {
   path?: string;
   ctaLabel: string;
 };
+type GuideTargetKey = "section-menu" | "mode-switcher" | "save-bar" | "search-panel";
 type GuideStep = {
   id: string;
   title: string;
   body: ReactNode;
+  targetKey: GuideTargetKey;
 };
 const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][number]["format"]> = [
   "Single",
@@ -544,6 +546,9 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
   const mediaUploadInputRef = useRef<HTMLInputElement | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDetailsElement | null>>({});
   const sectionMenuRef = useRef<HTMLDivElement | null>(null);
+  const modeSwitcherRef = useRef<HTMLDivElement | null>(null);
+  const searchPanelRef = useRef<HTMLDivElement | null>(null);
+  const saveBarRef = useRef<HTMLDivElement | null>(null);
   const releaseItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
   const showItemRefs = useRef<Record<number, HTMLLIElement | null>>({});
   const searchHighlightTimeoutRef = useRef<number | null>(null);
@@ -1546,6 +1551,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
       {
         id: "section-menu",
         title: "1. Kies eerst een onderdeel",
+        targetKey: "section-menu",
         body: (
           <>
             Gebruik het sectiemenu om snel naar een onderdeel van de site te gaan, zoals <strong>Releases</strong>,{" "}
@@ -1556,6 +1562,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
       {
         id: "edit-mode",
         title: "2. Pas tekst, links en foto's aan",
+        targetKey: "mode-switcher",
         body: (
           <>
             In <strong>Formuliermodus</strong> werk je veld voor veld. In <strong>Visuele modus</strong> klik je op het onderdeel in de
@@ -1566,6 +1573,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
       {
         id: "save-preview",
         title: "3. Sla op en controleer je wijziging",
+        targetKey: "save-bar",
         body: (
           <>
             Na je wijziging klik je op <strong>Opslaan</strong>. Gebruik daarna <strong>Voorbeeld</strong> om te controleren of de site
@@ -1576,6 +1584,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
       {
         id: "search-help",
         title: "4. Kom je iets niet meteen tegen?",
+        targetKey: "search-panel",
         body: (
           <>
             Gebruik de zoekbalk in de editor en de aandachtspunten bovenaan. Zoek gerust op gewone woorden zoals{" "}
@@ -1588,10 +1597,34 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
   );
   const activeGuideStep = guideSteps[guideStepIndex] ?? guideSteps[0];
 
+  const getGuideTargetNode = (targetKey: GuideTargetKey) => {
+    if (targetKey === "section-menu") return sectionMenuRef.current;
+    if (targetKey === "mode-switcher") return modeSwitcherRef.current;
+    if (targetKey === "search-panel") return searchPanelRef.current;
+    return saveBarRef.current;
+  };
+
+  const isGuideTargetActive = (targetKey: GuideTargetKey) => isGuideOpen && activeGuideStep?.targetKey === targetKey;
+
+  const guideTargetClass = (targetKey: GuideTargetKey) =>
+    isGuideTargetActive(targetKey)
+      ? "relative z-[60] rounded-2xl ring-2 ring-[var(--color-accent-amber)] ring-offset-4 ring-offset-[rgba(8,12,18,0.45)] shadow-[0_0_0_1px_rgba(242,139,14,0.45),0_22px_45px_rgba(0,0,0,0.4)]"
+      : "";
+
   useEffect(() => {
     const validIds = new Set(attentionPoints.map((item) => item.id));
     setDismissedAttentionPointIds((previous) => previous.filter((id) => validIds.has(id)));
   }, [attentionPoints]);
+
+  useEffect(() => {
+    if (!isGuideOpen || !activeGuideStep) return;
+    const node = getGuideTargetNode(activeGuideStep.targetKey);
+    if (!node) return;
+
+    requestAnimationFrame(() => {
+      node.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }, [activeGuideStep, isGuideOpen]);
 
   const closeGuide = () => {
     setIsGuideOpen(false);
@@ -1645,7 +1678,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
           ?
         </button>
       </div>
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <div ref={modeSwitcherRef} className={`mb-4 flex flex-wrap items-center gap-2 ${guideTargetClass("mode-switcher")}`}>
         <button
           type="button"
           onClick={() => setEditorMode("form")}
@@ -1673,8 +1706,8 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
       </div>
 
       {isGuideOpen && activeGuideStep ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.72)] p-4" role="dialog" aria-modal="true" aria-labelledby="editor-guide-title">
-          <div className="w-full max-w-2xl rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.98)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.45)] sm:p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)] p-4" role="dialog" aria-modal="true" aria-labelledby="editor-guide-title">
+          <div className="relative z-[70] w-full max-w-2xl rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.98)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.45)] sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-accent-amber)]">Eerste keer in de editor</p>
@@ -1840,7 +1873,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
         ref={sectionMenuRef}
         className={`sticky z-30 mb-6 rounded-xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.92)] shadow-[0_10px_28px_rgba(0,0,0,0.32)] backdrop-blur transition-all ${
           isSectionMenuCompact ? "top-1 p-2.5" : "top-2 p-4"
-        }`}
+        } ${guideTargetClass("section-menu")}`}
       >
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -1888,7 +1921,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
           </p>
         ) : null}
 
-        <div className={isSectionMenuCompact ? "mt-2" : "mt-4"}>
+        <div ref={searchPanelRef} className={`${isSectionMenuCompact ? "mt-2" : "mt-4"} ${guideTargetClass("search-panel")}`}>
           {!isSectionMenuCompact ? <p className="mb-2 text-xs font-semibold uppercase tracking-[0.06em] text-[#d9c6ac]">Zoek veld of inhoud</p> : null}
           <div className="relative">
             <input
@@ -2817,7 +2850,10 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
       </form>
       </div>
 
-      <div className="fixed inset-x-3 bottom-3 z-40 mx-auto w-full max-w-[1120px] rounded-xl border border-[var(--color-line-muted)] bg-[rgba(14,19,30,0.94)] p-3 shadow-[0_10px_30px_rgba(0,0,0,0.36)] backdrop-blur supports-[padding:max(0px)]:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <div
+        ref={saveBarRef}
+        className={`fixed inset-x-3 bottom-3 z-40 mx-auto w-full max-w-[1120px] rounded-xl border border-[var(--color-line-muted)] bg-[rgba(14,19,30,0.94)] p-3 shadow-[0_10px_30px_rgba(0,0,0,0.36)] backdrop-blur supports-[padding:max(0px)]:pb-[max(0.75rem,env(safe-area-inset-bottom))] ${guideTargetClass("save-bar")}`}
+      >
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="submit"

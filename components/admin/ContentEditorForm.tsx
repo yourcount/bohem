@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import Image from "next/image";
 
+import { filterFutureShows, normalizeDutchShowDateInput, parseDutchShowDate } from "@/lib/content/shows";
 import type { SiteContent } from "@/lib/types";
 
 type EditorManagedContent = Pick<
@@ -96,6 +97,7 @@ const RELEASE_FORMAT_OPTIONS: Array<SiteContent["discography"]["releases"][numbe
 ];
 const DISC_SECTION_TITLE = "Releases beheren";
 const SHOWS_SECTION_TITLE = "Volgende shows beheren";
+const FOOTER_SECTION_TITLE = "Onderaan de pagina en socials";
 const HIDDEN_EDITOR_SECTIONS = new Set(["brand"]);
 const HIDDEN_EDITOR_PATHS = new Set(["hero.eyebrow", "bookings.cta.variant"]);
 const HIDDEN_EDITOR_PATH_PREFIXES = [
@@ -109,6 +111,10 @@ const HIDDEN_EDITOR_PATH_PREFIXES = [
   "kampvuur.packages.",
   "kampvuur.packageCta."
 ];
+
+function hasText(value: string | null | undefined) {
+  return typeof value === "string" && value.trim().length > 0;
+}
 
 const sectionLabels: Record<string, string> = {
   brand: "Bovenaan de pagina",
@@ -1420,45 +1426,103 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
     focusFieldPath(sectionTitle, path);
   };
 
-  const attentionPoints: AttentionPoint[] = [
-    {
-      id: "empty-links-hide-buttons",
-      text: <>Laat je een knoplink leeg, dan wordt die knop niet op de site getoond.</>,
-      sectionTitle: SHOWS_SECTION_TITLE,
-      path: "bookings.upcomingShows.0.ticketsHref",
-      ctaLabel: "Ga naar shows en knoppen"
-    },
-    {
-      id: "empty-blocks-hide",
-      text: <>Laat je alle inhoud van een blok leeg, dan verdwijnt dat blok op de site.</>,
-      sectionTitle: "Onderaan de pagina en socials",
-      path: "footer.instagramHref",
-      ctaLabel: "Ga naar footer en socials"
-    },
-    {
-      id: "past-shows-hidden",
-      text: <>Shows met een datum in het verleden blijven in de editor staan, maar worden niet meer live getoond.</>,
-      sectionTitle: SHOWS_SECTION_TITLE,
-      path: "bookings.upcomingShows.0.date",
-      ctaLabel: "Ga naar showdatums"
-    },
-    {
-      id: "show-dates-normalized",
-      text: <>Showdatums worden bij opslaan netjes gemaakt, bijvoorbeeld <strong>17 mrt</strong> naar <strong>17 maart {new Date().getFullYear()}</strong>.</>,
-      sectionTitle: SHOWS_SECTION_TITLE,
-      path: "bookings.upcomingShows.0.date",
-      ctaLabel: "Ga naar datumveld"
-    },
-    {
-      id: "external-links-new-tab",
-      text: <>Externe links openen op de site in een nieuw tabblad. Interne links zoals <strong>#contact</strong> blijven op dezelfde pagina.</>,
-      sectionTitle: "Discografie",
-      path: "discography.featuredSingle.href",
-      ctaLabel: "Ga naar linkveld"
+  const attentionPoints = useMemo<AttentionPoint[]>(() => {
+    if (!content) return [];
+
+    const points: AttentionPoint[] = [];
+    const amsterdamYear = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Amsterdam",
+      year: "numeric"
+    }).format(new Date());
+
+    const firstShowWithoutLinks = shows.findIndex(
+      (show) =>
+        (hasText(show.date) || hasText(show.venue) || hasText(show.city)) &&
+        !hasText(show.ticketsHref) &&
+        !hasText(show.infoHref)
+    );
+    if (firstShowWithoutLinks >= 0) {
+      const show = shows[firstShowWithoutLinks];
+      points.push({
+        id: `show-without-links-${firstShowWithoutLinks}`,
+        text: (
+          <>
+            De show <strong>{show.venue || `zonder locatie ${firstShowWithoutLinks + 1}`}</strong> heeft nog geen tickets- of extra
+            infolink. Op de site verschijnen dan geen knoppen bij deze show.
+          </>
+        ),
+        sectionTitle: SHOWS_SECTION_TITLE,
+        path: `bookings.upcomingShows.${firstShowWithoutLinks}.ticketsHref`,
+        ctaLabel: "Ga naar deze show"
+      });
     }
-  ];
+
+    const firstPastShowIndex = shows.findIndex((show) => Boolean(parseDutchShowDate(show.date)) && !filterFutureShows([show]).length);
+    if (firstPastShowIndex >= 0) {
+      const show = shows[firstPastShowIndex];
+      points.push({
+        id: `past-show-${firstPastShowIndex}`,
+        text: (
+          <>
+            De show <strong>{show.venue || `op ${show.date}`}</strong> ligt in het verleden. Hij blijft in de editor staan, maar wordt
+            niet meer op de site getoond.
+          </>
+        ),
+        sectionTitle: SHOWS_SECTION_TITLE,
+        path: `bookings.upcomingShows.${firstPastShowIndex}.date`,
+        ctaLabel: "Ga naar deze show"
+      });
+    }
+
+    const firstDateNeedingCleanup = shows.findIndex((show) => {
+      if (!hasText(show.date)) return false;
+      return normalizeDutchShowDateInput(show.date) !== show.date.trim();
+    });
+    if (firstDateNeedingCleanup >= 0) {
+      const show = shows[firstDateNeedingCleanup];
+      points.push({
+        id: `show-date-cleanup-${firstDateNeedingCleanup}`,
+        text: (
+          <>
+            De datum <strong>{show.date}</strong> wordt bij opslaan automatisch netjes gemaakt, bijvoorbeeld naar{" "}
+            <strong>{normalizeDutchShowDateInput(show.date) || `17 maart ${amsterdamYear}`}</strong>.
+          </>
+        ),
+        sectionTitle: SHOWS_SECTION_TITLE,
+        path: `bookings.upcomingShows.${firstDateNeedingCleanup}.date`,
+        ctaLabel: "Ga naar datumveld"
+      });
+    }
+
+    if (!hasText(content.footer.instagramHref) && !hasText(content.footer.youtubeHref)) {
+      points.push({
+        id: "footer-socials-missing",
+        text: <>In de footer staan nu geen social links. Daardoor worden er onderaan de site geen social iconen getoond.</>,
+        sectionTitle: FOOTER_SECTION_TITLE,
+        path: "footer.instagramHref",
+        ctaLabel: "Ga naar footer en socials"
+      });
+    }
+
+    if (hasText(content.discography.featuredSingle.title) && !hasText(content.discography.featuredSingle.href)) {
+      points.push({
+        id: "featured-single-missing-link",
+        text: <>De uitgelichte single heeft wel een titel, maar nog geen link. De luisterknop in de sticky balk werkt dan niet.</>,
+        sectionTitle: "Discografie",
+        path: "discography.featuredSingle.href",
+        ctaLabel: "Ga naar sticky luisterknop"
+      });
+    }
+
+    return points;
+  }, [content, shows]);
 
   const visibleAttentionPoints = attentionPoints.filter((item) => !dismissedAttentionPointIds.includes(item.id));
+
+  useEffect(() => {
+    const validIds = new Set(attentionPoints.map((item) => item.id));
+    setDismissedAttentionPointIds((previous) => previous.filter((id) => validIds.has(id)));
+  }, [attentionPoints]);
 
   const visualSectionFields = visualSelectedSection ? groupedFieldsMap.get(visualSelectedSection) ?? [] : [];
   const visualSelectedField =
@@ -1572,6 +1636,10 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
                 </li>
               ))}
             </ul>
+          ) : attentionPoints.length === 0 ? (
+            <div className="mt-2 rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3 text-xs sm:text-sm">
+              <p>Er zijn op dit moment geen aandachtspunten op basis van de huidige inhoud.</p>
+            </div>
           ) : (
             <div className="mt-2 rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3 text-xs sm:text-sm">
               <p>Je hebt alle aandachtspunten voor jouw account verborgen.</p>

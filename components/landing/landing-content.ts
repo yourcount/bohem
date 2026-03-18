@@ -101,47 +101,25 @@ function toHighlightItems(items: LandingHighlightItem[] | string[] | undefined):
     .filter((item) => hasText(item.body));
 }
 
-function toSentenceCase(value: string) {
-  const trimmed = value.trim();
-  if (!trimmed) return "";
-  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
-}
-
-function deriveHighlightTitle(body: string, index: number) {
-  const normalized = body.trim().replace(/\s+/g, " ");
-  if (!normalized) return `Kernpunt ${String(index + 1).padStart(2, "0")}`;
-
-  const shortWords = normalized.split(" ");
-  if (shortWords.length <= 4) {
-    return toSentenceCase(normalized);
-  }
-
-  const separators = [" waar ", " die ", " met ", " voor ", " zonder ", " zodat ", " waarin "];
-  for (const separator of separators) {
-    const [candidate] = normalized.split(separator);
-    const trimmedCandidate = candidate?.trim() || "";
-    if (trimmedCandidate.split(" ").length >= 2 && trimmedCandidate.split(" ").length <= 5) {
-      return toSentenceCase(trimmedCandidate);
-    }
-  }
-
-  return toSentenceCase(shortWords.slice(0, 4).join(" "));
-}
-
-function toTitledFitItems(items: string[] | undefined): LandingHighlightItem[] {
+function toFactItems(items: string[] | undefined): LandingHighlightItem[] {
   if (!Array.isArray(items) || items.length === 0) return [];
 
   return items
-    .map((item, index) => {
-      const body = item.trim();
-      if (!body) return null;
+    .map((item) => {
+      const normalized = item.trim();
+      if (!normalized) return null;
 
-      const title = deriveHighlightTitle(body, index);
-      const hasCompactBody = body.split(" ").length <= 4;
+      const separatorIndex = normalized.indexOf(":");
+      if (separatorIndex > 0) {
+        return {
+          title: normalized.slice(0, separatorIndex).trim(),
+          body: normalized.slice(separatorIndex + 1).trim()
+        };
+      }
 
       return {
-        title,
-        body: hasCompactBody && title === toSentenceCase(body) ? "" : toSentenceCase(body)
+        title: "Kernfeit",
+        body: normalized
       };
     })
     .filter((item): item is LandingHighlightItem => Boolean(item && (hasText(item.title) || hasText(item.body))));
@@ -154,7 +132,6 @@ function limitFaq(items: Array<{ question: string; answer: string }>, fallback: 
 
 function combineSections(
   highlights: LandingHighlightItem[] | string[] | undefined,
-  fitItems: string[] | undefined,
   extraSections: LandingExtraSection[] | undefined,
   proofTitle?: string,
   fitTitle?: string
@@ -163,10 +140,6 @@ function combineSections(
 
   if (Array.isArray(highlights)) {
     items.push(...toHighlightItems(highlights));
-  }
-
-  if (Array.isArray(fitItems)) {
-    items.push(...toTitledFitItems(fitItems));
   }
 
   if (Array.isArray(extraSections)) {
@@ -322,7 +295,7 @@ export function buildMusicDuoLanding(siteContent: SiteContent): LandingRouteView
       eyebrow: content.proofTitle || "Wat je neerzet",
       title: content.positioningTitle || "Waarom dit als avond blijft hangen",
       intro: content.positioningBody || content.intro,
-      items: combineSections(content.highlights, content.fitItems, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6),
+      items: combineSections(content.highlights, undefined, content.proofTitle, content.fitTitle).slice(0, 3),
       variant: content.highlightsVariant || "split-scenarios"
     },
     socialProof: buildSocialProof(content.socialProofItems, "Wat organisatoren en bezoekers teruggeven", "Reacties"),
@@ -396,7 +369,7 @@ export function buildTheaterConcertLanding(siteContent: SiteContent): LandingRou
       eyebrow: content.proofTitle || "Programmafit",
       title: content.positioningTitle || "Waarom dit in een theaterzaal zo goed werkt",
       intro: content.positioningBody || "Een avond die dichtbij voelt, maar stevig genoeg is om een zaal te dragen.",
-      items: combineSections(content.highlights, content.fitItems, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6),
+      items: combineSections(content.highlights, undefined, content.proofTitle, content.fitTitle).slice(0, 3),
       variant: content.highlightsVariant || "editorial-list"
     },
     socialProof: buildSocialProof(content.socialProofItems, "Wat deze setting losmaakt", "Reacties uit de zaal"),
@@ -470,7 +443,7 @@ export function buildKampvuurLanding(siteContent: SiteContent): LandingRouteView
       eyebrow: content.proofTitle || "Voor teams en organisaties",
       title: content.positioningTitle || "Wat dit in een groep losmaakt",
       intro: content.positioningBody || siteContent.kampvuur.body?.[0],
-      items: combineSections(content.highlights, content.fitItems, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6),
+      items: combineSections(content.highlights, undefined, content.proofTitle, content.fitTitle).slice(0, 3),
       variant: content.highlightsVariant || "host-flow"
     },
     socialProof: buildSocialProof(content.socialProofItems, "Waarom groepen hierop reageren", "Terug uit teams"),
@@ -533,7 +506,7 @@ export function buildHuiskamerConcertLanding(siteContent: SiteContent): LandingR
       eyebrow: content.proofTitle || "Dicht op het publiek",
       title: content.positioningTitle || "Waarom dit in een kleine setting zo sterk werkt",
       intro: content.positioningBody || "De ruimte is klein, de aandacht juist groot.",
-      items: combineSections(content.highlights, content.fitItems, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6),
+      items: combineSections(content.highlights, undefined, content.proofTitle, content.fitTitle).slice(0, 3),
       variant: content.highlightsVariant || "host-flow"
     },
     socialProof: buildSocialProof(content.socialProofItems, "Wat gasten na afloop onthouden", "Reacties"),
@@ -602,7 +575,7 @@ export function buildPersLanding(siteContent: SiteContent): LandingRouteView {
       eyebrow: content.proofTitle || "Kernfeiten",
       title: content.positioningTitle || press?.title || "Bohèm in het kort",
       intro: content.positioningBody || press?.boilerplate || "Feiten, positionering en contactopties zonder omweg.",
-      items: combineSections(content.highlights, content.fitItems || facts, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6),
+      items: toFactItems(content.fitItems || facts).slice(0, 4),
       variant: content.highlightsVariant || "facts"
     },
     socialProof: buildSocialProof(content.socialProofItems, "Kernfeiten voor pers en boekers", "Context"),

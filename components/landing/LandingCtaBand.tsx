@@ -33,7 +33,7 @@ export function LandingCtaBand({ id = "contact", eyebrow, title, body, proofIntr
     <section id={id} aria-labelledby={`${id}-title`} className="section-ambient py-16">
       <div className="mx-auto w-full max-w-[1120px] px-4 sm:px-6">
         <Reveal>
-          <div className="rounded-3xl border border-[rgba(242,139,14,0.45)] bg-[linear-gradient(145deg,rgba(39,27,21,0.92)_0%,rgba(28,22,31,0.92)_100%)] p-6 shadow-[0_18px_42px_rgba(0,0,0,0.24)] md:p-8">
+          <div className="chiaroscuro-panel rounded-3xl border border-[rgba(242,139,14,0.45)] bg-[linear-gradient(145deg,rgba(39,27,21,0.92)_0%,rgba(28,22,31,0.92)_100%)] p-6 shadow-[0_18px_42px_rgba(0,0,0,0.24)] md:p-8">
             {hasText(eyebrow) ? (
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">
                 {eyebrow}
@@ -49,7 +49,7 @@ export function LandingCtaBand({ id = "contact", eyebrow, title, body, proofIntr
                 {visibleProofItems.length > 0 ? (
                   <div className={`grid gap-3 md:grid-cols-3 ${hasText(proofIntro) ? "mt-3" : ""}`.trim()}>
                     {visibleProofItems.map((item) => (
-                      <div key={item} className="subtle-lift-card rounded-xl border border-[rgba(243,215,176,0.12)] bg-[rgba(9,14,24,0.18)] px-3 py-3 text-sm leading-6 text-[#ead7bc]">
+                      <div key={item} className="subtle-lift-card chiaroscuro-panel rounded-xl border border-[rgba(243,215,176,0.12)] bg-[rgba(9,14,24,0.18)] px-3 py-3 text-sm leading-6 text-[#ead7bc]">
                         {item}
                       </div>
                     ))}

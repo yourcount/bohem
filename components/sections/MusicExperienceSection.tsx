@@ -21,7 +21,7 @@ export function MusicExperienceSection({ musicExperience }: MusicExperienceSecti
     <section
       id="muziek"
       aria-labelledby="muziek-title"
-      className="section-ambient section-ambient-experience bg-[linear-gradient(180deg,#2a2537_0%,#2b2434_56%,#2b2230_100%)] py-16"
+      className="section-ambient section-ambient-experience section-contrast-open bg-[linear-gradient(180deg,#2a2537_0%,#2b2434_56%,#2b2230_100%)] py-16"
     >
       <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-4 sm:px-6 md:grid-cols-[1.15fr_1fr]">
         <Reveal>
@@ -44,7 +44,7 @@ export function MusicExperienceSection({ musicExperience }: MusicExperienceSecti
         </Reveal>
         {hasImage ? (
           <Reveal delayMs={140}>
-            <figure className="overflow-hidden rounded-2xl border border-[var(--color-line-muted)]">
+            <figure className="chiaroscuro-frame overflow-hidden rounded-2xl border border-[var(--color-line-muted)]">
               <Image
                 src={musicExperience.image.src}
                 alt={musicExperience.image.alt}

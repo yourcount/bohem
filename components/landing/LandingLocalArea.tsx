@@ -32,7 +32,7 @@ export function LandingLocalArea({ id = "regio", title, intro, cities = [], proo
     <section id={id} aria-labelledby={`${id}-title`} className="section-ambient py-16">
       <div className="mx-auto w-full max-w-[1120px] px-4 sm:px-6">
         <Reveal>
-          <div className="rounded-3xl border border-[rgba(67,135,133,0.45)] bg-[linear-gradient(155deg,rgba(17,31,45,0.92)_0%,rgba(27,24,34,0.92)_100%)] p-6 shadow-[0_18px_42px_rgba(0,0,0,0.22)] md:p-8">
+          <div className="chiaroscuro-panel rounded-3xl border border-[rgba(67,135,133,0.45)] bg-[linear-gradient(155deg,rgba(17,31,45,0.92)_0%,rgba(27,24,34,0.92)_100%)] p-6 shadow-[0_18px_42px_rgba(0,0,0,0.22)] md:p-8">
             {hasText(title) ? (
               <h2 id={`${id}-title`} className="font-display text-3xl text-[#f8f1e5] sm:text-4xl">
                 {title}
@@ -58,7 +58,7 @@ export function LandingLocalArea({ id = "regio", title, intro, cities = [], proo
                 {hasText(proofTitle) ? <h3 className="font-display text-2xl text-[#f8f1e5]">{proofTitle}</h3> : null}
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
                   {visibleProof.map((item) => (
-                    <article key={item} className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] p-4 text-sm text-[#e7d7c1]">
+                    <article key={item} className="subtle-lift-card chiaroscuro-panel rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] p-4 text-sm text-[#e7d7c1]">
                       {item}
                     </article>
                   ))}

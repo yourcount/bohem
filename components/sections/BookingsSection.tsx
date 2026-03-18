@@ -49,7 +49,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
     <section
       id="boekingen"
       aria-labelledby="boekingen-title"
-      className="section-ambient section-ambient-bookings bg-[linear-gradient(180deg,#2a1d1b_0%,#271b19_56%,#231816_100%)] py-16"
+      className="section-ambient section-ambient-bookings section-contrast-deep bg-[linear-gradient(180deg,#2a1d1b_0%,#271b19_56%,#231816_100%)] py-16"
     >
       <div className={`mx-auto grid w-full max-w-[1120px] gap-8 px-4 sm:px-6 ${gridLayoutClass}`.trim()}>
         {pressQuotes.length > 0 ? (
@@ -75,7 +75,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
           <Reveal className="md:col-span-2">
             <section
               aria-label="Social proof"
-              className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] p-6"
+              className="chiaroscuro-panel rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] p-6"
             >
               {hasText(bookings.socialProofTitle) ? (
                 <h3 className="mb-4 font-display text-3xl text-[var(--color-text-primary)]">{bookings.socialProofTitle}</h3>
@@ -84,7 +84,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                 {socialProof.map((item, index) => (
                   <blockquote
                     key={`${item.quote || item.source || "proof"}-${index}`}
-                    className="flex h-full flex-col rounded-xl border border-[rgba(255,255,255,0.12)] bg-[rgba(15,24,37,0.35)] p-4"
+                    className="subtle-lift-card chiaroscuro-panel flex h-full flex-col rounded-xl border border-[rgba(255,255,255,0.12)] bg-[rgba(15,24,37,0.35)] p-4"
                   >
                     {hasText(item.quote) ? <p className="mb-3 text-sm text-[var(--color-text-primary)]">“{item.quote}”</p> : null}
                     {hasText(item.source) ? <footer className="mt-auto text-left text-xs text-[#d6be9f]">{item.source}</footer> : null}
@@ -129,7 +129,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                 </div>
               ) : null}
             {bookabilityItems.length > 0 ? (
-              <article className="mt-5 flex flex-col justify-center rounded-2xl border border-[rgba(242,139,14,0.42)] bg-[rgba(242,139,14,0.08)] p-5 md:flex-1">
+              <article className="subtle-lift-card chiaroscuro-panel mt-5 flex flex-col justify-center rounded-2xl border border-[rgba(242,139,14,0.42)] bg-[rgba(242,139,14,0.08)] p-5 md:flex-1">
                 <h3 className="mb-3 font-display text-2xl text-[var(--color-text-primary)]">{bookings.quickFactsTitle ?? "In 20 sec geregeld"}</h3>
                 <ul className="space-y-2 text-sm text-[#f1deca]">
                   {bookabilityItems.slice(0, 4).map((item) => (
@@ -139,7 +139,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
               </article>
             ) : null}
             {fitItems.length > 0 ? (
-              <article className="mt-5 flex flex-col justify-center rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] p-5 md:flex-1">
+              <article className="subtle-lift-card chiaroscuro-panel mt-5 flex flex-col justify-center rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] p-5 md:flex-1">
                 {hasText(bookings.fitTitle) ? <h3 className="mb-3 font-display text-2xl text-[var(--color-text-primary)]">{bookings.fitTitle}</h3> : null}
                 <ul className="space-y-2 text-[#ead7bc]">
                   {fitItems.map((item) => (
@@ -157,7 +157,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
           <Reveal delayMs={140} className="h-full">
             <aside
               aria-label="Boekingsinformatie"
-              className="booking-info-panel h-full rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(145deg,rgba(35,24,22,0.82)_0%,rgba(28,20,24,0.84)_100%)] p-6 text-[var(--color-text-primary)] shadow-[0_12px_28px_rgba(0,0,0,0.24)]"
+              className="booking-info-panel chiaroscuro-panel h-full rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(145deg,rgba(35,24,22,0.82)_0%,rgba(28,20,24,0.84)_100%)] p-6 text-[var(--color-text-primary)] shadow-[0_12px_28px_rgba(0,0,0,0.24)]"
             >
             {hasText(bookings.infoTitle) ? <h3 className="mb-3 font-display text-2xl sm:text-3xl">{bookings.infoTitle}</h3> : null}
             {infoItems.length > 0 ? (
@@ -199,7 +199,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
           <Reveal className="md:col-span-2">
             <section
               aria-label="Coverkoffer"
-              className="max-h-[30rem] overflow-hidden rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(145deg,rgba(38,24,20,0.82)_0%,rgba(25,20,27,0.86)_100%)] shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
+              className="chiaroscuro-panel max-h-[30rem] overflow-hidden rounded-2xl border border-[var(--color-line-muted)] bg-[linear-gradient(145deg,rgba(38,24,20,0.82)_0%,rgba(25,20,27,0.86)_100%)] shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
             >
               <div className="grid h-full gap-0 md:grid-cols-[1fr_1fr]">
                 <div className="flex items-center overflow-auto p-6 sm:p-8">
@@ -216,7 +216,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                   </div>
                 </div>
                 {bookings.coverKoffer.image && hasText(bookings.coverKoffer.image.src) ? (
-                  <figure className="h-full min-h-0">
+                  <figure className="chiaroscuro-frame h-full min-h-0">
                     <Image
                       src={bookings.coverKoffer.image.src}
                       alt={bookings.coverKoffer.image.alt}
@@ -239,7 +239,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
           <Reveal className="md:col-span-2">
             <section
               aria-labelledby="boekingen-faq-title"
-              className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] p-6"
+              className="chiaroscuro-panel rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] p-6"
             >
               {hasText(bookings.faqTitle) ? (
                 <h3 id="boekingen-faq-title" className="mb-5 font-display text-3xl text-[var(--color-text-primary)]">
@@ -251,7 +251,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                   {faqItems.map((item, index) => (
                     <article
                       key={`${item.question}-${index}`}
-                      className="rounded-xl border border-[rgba(255,255,255,0.12)] bg-[rgba(15,24,37,0.35)] p-5"
+                      className="subtle-lift-card chiaroscuro-panel rounded-xl border border-[rgba(255,255,255,0.12)] bg-[rgba(15,24,37,0.35)] p-5"
                     >
                       <h4 className="mb-2 font-display text-xl text-[var(--color-text-primary)]">{item.question}</h4>
                       <p className="text-sm text-[#ead7bc]">{item.answer}</p>
@@ -269,7 +269,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
               <section
                 id="pers"
                 aria-labelledby="pers-title"
-                className="rounded-2xl border border-[rgba(67,135,133,0.45)] bg-[linear-gradient(150deg,rgba(20,30,42,0.88)_0%,rgba(22,30,38,0.9)_100%)] p-6 shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
+                className="chiaroscuro-panel rounded-2xl border border-[rgba(67,135,133,0.45)] bg-[linear-gradient(150deg,rgba(20,30,42,0.88)_0%,rgba(22,30,38,0.9)_100%)] p-6 shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
               >
                 {hasText(bookings.press.title) ? (
                   <h2 id="pers-title" className="mb-3 font-display text-3xl text-[var(--color-text-primary)]">

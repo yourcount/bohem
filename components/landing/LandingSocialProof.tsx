@@ -42,7 +42,7 @@ export function LandingSocialProof({ id = "reacties", eyebrow, title, items }: L
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {visibleItems.map((item, index) => (
             <Reveal key={`${item.quote}-${index}`} delayMs={index * 80}>
-              <article className="flex h-full flex-col rounded-2xl border border-[rgba(242,139,14,0.32)] bg-[rgba(36,24,22,0.62)] p-5 text-sm text-[#e7d7c1] shadow-[0_12px_30px_rgba(0,0,0,0.18)]">
+              <article className="subtle-lift-card chiaroscuro-panel flex h-full flex-col rounded-2xl border border-[rgba(242,139,14,0.32)] bg-[rgba(36,24,22,0.62)] p-5 text-sm text-[#e7d7c1] shadow-[0_12px_30px_rgba(0,0,0,0.18)]">
                 <p className="text-base leading-7 text-[#f8f1e5]">“{item.quote}”</p>
                 {(hasText(item.source) || hasText(item.context)) ? (
                   <div className="mt-4 border-t border-[rgba(242,139,14,0.14)] pt-4 text-xs uppercase tracking-[0.08em] text-[#f3d7b0]">

@@ -128,7 +128,7 @@ export function LandingHero({ id = "intro", eyebrow, audienceLabel, title, intro
 
         {hasImage ? (
           <Reveal delayMs={120} className="lg:justify-self-end">
-            <figure className="overflow-hidden rounded-3xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.04)] shadow-[0_18px_36px_rgba(0,0,0,0.28)]">
+            <figure className="chiaroscuro-frame overflow-hidden rounded-3xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.04)] shadow-[0_18px_36px_rgba(0,0,0,0.28)]">
               <Image
                 src={image!.src}
                 alt={image!.alt}

@@ -25,7 +25,7 @@ export function AboutSection({ about }: AboutSectionProps) {
     <section
       id="bio"
       aria-labelledby="over-title"
-      className="section-ambient section-ambient-bio bg-[linear-gradient(180deg,#1a2431_0%,#1f2938_46%,#242b3a_100%)] py-16"
+      className="section-ambient section-ambient-bio section-contrast-open bg-[linear-gradient(180deg,#1a2431_0%,#1f2938_46%,#242b3a_100%)] py-16"
     >
       <div className="mx-auto w-full max-w-[1120px] px-4 sm:px-6">
         <Reveal>
@@ -39,7 +39,7 @@ export function AboutSection({ about }: AboutSectionProps) {
           <div className="bio-photo-slider mb-6 md:grid md:grid-cols-2" aria-label="Fotomomenten">
             {photoMoments.map((photo, index) => (
               <Reveal key={photo.src} delayMs={index * 120} className="bio-photo-item">
-                <figure className="bio-photo-slide overflow-hidden border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.24)]">
+                <figure className="bio-photo-slide chiaroscuro-frame overflow-hidden border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.24)]">
                   <Image
                     src={photo.src}
                     alt={photo.alt}
@@ -60,7 +60,7 @@ export function AboutSection({ about }: AboutSectionProps) {
         <div className="grid gap-6 md:grid-cols-2" aria-label="Bio's">
           {bios.map((bio, index) => (
             <Reveal key={`${bio.name || "bio"}-${index}`} delayMs={index * 120} className="h-full">
-              <article className="flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
+              <article className="subtle-lift-card chiaroscuro-panel flex h-full flex-col rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.06)] p-6">
                 {hasText(bio.name) ? <h3 className="mb-3 font-display text-2xl sm:text-3xl">{bio.name}</h3> : null}
                 {hasText(bio.text) ? <p className="mb-0">{bio.text}</p> : null}
                 {hasText(bio.website) ? (
@@ -82,7 +82,7 @@ export function AboutSection({ about }: AboutSectionProps) {
 
         {lineupItems.length > 0 ? (
           <Reveal delayMs={220}>
-            <article className="mt-6 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.04)] p-6">
+            <article className="subtle-lift-card chiaroscuro-panel mt-6 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.04)] p-6">
               {hasText(about.lineupTitle) ? <h3 className="mb-3 font-display text-2xl sm:text-3xl">{about.lineupTitle}</h3> : null}
               <ul className="space-y-2">
                 {lineupItems.map((item) => (

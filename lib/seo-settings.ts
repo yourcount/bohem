@@ -22,6 +22,16 @@ export type SeoSettings = {
   home_json_ld_custom: string;
 };
 
+export type ResolvedSeoInput = {
+  title: string;
+  description: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  canonical: string;
+  robotsIndex?: boolean;
+  robotsFollow?: boolean;
+};
+
 const ALLOWED_KEYS = [
   "global_title_template",
   "global_meta_template",
@@ -262,20 +272,18 @@ const getSeoSettingsCached = unstable_cache(
 );
 
 export function resolveHomeSeo(content: SiteContent, settings: SeoSettings | null) {
-  const baseTitle = settings?.home_title || content.meta.title;
-  const baseDescription = settings?.home_description || content.meta.description;
-  const baseOgTitle = settings?.home_og_title || content.meta.ogTitle || baseTitle;
-  const baseOgDescription = settings?.home_og_description || content.meta.ogDescription || baseDescription;
-
-  return {
-    title: applyTemplate(baseTitle, settings?.global_title_template || "%s"),
-    description: applyTemplate(baseDescription, settings?.global_meta_template || "%s"),
-    ogTitle: applyTemplate(baseOgTitle, settings?.global_title_template || "%s"),
-    ogDescription: applyTemplate(baseOgDescription, settings?.global_meta_template || "%s"),
-    canonical: settings?.home_canonical || content.meta.canonical || "/",
-    robotsIndex: settings?.home_robots_index ?? true,
-    robotsFollow: settings?.home_robots_follow ?? true
-  };
+  return resolveSeoInput(
+    {
+      title: settings?.home_title || content.meta.title,
+      description: settings?.home_description || content.meta.description,
+      ogTitle: settings?.home_og_title || content.meta.ogTitle || content.meta.title,
+      ogDescription: settings?.home_og_description || content.meta.ogDescription || content.meta.description,
+      canonical: settings?.home_canonical || content.meta.canonical || "/",
+      robotsIndex: settings?.home_robots_index ?? true,
+      robotsFollow: settings?.home_robots_follow ?? true
+    },
+    settings
+  );
 }
 
 export function resolveHomeJsonLd(content: SiteContent, settings: SeoSettings | null) {
@@ -289,4 +297,19 @@ export function resolveHomeJsonLd(content: SiteContent, settings: SeoSettings | 
   }
 
   return parsed.parsed;
+}
+
+export function resolveSeoInput(input: ResolvedSeoInput, settings: SeoSettings | null) {
+  const baseOgTitle = input.ogTitle || input.title;
+  const baseOgDescription = input.ogDescription || input.description;
+
+  return {
+    title: applyTemplate(input.title, settings?.global_title_template || "%s"),
+    description: applyTemplate(input.description, settings?.global_meta_template || "%s"),
+    ogTitle: applyTemplate(baseOgTitle, settings?.global_title_template || "%s"),
+    ogDescription: applyTemplate(baseOgDescription, settings?.global_meta_template || "%s"),
+    canonical: input.canonical,
+    robotsIndex: input.robotsIndex ?? true,
+    robotsFollow: input.robotsFollow ?? true
+  };
 }

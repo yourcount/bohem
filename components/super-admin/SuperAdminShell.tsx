@@ -88,6 +88,13 @@ const domains = [
     href: "/admin/backend/seo"
   },
   {
+    key: "landings",
+    title: "SEO landings",
+    description: "Muziekduo boeken, theaterconcert boeken, Kampvuurklanken, huiskamerconcert boeken en pers.",
+    status: "Nieuw",
+    href: "/admin/backend/landings"
+  },
+  {
     key: "users",
     title: "Gebruikers",
     description: "Rollen, accountstatus, reset flow en sessiebeheer.",
@@ -123,6 +130,8 @@ function formatAuditAction(action: string) {
   switch (action) {
     case "CONTENT_EDITOR_UPDATED":
       return "Website-inhoud opgeslagen";
+    case "LANDING_PAGES_UPDATED":
+      return "SEO-landingspagina's opgeslagen";
     case "SYSTEM_TECHNICAL_SETTINGS_UPDATED":
       return "Technische instellingen opgeslagen";
     case "SYSTEM_FEATURE_FLAGS_UPDATED":
@@ -141,6 +150,9 @@ function formatAuditAction(action: string) {
 function formatAuditTarget(targetType: string, targetId: string) {
   if (targetType === "content" && targetId === "site_content_full_v1_editor") {
     return "Website-inhoud";
+  }
+  if (targetType === "content" && targetId === "site_content_full_v1_landings") {
+    return "SEO-landingspagina's";
   }
   if (targetType === "system" && targetId === "technical_settings_v1") {
     return "Technische instellingen";

@@ -116,6 +116,20 @@ function sanitizeOptionalHref(href: string | undefined, fallback = "") {
   return isValidHref(value) ? value : fallback;
 }
 
+function sanitizeLandingCta(
+  value: { label?: string; href?: string; variant?: "primary" | "secondary" } | undefined,
+  fallback: { label?: string; href?: string; variant?: "primary" | "secondary" } | undefined
+) {
+  const fallbackLabel = fallback?.label?.trim() || "";
+  const fallbackHref = fallback?.href?.trim() || "/#contact";
+
+  return {
+    label: value?.label?.trim() || fallbackLabel,
+    href: sanitizeHref(value?.href ?? fallbackHref, fallbackHref),
+    variant: value?.variant ?? fallback?.variant ?? "primary"
+  };
+}
+
 export function sanitizeNavigationItems(items: SiteContent["navigation"]): SiteContent["navigation"] {
   return items.map((item, index) => {
     const fallback = siteContent.navigation[index]?.href ?? "#contact";
@@ -268,6 +282,53 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
             }
           }
         : {})
+    },
+    landingPages: {
+      musicDuo: {
+        ...siteContent.landingPages.musicDuo,
+        ...content.landingPages?.musicDuo,
+        cta: sanitizeLandingCta(content.landingPages?.musicDuo?.cta, siteContent.landingPages.musicDuo.cta),
+        faqItems: (content.landingPages?.musicDuo?.faqItems ?? siteContent.landingPages.musicDuo.faqItems ?? []).map((item, index) => ({
+          question: item.question?.trim() || siteContent.landingPages.musicDuo.faqItems?.[index]?.question || "",
+          answer: item.answer?.trim() || siteContent.landingPages.musicDuo.faqItems?.[index]?.answer || ""
+        }))
+      },
+      theaterConcert: {
+        ...siteContent.landingPages.theaterConcert,
+        ...content.landingPages?.theaterConcert,
+        cta: sanitizeLandingCta(content.landingPages?.theaterConcert?.cta, siteContent.landingPages.theaterConcert.cta),
+        faqItems: (content.landingPages?.theaterConcert?.faqItems ?? siteContent.landingPages.theaterConcert.faqItems ?? []).map((item, index) => ({
+          question: item.question?.trim() || siteContent.landingPages.theaterConcert.faqItems?.[index]?.question || "",
+          answer: item.answer?.trim() || siteContent.landingPages.theaterConcert.faqItems?.[index]?.answer || ""
+        }))
+      },
+      kampvuur: {
+        ...siteContent.landingPages.kampvuur,
+        ...content.landingPages?.kampvuur,
+        cta: sanitizeLandingCta(content.landingPages?.kampvuur?.cta, siteContent.landingPages.kampvuur.cta),
+        faqItems: (content.landingPages?.kampvuur?.faqItems ?? siteContent.landingPages.kampvuur.faqItems ?? []).map((item, index) => ({
+          question: item.question?.trim() || siteContent.landingPages.kampvuur.faqItems?.[index]?.question || "",
+          answer: item.answer?.trim() || siteContent.landingPages.kampvuur.faqItems?.[index]?.answer || ""
+        }))
+      },
+      huiskamerconcert: {
+        ...siteContent.landingPages.huiskamerconcert,
+        ...content.landingPages?.huiskamerconcert,
+        cta: sanitizeLandingCta(content.landingPages?.huiskamerconcert?.cta, siteContent.landingPages.huiskamerconcert.cta),
+        faqItems: (content.landingPages?.huiskamerconcert?.faqItems ?? siteContent.landingPages.huiskamerconcert.faqItems ?? []).map((item, index) => ({
+          question: item.question?.trim() || siteContent.landingPages.huiskamerconcert.faqItems?.[index]?.question || "",
+          answer: item.answer?.trim() || siteContent.landingPages.huiskamerconcert.faqItems?.[index]?.answer || ""
+        }))
+      },
+      press: {
+        ...siteContent.landingPages.press,
+        ...content.landingPages?.press,
+        cta: sanitizeLandingCta(content.landingPages?.press?.cta, siteContent.landingPages.press.cta),
+        faqItems: (content.landingPages?.press?.faqItems ?? siteContent.landingPages.press.faqItems ?? []).map((item, index) => ({
+          question: item.question?.trim() || siteContent.landingPages.press.faqItems?.[index]?.question || "",
+          answer: item.answer?.trim() || siteContent.landingPages.press.faqItems?.[index]?.answer || ""
+        }))
+      }
     },
     contact: {
       ...siteContent.contact,

@@ -18,6 +18,45 @@ export type ImageAsset = {
   focusY?: number;
 };
 
+export type LandingFaqItem = {
+  question: string;
+  answer: string;
+};
+
+export type LandingHighlightItem = {
+  title: string;
+  body: string;
+};
+
+export type LandingExtraSection = {
+  title: string;
+  body: string;
+};
+
+export type LandingPageContent = {
+  heroLabel?: string;
+  title: string;
+  intro: string;
+  seoTitle: string;
+  seoDescription: string;
+  ogTitle: string;
+  ogDescription: string;
+  cta?: Cta;
+  image?: ImageAsset & {
+    width: number;
+    height: number;
+  };
+  positioningTitle?: string;
+  positioningBody?: string;
+  fitTitle?: string;
+  fitItems?: string[];
+  highlights?: LandingHighlightItem[];
+  extraSections?: LandingExtraSection[];
+  faqTitle?: string;
+  faqItems?: LandingFaqItem[];
+  proofTitle?: string;
+};
+
 export type SiteContent = {
   meta: {
     title: string;
@@ -204,6 +243,13 @@ export type SiteContent = {
       contactEmail: string;
       contactPhone: string;
     };
+  };
+  landingPages: {
+    musicDuo: LandingPageContent;
+    theaterConcert: LandingPageContent;
+    kampvuur: LandingPageContent;
+    huiskamerconcert: LandingPageContent;
+    press: LandingPageContent;
   };
   contact: {
     title: string;

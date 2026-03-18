@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 import type { NavItem } from "@/lib/types";
 import { scrollToAnchor } from "@/lib/ui/anchor-scroll";
@@ -10,12 +11,14 @@ import { scrollToAnchor } from "@/lib/ui/anchor-scroll";
 type SiteHeaderProps = {
   brandName: string;
   navigation: NavItem[];
+  homeHref?: string;
 };
 
-export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
+export function SiteHeader({ brandName, navigation, homeHref = "#" }: SiteHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeHref, setActiveHref] = useState<string>("");
   const pendingHrefRef = useRef<string | null>(null);
+  const pathname = usePathname();
 
   const sectionIds = useMemo(
     () =>
@@ -29,6 +32,10 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
   const handleCloseMenu = () => setIsMenuOpen(false);
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
   const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!homeHref.startsWith("#")) {
+      handleCloseMenu();
+      return;
+    }
     event.preventDefault();
     pendingHrefRef.current = null;
     setActiveHref("");
@@ -91,6 +98,9 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
       if (window.location.hash) {
         pendingHrefRef.current = null;
         setActiveHref(window.location.hash);
+      } else if (pathname !== "/") {
+        const currentRoute = navigation.find((item) => !item.href.startsWith("#") && item.href === pathname);
+        setActiveHref(currentRoute?.href ?? "");
       }
     };
 
@@ -104,12 +114,12 @@ export function SiteHeader({ brandName, navigation }: SiteHeaderProps) {
       window.removeEventListener("resize", updateActiveSection);
       window.removeEventListener("hashchange", updateFromHash);
     };
-  }, [navigation, sectionIds]);
+  }, [navigation, pathname, sectionIds]);
 
   return (
     <header id="site-header" className="sticky top-0 z-30 border-b border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.82)] backdrop-blur">
       <div className="mx-auto flex min-h-16 w-full max-w-[1120px] items-center justify-between gap-3 px-4 sm:gap-4 sm:px-6">
-        <Link href="#" onClick={handleLogoClick} className="inline-flex items-center">
+        <Link href={homeHref} onClick={handleLogoClick} className="inline-flex items-center">
           <Image
             src="/brand/logos/bohem-logo-white-moon-color.webp"
             alt={brandName}

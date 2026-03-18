@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { AboutSection } from "@/components/sections/AboutSection";
 import { BookingsSection } from "@/components/sections/BookingsSection";
 import { ContactSection } from "@/components/sections/ContactSection";
@@ -15,10 +17,67 @@ import { StickyListenBar } from "@/components/ui/StickyListenBar";
 import { ensureShowsNavigationItem } from "@/lib/content/navigation";
 import { getLiveSiteContent } from "@/lib/content/live-content";
 import { filterFutureShows } from "@/lib/content/shows";
-import { getSeoSettingsSafe, resolveHomeJsonLd } from "@/lib/seo-settings";
+import { getSeoSettingsSafe, resolveHomeJsonLd, resolveHomeSeo } from "@/lib/seo-settings";
 import { getFeatureFlagsSafe } from "@/lib/system/feature-flags";
 
 export const revalidate = 90;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const siteContent = await getLiveSiteContent();
+  const seoSettings = await getSeoSettingsSafe();
+  const resolvedSeo = resolveHomeSeo(siteContent, seoSettings);
+
+  return {
+    title: resolvedSeo.title,
+    description: resolvedSeo.description,
+    keywords: [
+      "Bohèm",
+      "muziekduo boeken",
+      "live muziek boekingen",
+      "theater muziekduo",
+      "Nederlandstalige muziek",
+      "Kampvuurklanken",
+      "Arthur Bont",
+      "Bettina Kraaieveld"
+    ],
+    alternates: {
+      canonical: resolvedSeo.canonical
+    },
+    robots: {
+      index: resolvedSeo.robotsIndex,
+      follow: resolvedSeo.robotsFollow,
+      googleBot: {
+        index: resolvedSeo.robotsIndex,
+        follow: resolvedSeo.robotsFollow,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1
+      }
+    },
+    openGraph: {
+      type: "website",
+      locale: "nl_NL",
+      url: resolvedSeo.canonical,
+      siteName: "Bohèm",
+      title: resolvedSeo.ogTitle,
+      description: resolvedSeo.ogDescription,
+      images: [
+        {
+          url: siteContent.hero.image.src,
+          width: 1536,
+          height: 864,
+          alt: siteContent.hero.image.alt
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: resolvedSeo.ogTitle,
+      description: resolvedSeo.ogDescription,
+      images: [siteContent.hero.image.src]
+    }
+  };
+}
 
 const NON_CONTENT_KEYS = new Set(["href", "variant", "id", "type", "autoComplete", "required", "width", "height", "focusX", "focusY"]);
 function hasText(value: string | undefined | null) {

@@ -457,8 +457,8 @@
       "localLinkLabel": "Vraag een regionale boeking aan",
       "localLinkHref": "/#contact",
       "cta": {
-        "label": "Leg je avond aan ons voor",
-        "href": "#contact",
+        "label": "Luister eerst naar Bohèm",
+        "href": "https://open.spotify.com/track/2NmA4g3ODyXuhHe6e4L7Q1",
         "variant": "primary"
       },
       "extraSections": [
@@ -471,7 +471,7 @@
       "practicalInfoItems": [
         "De opstelling blijft compact en is eenvoudig af te stemmen op zaal of locatie.",
         "We denken mee over lengte, opbouw en hoe Bohèm in het verloop van de avond past.",
-        "Deze vorm werkt juist sterk als publiek mag luisteren in plaats van alleen consumeren."
+        "Je hoeft dus niet eerst alles vast te leggen voordat we kunnen meedenken."
       ],
       "socialProofItems": [
         {
@@ -565,8 +565,8 @@
       "localLinkLabel": "Bespreek een theateravond",
       "localLinkHref": "/#contact",
       "cta": {
-        "label": "Bespreek je programma",
-        "href": "#contact",
+        "label": "Bekijk of dit past",
+        "href": "#highlights",
         "variant": "primary"
       },
       "extraSections": [
@@ -579,7 +579,7 @@
       "practicalInfoItems": [
         "We stemmen speelduur, opbouw en toon af op het type zaal en publiek.",
         "De live-vorm blijft compact, waardoor Bohèm goed past in kleine en middelgrote theaterzalen.",
-        "Ook als onderdeel van een culturele avond of seizoensopening kan de set gericht worden opgebouwd."
+        "Ook in een bestaand avondprogramma kunnen we gericht meedenken over plek, duur en opbouw."
       ],
       "socialProofItems": [
         {
@@ -755,8 +755,8 @@
       "localLinkLabel": "Vraag een huiskamerconcert aan",
       "localLinkHref": "/#contact",
       "cta": {
-        "label": "Leg je avond aan ons voor",
-        "href": "#contact",
+        "label": "Bekijk de mogelijkheden",
+        "href": "#highlights",
         "variant": "primary"
       },
       "extraSections": [
@@ -769,7 +769,7 @@
       "practicalInfoItems": [
         "De opstelling blijft compact en is meestal eenvoudig af te stemmen op de ruimte.",
         "We denken mee over speelduur, opstelling en hoe het publiek het best zit of luistert.",
-        "Ook als je nog twijfelt over de setting of grootte van de ruimte kunnen we gericht adviseren."
+        "Stuur gerust eerst een foto of korte beschrijving van de ruimte als je wilt toetsen of het past."
       ],
       "socialProofItems": [
         {
@@ -799,7 +799,7 @@
       "ogTitle": "Pers & media | Bohèm",
       "ogDescription": "Alle kernfeiten, boekingsinfo en persmateriaal van Bohèm compact op één pagina.",
       "heroLabel": "Persinformatie, perskit en contact",
-      "positioningTitle": "Bohèm in het kort",
+      "positioningTitle": "Boilerplate en kernfeiten",
       "positioningBody": "BOHÈM maakt melodische, verhalende songs in het Nederlands en Engels over het leven in al zijn facetten. In hun live-concept Reizigers combineren Arthur Bont en Bettina Kraaieveld persoonlijke liedjes met een warme live-presentatie die raakt en verbindt.",
       "fitTitle": "Snelle kernfeiten",
       "fitItems": [
@@ -810,16 +810,16 @@
       ],
       "highlights": [
         {
-          "title": "Direct bruikbaar",
+          "title": "Korte omschrijving klaar voor gebruik",
           "body": "De korte omschrijving, kernfeiten en contactopties staan hier direct bij elkaar voor pers, programmeurs en venues."
         },
         {
           "title": "Snel door te zetten",
-          "body": "Gebruik deze pagina om een aankondiging, korte introductie of persaanvraag zonder extra zoekwerk rond te maken."
+          "body": "Gebruik deze pagina voor een aankondiging, korte introductie, programmatekst of gerichte persaanvraag."
         },
         {
-          "title": "Perskit meteen beschikbaar",
-          "body": "Beeldmateriaal en basisinformatie zijn direct te downloaden of op te vragen voor verdere afstemming."
+          "title": "Beeld en basisinformatie direct beschikbaar",
+          "body": "De perskit, kernfeiten en contactopties zijn meteen beschikbaar voor publicatie of verdere afstemming."
         }
       ],
       "faqTitle": "Veelgestelde vragen voor pers en programmeurs",
@@ -850,9 +850,9 @@
       ],
       "audienceLabel": "Voor redacties, programmeurs en venues die snel bruikbare informatie nodig hebben.",
       "practicalInfoItems": [
-        "De perskit is direct te downloaden zonder extra aanvraag.",
-        "Voor persvragen en boekingsvragen is er een direct contactadres.",
-        "Je vindt hier de korte omschrijving, kernfeiten en basislinks zonder verder te hoeven zoeken."
+        "Download direct de perskit met basisinformatie en materiaal.",
+        "Gebruik het contactadres voor persvragen, programmeerinfo of boekingsvragen.",
+        "Alle kerninformatie op deze pagina is bedoeld om snel te kopiëren of door te zetten."
       ],
       "socialProofItems": [
         {
@@ -871,8 +871,8 @@
           "context": "herkenbaar live-profiel"
         }
       ],
-      "ctaContextTitle": "Vraag persmateriaal of extra informatie aan",
-      "ctaContextBody": "Stuur een bericht als je aanvullende informatie, beeldmateriaal of een gerichte afstemming nodig hebt. We reageren snel en helder."
+      "ctaContextTitle": "Contact voor pers en boekingen",
+      "ctaContextBody": "Heb je aanvullend materiaal, een extra quote of afstemming nodig voor publicatie of programmering, neem dan direct contact op."
     }
   },
   "contact": {

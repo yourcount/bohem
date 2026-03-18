@@ -212,6 +212,10 @@ function toTelHref(phone: string | undefined | null) {
   return `tel:${normalizedPhone}`;
 }
 
+function isDirectContactCta(cta: { href?: string } | undefined) {
+  return cta?.href?.trim() === "#contact";
+}
+
 export function buildMusicDuoLanding(siteContent: SiteContent): LandingRouteView {
   const content = getLandingPageContent(siteContent, "musicDuo");
   const visibleShows = filterFutureShows(siteContent.bookings.upcomingShows);
@@ -235,7 +239,12 @@ export function buildMusicDuoLanding(siteContent: SiteContent): LandingRouteView
       intro: content.intro,
       note: content.positioningBody || "Een avond die dichtbij voelt, muzikaal blijft boeien en zonder afstand gespeeld wordt.",
       image: content.image || siteContent.hero.image,
-      primaryCta: content.cta ?? { label: "Leg je idee aan ons voor", href: "#contact" },
+      primaryCta:
+        content.cta && !isDirectContactCta(content.cta)
+          ? content.cta
+          : hasText(siteContent.discography.featuredSingle.href)
+            ? { label: "Luister eerst naar Bohèm", href: siteContent.discography.featuredSingle.href, variant: "primary" }
+            : { label: "Bekijk of dit past", href: "#highlights", variant: "primary" },
       secondaryCta: visibleShows.length > 0 ? { label: "Bekijk de shows", href: "#shows", variant: "secondary" } : { label: "Lees de FAQ", href: "#faq", variant: "secondary" }
     },
     highlights: {
@@ -295,8 +304,11 @@ export function buildTheaterConcertLanding(siteContent: SiteContent): LandingRou
       intro: content.intro,
       note: content.positioningBody || "Voor zalen die een aandachtig programma zoeken dat muzikaal blijft verrassen en als avond goed in elkaar zit.",
       image: content.image || siteContent.about.photoMoments?.[0] || siteContent.hero.image,
-      primaryCta: content.cta ?? { label: "Bespreek je programma", href: "#contact" },
-      secondaryCta: visibleShows.length > 0 ? { label: "Bekijk de shows", href: "#shows", variant: "secondary" } : { label: "Bekijk de highlights", href: "#highlights", variant: "secondary" }
+      primaryCta:
+        content.cta && !isDirectContactCta(content.cta)
+          ? content.cta
+          : { label: "Bekijk of dit past", href: "#highlights", variant: "primary" },
+      secondaryCta: visibleShows.length > 0 ? { label: "Bekijk de shows", href: "#shows", variant: "secondary" } : { label: "Lees de FAQ", href: "#faq", variant: "secondary" }
     },
     highlights: {
       eyebrow: content.proofTitle || "Programmafit",
@@ -355,8 +367,11 @@ export function buildKampvuurLanding(siteContent: SiteContent): LandingRouteView
       intro: content.intro,
       note: content.positioningBody || "Geen standaard teamactiviteit, maar een avond die rust, herkenning en gesprek oproept.",
       image: content.image || siteContent.kampvuur.image || siteContent.hero.image,
-      primaryCta: content.cta ?? { label: "Bekijk de beleving", href: "#kampvuurklanken" },
-      secondaryCta: { label: "Lees wat dit losmaakt", href: "#highlights", variant: "secondary" }
+      primaryCta:
+        content.cta && !isDirectContactCta(content.cta)
+          ? content.cta
+          : { label: "Lees wat dit losmaakt", href: "#highlights", variant: "primary" },
+      secondaryCta: { label: "Bekijk de opzet", href: "#kampvuurklanken", variant: "secondary" }
     },
     highlights: {
       eyebrow: content.proofTitle || "Voor teams en organisaties",
@@ -402,8 +417,13 @@ export function buildHuiskamerConcertLanding(siteContent: SiteContent): LandingR
       intro: content.intro,
       note: content.positioningBody || "Een avond die klein mag voelen, maar groot binnenkomt.",
       image: content.image || siteContent.musicExperience.image,
-      primaryCta: content.cta ?? { label: "Leg je avond aan ons voor", href: "#contact" },
-      secondaryCta: { label: "Bekijk de mogelijkheden", href: "#highlights", variant: "secondary" }
+      primaryCta:
+        content.cta && !isDirectContactCta(content.cta)
+          ? content.cta
+          : { label: "Bekijk de mogelijkheden", href: "#highlights", variant: "primary" },
+      secondaryCta: hasText(siteContent.discography.featuredSingle.href)
+        ? { label: "Luister eerst", href: siteContent.discography.featuredSingle.href, variant: "secondary" }
+        : { label: "Lees de FAQ", href: "#faq", variant: "secondary" }
     },
     highlights: {
       eyebrow: content.proofTitle || "Dicht op het publiek",

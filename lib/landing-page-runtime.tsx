@@ -102,6 +102,77 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
         })
       : [];
   const showStickyListenBar = stickyVisibleSectionIds.length > 0;
+  const highlightSection = view.highlights ? (
+    <>
+      <SectionMotifDivider />
+      <LandingHighlights
+        id="highlights"
+        eyebrow={view.highlights.eyebrow}
+        title={view.highlights.title}
+        intro={view.highlights.intro}
+        items={view.highlights.items}
+      />
+    </>
+  ) : null;
+  const kampvuurExperienceSection = landingKey === "kampvuur" ? (
+    <>
+      <SectionMotifDivider />
+      <KampvuurSection kampvuur={siteContent.kampvuur} />
+    </>
+  ) : null;
+  const showsSection = showLandingShows ? (
+    <>
+      <SectionMotifDivider />
+      <ShowsSection
+        shows={visibleShows}
+        eyebrow={view.shows?.eyebrow}
+        title={view.shows?.title}
+        badgeLabel={view.shows?.badgeLabel}
+      />
+    </>
+  ) : null;
+  const localAreaSection = view.localArea ? (
+    <>
+      <SectionMotifDivider />
+      <LandingLocalArea
+        id="regio"
+        title={view.localArea.title}
+        intro={view.localArea.intro}
+        cities={view.localArea.cities}
+        proofTitle={view.localArea.proofTitle}
+        proofItems={view.localArea.proofItems}
+        cta={view.localArea.cta}
+      />
+    </>
+  ) : null;
+  const socialProofSection = view.socialProof ? (
+    <>
+      <SectionMotifDivider />
+      <LandingSocialProof
+        id="reacties"
+        eyebrow={view.socialProof.eyebrow}
+        title={view.socialProof.title}
+        items={view.socialProof.items}
+      />
+    </>
+  ) : null;
+  const practicalInfoSection = view.practicalInfo ? (
+    <>
+      <SectionMotifDivider />
+      <LandingPracticalInfo
+        id="praktisch"
+        eyebrow={view.practicalInfo.eyebrow}
+        title={view.practicalInfo.title}
+        items={view.practicalInfo.items}
+      />
+    </>
+  ) : null;
+  const faqSection = view.faq ? (
+    <>
+      <SectionMotifDivider />
+      <LandingFaq id="faq" eyebrow={view.faq.eyebrow} title={view.faq.title} items={view.faq.items} />
+    </>
+  ) : null;
 
   return (
     <LandingPageShell brandName={siteContent.brand.name} navigation={view.navigation} footer={siteContent.footer}>
@@ -120,65 +191,56 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
         secondaryCta={view.intro.secondaryCta}
       />
 
-      {view.highlights ? <SectionMotifDivider /> : null}
-      {view.highlights ? (
-        <LandingHighlights
-          id="highlights"
-          eyebrow={view.highlights.eyebrow}
-          title={view.highlights.title}
-          intro={view.highlights.intro}
-          items={view.highlights.items}
-        />
+      {landingKey === "musicDuo" ? (
+        <>
+          {highlightSection}
+          {showsSection}
+          {socialProofSection}
+          {practicalInfoSection}
+          {localAreaSection}
+          {faqSection}
+        </>
       ) : null}
 
-      {landingKey === "kampvuur" ? <SectionMotifDivider /> : null}
-      {landingKey === "kampvuur" ? <KampvuurSection kampvuur={siteContent.kampvuur} /> : null}
-
-      {showLandingShows ? <SectionMotifDivider /> : null}
-      {showLandingShows ? (
-        <ShowsSection
-          shows={visibleShows}
-          eyebrow={view.shows?.eyebrow}
-          title={view.shows?.title}
-          badgeLabel={view.shows?.badgeLabel}
-        />
+      {landingKey === "theaterConcert" ? (
+        <>
+          {highlightSection}
+          {practicalInfoSection}
+          {showsSection}
+          {socialProofSection}
+          {localAreaSection}
+          {faqSection}
+        </>
       ) : null}
 
-      {view.localArea ? <SectionMotifDivider /> : null}
-      {view.localArea ? (
-        <LandingLocalArea
-          id="regio"
-          title={view.localArea.title}
-          intro={view.localArea.intro}
-          cities={view.localArea.cities}
-          proofTitle={view.localArea.proofTitle}
-          proofItems={view.localArea.proofItems}
-          cta={view.localArea.cta}
-        />
+      {landingKey === "kampvuur" ? (
+        <>
+          {highlightSection}
+          {kampvuurExperienceSection}
+          {practicalInfoSection}
+          {socialProofSection}
+          {faqSection}
+        </>
       ) : null}
 
-      {view.socialProof ? <SectionMotifDivider /> : null}
-      {view.socialProof ? (
-        <LandingSocialProof
-          id="reacties"
-          eyebrow={view.socialProof.eyebrow}
-          title={view.socialProof.title}
-          items={view.socialProof.items}
-        />
+      {landingKey === "huiskamerconcert" ? (
+        <>
+          {highlightSection}
+          {practicalInfoSection}
+          {localAreaSection}
+          {socialProofSection}
+          {faqSection}
+        </>
       ) : null}
 
-      {view.practicalInfo ? <SectionMotifDivider /> : null}
-      {view.practicalInfo ? (
-        <LandingPracticalInfo
-          id="praktisch"
-          eyebrow={view.practicalInfo.eyebrow}
-          title={view.practicalInfo.title}
-          items={view.practicalInfo.items}
-        />
+      {landingKey === "press" ? (
+        <>
+          {practicalInfoSection}
+          {highlightSection}
+          {socialProofSection}
+          {faqSection}
+        </>
       ) : null}
-
-      {view.faq ? <SectionMotifDivider /> : null}
-      {view.faq ? <LandingFaq id="faq" eyebrow={view.faq.eyebrow} title={view.faq.title} items={view.faq.items} /> : null}
 
       <SectionMotifDivider />
 
@@ -189,7 +251,7 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
         body={view.cta.body}
         primaryCta={view.cta.primaryCta}
         secondaryCta={view.cta.secondaryCta}
-        homeLink={{
+        homeLink={landingKey === "press" ? undefined : {
           intro: "Wil je Bohèm eerst als geheel leren kennen, met muziek, achtergrond, shows en contact op één plek?",
           label: "Bekijk de volledige homepagina",
           href: "/"

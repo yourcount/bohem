@@ -271,7 +271,7 @@ export function buildTheaterConcertLanding(siteContent: SiteContent): LandingRou
   const visibleShows = filterFutureShows(siteContent.bookings.upcomingShows);
   const faq = buildFaq(getLandingFaqItems(siteContent, "theaterConcert"), [
     { question: "Waarom werkt Bohèm in een theater?", answer: "Omdat de muziek ruimte geeft aan tekst, dynamiek en aandacht. Dat past goed bij een luisterpubliek." },
-    { question: "Is dit geschikt voor culturele programmering?", answer: "Ja, juist daar komt de combinatie van sfeer, verhaal en performance goed tot zijn recht." }
+    { question: "Is dit geschikt voor een culturele avond?", answer: "Ja, juist daar komen sfeer, verhaal en live-presentatie goed samen." }
   ], content.faqTitle || "Veelgestelde vragen over theaterconcert boeken");
 
   return {
@@ -287,14 +287,14 @@ export function buildTheaterConcertLanding(siteContent: SiteContent): LandingRou
       audienceLabel: content.audienceLabel,
       title: content.title,
       intro: content.intro,
-      note: content.positioningBody || "Voor zalen die een luistergericht programma zoeken dat muzikaal blijft verrassen en dramaturgisch klopt.",
+      note: content.positioningBody || "Voor zalen die een aandachtig programma zoeken dat muzikaal blijft verrassen en als avond goed in elkaar zit.",
       image: content.image || siteContent.about.photoMoments?.[0] || siteContent.hero.image,
       primaryCta: content.cta ?? { label: "Bespreek je programma", href: "#contact" },
       secondaryCta: visibleShows.length > 0 ? { label: "Bekijk de shows", href: "#shows", variant: "secondary" } : { label: "Bekijk de highlights", href: "#highlights", variant: "secondary" }
     },
     highlights: {
       eyebrow: content.proofTitle || "Programmafit",
-      title: content.positioningTitle || "Waarom dit in een theatercontext werkt",
+      title: content.positioningTitle || "Waarom dit in een theaterzaal zo goed werkt",
       intro: content.positioningBody || "Een avond die dichtbij voelt, maar stevig genoeg is om een zaal te dragen.",
       items: combineSections(content.highlights, content.fitItems, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6)
     },
@@ -317,7 +317,7 @@ export function buildTheaterConcertLanding(siteContent: SiteContent): LandingRou
     cta: {
       eyebrow: "Contact",
       title: content.ctaContextTitle || "Bespreek publiek, zaal en speelvorm",
-      body: content.ctaContextBody || "Vertel kort wat voor zaal, publiek of programma je voor ogen hebt. Dan denken we mee over een passende invulling.",
+      body: content.ctaContextBody || "Vertel kort wat voor zaal, publiek of avond je voor ogen hebt. Dan denken we mee over een passende invulling.",
       primaryCta: { label: "Mail direct", href: `mailto:${siteContent.bookings.press?.contactEmail || siteContent.contact.email}` },
       secondaryCta: toTelHref(siteContent.bookings.press?.contactPhone)
         ? { label: "Bel direct", href: toTelHref(siteContent.bookings.press?.contactPhone)!, variant: "secondary" }
@@ -434,8 +434,8 @@ export function buildPersLanding(siteContent: SiteContent): LandingRouteView {
   const facts = press?.facts ?? [];
   const faq = buildFaq(getLandingFaqItems(siteContent, "press"), [
     { question: "Waar vinden we persinformatie?", answer: press?.kitLabel ? `Via ${press.kitLabel}.` : "Via het persmateriaal en de contactgegevens op deze pagina." },
-    { question: "Wie kunnen we benaderen voor pers of programmering?", answer: "Gebruik het contactadres of telefoonnummer op deze pagina voor een snelle reactie." },
-    { question: "Welke informatie is handig voor een programma-aanvraag?", answer: "Noem de locatie, doelgroep, gewenste datum en het type programma; dan kunnen we gericht meedenken." }
+    { question: "Wie kunnen we benaderen voor pers of boekingen?", answer: "Gebruik het contactadres of telefoonnummer op deze pagina voor een snelle reactie." },
+    { question: "Welke informatie is handig voor een aanvraag?", answer: "Noem de locatie, doelgroep, gewenste datum en het soort avond; dan kunnen we gericht meedenken." }
   ], content.faqTitle || "Veelgestelde vragen voor pers en programmeurs");
 
   return {
@@ -446,7 +446,7 @@ export function buildPersLanding(siteContent: SiteContent): LandingRouteView {
       ["Contact", "#contact"]
     ]),
     intro: {
-      eyebrow: content.heroLabel || "Pers en programmering",
+      eyebrow: content.heroLabel || "Pers en boekingsinfo",
       audienceLabel: content.audienceLabel,
       title: content.title,
       intro: content.intro,
@@ -461,13 +461,13 @@ export function buildPersLanding(siteContent: SiteContent): LandingRouteView {
       intro: content.positioningBody || "Feiten, positionering en contactopties zonder omweg.",
       items: combineSections(content.highlights, content.fitItems || facts, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6)
     },
-    socialProof: buildSocialProof(content.socialProofItems, "Snelle context voor programmeurs en media", "Context"),
+    socialProof: buildSocialProof(content.socialProofItems, "Snelle context voor pers en boekers", "Context"),
     practicalInfo: buildPracticalInfo(content.practicalInfoItems, "Snel geregeld", "Praktisch"),
     faq,
     cta: {
       eyebrow: "Contact",
-      title: content.ctaContextTitle || "Vraag persmateriaal of programmeerinformatie aan",
-      body: content.ctaContextBody || "Stuur een bericht voor persinformatie, programmering of beeldmateriaal. We reageren snel en gericht.",
+      title: content.ctaContextTitle || "Vraag persmateriaal of extra informatie aan",
+      body: content.ctaContextBody || "Stuur een bericht voor persinformatie, boekingsvragen of beeldmateriaal. We reageren snel en helder.",
       primaryCta: press?.kitHref && press.kitLabel ? { label: press.kitLabel, href: press.kitHref } : undefined,
       secondaryCta: press?.contactEmail
         ? { label: "Mail direct", href: `mailto:${press.contactEmail}`, variant: "secondary" }

@@ -136,6 +136,11 @@ export type SiteContent = {
   bookings: {
     title: string;
     body: string;
+    faqTitle?: string;
+    faqItems?: Array<{
+      question: string;
+      answer: string;
+    }>;
     fitTitle?: string;
     fitItems?: string[];
     routeTitle?: string;

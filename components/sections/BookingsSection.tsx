@@ -19,6 +19,7 @@ function nonEmptyItems(items: string[] | undefined) {
 export function BookingsSection({ bookings }: BookingsSectionProps) {
   const pressQuotes = nonEmptyItems(bookings.pressQuotes);
   const socialProof = (bookings.socialProof ?? []).filter((item) => hasText(item.quote) || hasText(item.source));
+  const faqItems = (bookings.faqItems ?? []).filter((item) => hasText(item.question) && hasText(item.answer));
   const fitItems = nonEmptyItems(bookings.fitItems);
   const infoItems = nonEmptyItems(bookings.infoItems);
   const bookabilityItems = nonEmptyItems(bookings.bookabilityItems);
@@ -209,6 +210,34 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                   </figure>
                 ) : null}
               </div>
+            </section>
+          </Reveal>
+        ) : null}
+
+        {hasText(bookings.faqTitle) || faqItems.length > 0 ? (
+          <Reveal className="md:col-span-2">
+            <section
+              aria-labelledby="boekingen-faq-title"
+              className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(244,233,220,0.05)] p-6"
+            >
+              {hasText(bookings.faqTitle) ? (
+                <h3 id="boekingen-faq-title" className="mb-5 font-display text-3xl text-[var(--color-text-primary)]">
+                  {bookings.faqTitle}
+                </h3>
+              ) : null}
+              {faqItems.length > 0 ? (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {faqItems.map((item, index) => (
+                    <article
+                      key={`${item.question}-${index}`}
+                      className="rounded-xl border border-[rgba(255,255,255,0.12)] bg-[rgba(15,24,37,0.35)] p-5"
+                    >
+                      <h4 className="mb-2 font-display text-xl text-[var(--color-text-primary)]">{item.question}</h4>
+                      <p className="text-sm text-[#ead7bc]">{item.answer}</p>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
             </section>
           </Reveal>
         ) : null}

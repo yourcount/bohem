@@ -1,11 +1,11 @@
 {
   "meta": {
-    "title": "Bohèm boeken | Live muziekduo voor theater en events",
-    "description": "Bohèm (Arthur Bont & Bettina Kraaieveld) brengt melodische NL/EN songs voor theaters, culturele events en Kampvuurklanken-avonden. Bekijk muziek, persinfo en boek direct.",
+    "title": "Bohèm | Arthur Bont & Bettina Kraaieveld | live muziekduo voor theater en events",
+    "description": "Bohèm is het live muziekduo van Arthur Bont en Bettina Kraaieveld. Voor theater, intieme concerten, culturele events en Kampvuurklanken voor teams en organisaties.",
     "locale": "nl-NL",
     "canonical": "/",
-    "ogTitle": "Bohèm boeken | Live muziekduo voor theater en events",
-    "ogDescription": "Bohèm (Arthur Bont & Bettina Kraaieveld) brengt melodische NL/EN songs voor theaters, culturele events en Kampvuurklanken-avonden. Bekijk muziek, persinfo en boek direct."
+    "ogTitle": "Bohèm | Arthur Bont & Bettina Kraaieveld | live muziekduo voor theater en events",
+    "ogDescription": "Bohèm is het live muziekduo van Arthur Bont en Bettina Kraaieveld. Voor theater, intieme concerten, culturele events en Kampvuurklanken voor teams en organisaties."
   },
   "brand": {
     "name": "Bohèm"
@@ -39,7 +39,7 @@
   "hero": {
     "eyebrow": "Bohèm",
     "headline": "Liedjes met licht en schaduw",
-    "subhead": "Melodisch, verhalend en persoonlijk: Nederlandstalige en Engelstalige songs over het leven in al zijn facetten.",
+    "subhead": "Bohèm is het live muziekduo van Arthur Bont en Bettina Kraaieveld, met Nederlandstalige en Engelstalige songs voor theater, intieme concerten en bijzondere events.",
     "image": {
       "src": "/images/bohem-hero.jpg",
       "alt": "Arthur Bont en Bettina Kraaieveld in warm podiumlicht",
@@ -172,11 +172,11 @@
   },
   "kampvuur": {
     "title": "Kampvuurklanken",
-    "intro": "Een speciale avond die mensen echt samenbrengt.",
+    "intro": "Een muzikale teamavond die mensen echt samenbrengt.",
     "body": [
-      "Geen zweverig gedoe, maar herkenbare thema's en eerlijke woorden die raken aan wie we zijn, ook achter onze functie. Een moment van vertraging, verbinding, menselijkheid en humor.",
+      "Kampvuurklanken is een muzikale ervaring voor teams, management en organisaties die ruimte willen maken voor verbinding, reflectie en een echt gesprek.",
       "Het team verzamelt zich rond het vuur. Misschien net uit een vergadering, nog in de volle agenda. Even weg uit de waan van de dag.",
-      "Bij het licht van de vlammen verschuift de dynamiek. De liedjes en verhalen van BOHÈM gaan niet over deadlines of efficiëntie, maar over mens zijn: geluk, verdriet, twijfel en veerkracht."
+      "Bij het licht van de vlammen verschuift de dynamiek. De liedjes en verhalen van Bohèm gaan niet over deadlines of efficiëntie, maar over mens zijn: geluk, verdriet, twijfel en veerkracht."
     ],
     "benefitsTitle": "Waarom Kampvuurklanken werkt",
     "benefits": [
@@ -223,7 +223,26 @@
   },
   "bookings": {
     "title": "Live & Boekingen",
-    "body": "Bohèm speelt als Reizigers in theaters, intieme concerten en bijzondere gelegenheden zoals culturele seizoensopeningen, community-events en huiskamerconcerten.",
+    "body": "Bohèm is te boeken als live muziekduo voor theaters, intieme concerten, culturele events, huiskamerpodia en bijzondere avonden waarin verhaal, sfeer en persoonlijk contact centraal staan.",
+    "faqTitle": "Veelgestelde vragen over Bohèm boeken",
+    "faqItems": [
+      {
+        "question": "Voor welke gelegenheden is Bohèm te boeken?",
+        "answer": "Bohèm speelt in theaters, intieme concerten, culturele events, huiskamerpodia en andere kleinschalige settings waar verhalende live muziek goed tot zijn recht komt."
+      },
+      {
+        "question": "Speelt Bohèm alleen in theaters?",
+        "answer": "Nee. Naast theateravonden speelt Bohèm ook op culturele events, storytelling-avonden, huiskamerconcerten en bijzondere bijeenkomsten met een luisterend publiek."
+      },
+      {
+        "question": "Wat is Kampvuurklanken precies?",
+        "answer": "Kampvuurklanken is een muzikale avond voor teams en organisaties, met liedjes en verhalen rond verbinding, reflectie, menselijkheid en humor."
+      },
+      {
+        "question": "Hoe vraag ik beschikbaarheid aan?",
+        "answer": "Stuur via het contactformulier of per mail je datum, locatie en type avond. Bohèm reageert meestal binnen 2 werkdagen met een concreet voorstel."
+      }
+    ],
     "quickFactsTitle": "In 20 sec geregeld",
     "showsEyebrow": "Live agenda",
     "showsTitle": "Volgende shows",

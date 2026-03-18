@@ -140,6 +140,8 @@ const sectionLabels: Record<string, string> = {
 const keyLabels: Record<string, string> = {
   name: "Naam",
   label: "Label",
+  question: "Vraag",
+  answer: "Antwoord",
   href: "Link",
   eyebrow: "Boventitel",
   featuredSingleEyebrow: "Boventitel boven uitgelichte single",
@@ -208,6 +210,9 @@ const PATH_LABELS: Record<string, string> = {
   "musicExperience.image.alt": "Omschrijving van de foto bij muziekbeleving",
   "bookings.coverKoffer.image.src": "Foto bij coverkoffer",
   "bookings.coverKoffer.image.alt": "Omschrijving van de coverkoffer-foto",
+  "bookings.faqTitle": "Titel boven veelgestelde vragen",
+  "bookings.faqItems.0.question": "Vraag 1 in veelgestelde vragen",
+  "bookings.faqItems.0.answer": "Antwoord 1 in veelgestelde vragen",
   "footer.youtubeHref": "YouTube-link in de footer",
   "footer.instagramHref": "Instagram-link in de footer"
 };
@@ -217,6 +222,9 @@ const PATH_HELPERS: Record<string, string> = {
   "discography.featuredSingle.ctaLabel": "Deze tekst staat op de knop in de pop-up muziekbalk.",
   "discography.featuredSingle.image.src": "Deze cover wordt in de pop-up muziekbalk getoond zodra die zichtbaar wordt.",
   "discography.featuredSingle.image.alt": "Korte beschrijving van de cover in de pop-up muziekbalk.",
+  "bookings.faqTitle": "Deze titel staat boven de veelgestelde vragen in de boekingensectie.",
+  "bookings.faqItems.0.question": "Gebruik hier een echte vraag die organisatoren of boekers vaak stellen.",
+  "bookings.faqItems.0.answer": "Geef een kort, duidelijk antwoord dat ook op de site prettig leest.",
   "footer.youtubeHref": "Als je dit leeg laat, wordt het YouTube-icoon in de footer niet getoond.",
   "footer.instagramHref": "Als je dit leeg laat, wordt het Instagram-icoon in de footer niet getoond."
 };
@@ -229,6 +237,9 @@ const PATH_VISIBILITY_HINTS: Record<string, string> = {
   "musicExperience.cta.label": "Leeg = de knop in Muziekbeleving verdwijnt.",
   "bookings.cta.href": "Leeg = de hoofdknop in Boekingen verdwijnt.",
   "bookings.cta.label": "Leeg = de hoofdknop in Boekingen verdwijnt.",
+  "bookings.faqTitle": "Leeg + geen vragen = het blok met veelgestelde vragen wordt niet getoond.",
+  "bookings.faqItems.0.question": "Lege vraag of antwoord = dit vraagblok wordt niet getoond.",
+  "bookings.faqItems.0.answer": "Lege vraag of antwoord = dit vraagblok wordt niet getoond.",
   "bookings.press.kitHref": "Leeg = de perskit-knop wordt niet getoond.",
   "bookings.press.contactEmail": "Leeg = de e-mailknop in Pers wordt niet getoond.",
   "bookings.press.contactPhone": "Leeg = de telefoonknop in Pers wordt niet getoond.",
@@ -258,6 +269,9 @@ const FIELD_SEARCH_TERMS: Record<string, string[]> = {
   "hero.image.src": ["hero foto", "hoofdfoto", "bovenste foto", "grote foto"],
   "hero.headline": ["titel bovenaan", "hoofdtitel", "grote titel"],
   "hero.subhead": ["ondertitel bovenaan", "subtitel"],
+  "bookings.faqTitle": ["faq", "veelgestelde vragen", "vragen", "boekingsvragen"],
+  "bookings.faqItems.0.question": ["faq vraag", "veelgestelde vraag", "vraag"],
+  "bookings.faqItems.0.answer": ["faq antwoord", "antwoord op vraag", "antwoord"],
   "musicExperience.image.src": ["boom foto", "foto bij muziekbeleving"],
   "bookings.coverKoffer.image.src": ["coverkoffer foto", "koffer foto"],
   "bookings.press.kitHref": ["perskit", "technische rider", "media download"],

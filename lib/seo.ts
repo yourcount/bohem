@@ -15,10 +15,18 @@ export function absoluteUrl(path: string): string {
 export function buildHomeJsonLd(content: SiteContent) {
   const url = getSiteUrl();
   const heroImage = absoluteUrl(content.hero.image.src);
-  const artistProfileUrls = [
+  const personNameMap: Record<string, string> = {
+    Arthur: "Arthur Bont",
+    Bettina: "Bettina Kraaieveld"
+  };
+  const groupProfileUrls = [
     content.discography.artist.href,
+    content.footer.instagramHref,
+    content.footer.youtubeHref,
     ...content.about.bios.map((bio) => bio.website).filter((value): value is string => Boolean(value))
-  ].filter((value, index, array) => array.indexOf(value) === index);
+  ]
+    .filter((value): value is string => Boolean(value))
+    .filter((value, index, array) => array.indexOf(value) === index);
 
   const events =
     filterFutureShows(content.bookings.upcomingShows)
@@ -81,7 +89,7 @@ export function buildHomeJsonLd(content: SiteContent) {
           { "@type": "Person", name: "Arthur Bont" },
           { "@type": "Person", name: "Bettina Kraaieveld" }
         ],
-        sameAs: artistProfileUrls,
+        sameAs: groupProfileUrls,
         contactPoint: [
           {
             "@type": "ContactPoint",
@@ -114,7 +122,7 @@ export function buildHomeJsonLd(content: SiteContent) {
       },
       ...content.about.bios.map((bio) => ({
         "@type": "Person",
-        name: bio.name,
+        name: personNameMap[bio.name] ?? bio.name,
         ...(bio.website ? { url: bio.website, sameAs: [bio.website] } : {}),
         memberOf: { "@id": `${url}/#musicgroup` }
       })),

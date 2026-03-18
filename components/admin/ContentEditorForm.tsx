@@ -89,7 +89,7 @@ type AttentionPoint = {
   path?: string;
   ctaLabel: string;
 };
-type GuideTargetKey = "section-menu" | "mode-switcher" | "save-bar" | "search-panel";
+type GuideTargetKey = "section-menu" | "save-bar" | "search-panel";
 type GuideStep = {
   id: string;
   title: string;
@@ -1589,11 +1589,11 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
       {
         id: "edit-mode",
         title: "2. Pas tekst, links en foto's aan",
-        targetKey: "mode-switcher",
+        targetKey: "section-menu",
         body: (
           <>
-            In <strong>Formuliermodus</strong> werk je veld voor veld. In <strong>Visuele modus</strong> klik je op het onderdeel in de
-            preview. Kies de manier die voor jou het prettigst werkt.
+            Open de sectie die je nodig hebt en pas daar tekst, links of foto's aan. De editor werkt hier alleen in
+            <strong> formuliermodus</strong>, zodat alles op één vaste plek staat.
           </>
         )
       },
@@ -1626,7 +1626,6 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
 
   const getGuideTargetNode = (targetKey: GuideTargetKey) => {
     if (targetKey === "section-menu") return sectionMenuRef.current;
-    if (targetKey === "mode-switcher") return modeSwitcherRef.current;
     if (targetKey === "search-panel") return searchPanelRef.current;
     return saveBarRef.current;
   };
@@ -1660,7 +1659,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
       };
     }
 
-    if (targetKey === "mode-switcher" || targetKey === "search-panel") {
+    if (targetKey === "search-panel") {
       const preferredTop = rect.top - cardRect.height - gap;
       const fallbackTop = rect.bottom + gap;
       const top = preferredTop >= padding ? preferredTop : fallbackTop;
@@ -1781,33 +1780,6 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
           ?
         </button>
       </div>
-      <div ref={modeSwitcherRef} className={`mb-4 flex flex-wrap items-center gap-2 ${guideTargetClass("mode-switcher")}`}>
-        <button
-          type="button"
-          onClick={() => setEditorMode("form")}
-          className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
-            editorMode === "form"
-              ? "border-transparent bg-[var(--color-accent-amber)] text-[var(--color-bg-deep)]"
-              : "border-[var(--color-line-muted)] text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
-          }`}
-          aria-pressed={editorMode === "form"}
-        >
-          Formuliermodus
-        </button>
-        <button
-          type="button"
-          onClick={() => setEditorMode("visual")}
-          className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
-            editorMode === "visual"
-              ? "border-transparent bg-[var(--color-accent-amber)] text-[var(--color-bg-deep)]"
-              : "border-[var(--color-line-muted)] text-[var(--color-text-primary)] hover:bg-[rgba(244,233,220,0.08)]"
-          }`}
-          aria-pressed={editorMode === "visual"}
-        >
-          Visuele modus
-        </button>
-      </div>
-
       {isGuideOpen && activeGuideStep ? (
         <>
           <div className="pointer-events-none fixed inset-0 z-50 bg-[rgba(0,0,0,0.42)]" aria-hidden="true" />
@@ -1898,21 +1870,10 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
         <div>
           <p className="font-semibold text-[#f8f5f1]">Inhoud wijzigen in 2 minuten</p>
           <ol className="mt-2 list-decimal space-y-1 pl-5 text-xs sm:text-sm">
-            {editorMode === "visual" ? (
-              <>
-                <li>Kies links een sectie en klik in de preview op het onderdeel dat je wilt aanpassen.</li>
-                <li>Pas rechts tekst, links of foto's aan.</li>
-                <li>Klik onderaan op <strong>Opslaan</strong>.</li>
-                <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
-              </>
-            ) : (
-              <>
-                <li>Kies een sectie in het sectiemenu.</li>
-                <li>Pas tekst, links of foto's aan.</li>
-                <li>Klik onderaan op <strong>Opslaan</strong>.</li>
-                <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
-              </>
-            )}
+            <li>Kies een sectie in het sectiemenu.</li>
+            <li>Pas tekst, links of foto's aan.</li>
+            <li>Klik onderaan op <strong>Opslaan</strong>.</li>
+            <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
           </ol>
         </div>
         <div>

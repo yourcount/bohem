@@ -18,7 +18,7 @@ function hasText(value: string | undefined | null) {
 export function ShowsSection({ shows, eyebrow, title, badgeLabel }: ShowsSectionProps) {
   const visibleShows = (shows ?? []).filter((show) => {
     const hasBasics = hasText(show.date) || hasText(show.venue) || hasText(show.city);
-    const hasCta = hasText(show.ticketsHref) || hasText(show.infoHref);
+    const hasCta = Boolean(show.freeEntry) || hasText(show.ticketsHref) || hasText(show.infoHref);
     return hasBasics || hasCta;
   });
   if (visibleShows.length === 0) return null;
@@ -64,9 +64,13 @@ export function ShowsSection({ shows, eyebrow, title, badgeLabel }: ShowsSection
                     ) : null}
                     {hasText(show.venue) ? <p className="text-xl font-semibold text-[#f8f1e5]">{show.venue}</p> : null}
                     {hasText(show.city) ? <p className="mt-1 text-sm text-[#d9c4a8]">{show.city}</p> : null}
-                    {hasText(show.ticketsHref) || hasText(show.infoHref) ? (
+                    {show.freeEntry || hasText(show.ticketsHref) || hasText(show.infoHref) ? (
                       <div className="mt-5 flex flex-col gap-2">
-                      {hasText(show.ticketsHref) ? (
+                      {show.freeEntry ? (
+                        <span className="inline-flex w-full items-center justify-center rounded-full border border-[rgba(118,203,147,0.42)] bg-[rgba(118,203,147,0.14)] px-4 py-2.5 text-sm font-bold text-[#d6f0d0]">
+                          Gratis toegang
+                        </span>
+                      ) : hasText(show.ticketsHref) ? (
                         <Link
                           href={show.ticketsHref!}
                           {...getExternalLinkProps(show.ticketsHref)}

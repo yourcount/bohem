@@ -243,6 +243,7 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
               date: normalizeDutchShowDateInput(show.date),
               venue: show.venue,
               city: show.city,
+              freeEntry: Boolean(show.freeEntry),
               ticketsHref: sanitizeOptionalHref(show.ticketsHref, siteContent.bookings.upcomingShows?.[index]?.ticketsHref ?? ""),
               infoHref: sanitizeOptionalHref(show.infoHref, siteContent.bookings.upcomingShows?.[index]?.infoHref ?? "")
             }))

@@ -292,6 +292,7 @@
         "date": "12 apr 2026",
         "venue": "Theater het Nest",
         "city": "Nijmegen",
+        "freeEntry": false,
         "ticketsHref": "",
         "infoHref": "#contact"
       },
@@ -299,6 +300,7 @@
         "date": "08 mei 2026",
         "venue": "Podium De Lantaarn",
         "city": "Utrecht",
+        "freeEntry": false,
         "ticketsHref": "#contact",
         "infoHref": ""
       },
@@ -306,6 +308,7 @@
         "date": "29 mei 2026",
         "venue": "Cultuurhuis Zuid",
         "city": "Eindhoven",
+        "freeEntry": false,
         "ticketsHref": "#contact",
         "infoHref": ""
       }

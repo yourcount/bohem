@@ -173,6 +173,7 @@ export type SiteContent = {
       date: string;
       venue: string;
       city: string;
+      freeEntry?: boolean;
       ticketsHref?: string;
       infoHref?: string;
     }>;

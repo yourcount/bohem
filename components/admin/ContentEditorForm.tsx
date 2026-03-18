@@ -1195,6 +1195,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
         date: "",
         venue: "",
         city: "",
+        freeEntry: false,
         ticketsHref: "",
         infoHref: ""
       };
@@ -1238,7 +1239,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
   const updateShowField = (
     showIndex: number,
     key: keyof UpcomingShow,
-    value: string
+    value: UpcomingShow[keyof UpcomingShow]
   ) => {
     setContent((prev) => {
       if (!prev) return prev;
@@ -1246,7 +1247,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
       if (!next.bookings.upcomingShows) return prev;
       const show = next.bookings.upcomingShows[showIndex];
       if (!show) return prev;
-      show[key] = value;
+      show[key] = value as never;
       return next;
     });
     setFieldErrors((prev) => {
@@ -1468,6 +1469,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
     const firstShowWithoutLinks = shows.findIndex(
       (show) =>
         (hasText(show.date) || hasText(show.venue) || hasText(show.city)) &&
+        !show.freeEntry &&
         !hasText(show.ticketsHref) &&
         !hasText(show.infoHref)
     );
@@ -2554,7 +2556,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
           <span aria-hidden="true" className="text-sm text-[#d9c6ac]">Open/dicht</span>
         </summary>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-[#d9c6ac]">Voeg shows toe en beheer per show de Tickets-link en Extra info-link.</p>
+          <p className="text-xs text-[#d9c6ac]">Voeg shows toe en beheer per show de Tickets-link, Gratis toegang en Extra info-link.</p>
           <button
             type="button"
             onClick={addShow}
@@ -2651,15 +2653,32 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
 
                 <label className="text-xs font-semibold text-[#d9c6ac]">
                   Tickets link
+                  <div className="mt-2 flex items-center gap-2 rounded-lg border border-[rgba(118,203,147,0.28)] bg-[rgba(118,203,147,0.08)] px-3 py-2 text-[11px] font-medium text-[#d6f0d0]">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(show.freeEntry)}
+                      onChange={(event) => {
+                        updateShowField(index, "freeEntry", event.target.checked);
+                        if (event.target.checked && show.ticketsHref) {
+                          updateShowField(index, "ticketsHref", "");
+                        }
+                      }}
+                      className="h-4 w-4 rounded border-[var(--color-line-muted)] bg-transparent text-[var(--color-accent-amber)] focus:ring-[var(--color-accent-amber)]"
+                    />
+                    <span>Gratis toegang tonen in plaats van een Tickets-knop</span>
+                  </div>
                   <input
                     ref={(node) => {
                       fieldRefs.current[`bookings.upcomingShows.${index}.ticketsHref`] = node;
                     }}
                     value={show.ticketsHref ?? ""}
                     onChange={(event) => updateShowField(index, "ticketsHref", event.target.value)}
-                    className={editorInputClass}
+                    disabled={Boolean(show.freeEntry)}
+                    className={`${editorInputClass} disabled:cursor-not-allowed disabled:opacity-50`}
                   />
-                  <p className="mt-1 text-xs text-[#d9c6ac]">Laat leeg om geen Tickets-knop te tonen.</p>
+                  <p className="mt-1 text-xs text-[#d9c6ac]">
+                    {show.freeEntry ? "Deze show toont nu Gratis toegang in plaats van een Tickets-knop." : "Laat leeg om geen Tickets-knop te tonen."}
+                  </p>
                   {fieldErrors[`bookings.upcomingShows.${index}.ticketsHref`]?.[0] ? (
                     <span className="mt-1 block text-xs text-[#ffb4a8]">{fieldErrors[`bookings.upcomingShows.${index}.ticketsHref`]?.[0]}</span>
                   ) : null}

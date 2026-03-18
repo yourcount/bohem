@@ -106,22 +106,22 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                     </h2>
                   ) : null}
                   {hasText(bookings.body) ? <p>{bookings.body}</p> : null}
-                  <div className="mt-5 flex flex-wrap gap-2 text-sm">
+                  <div className="mt-5 grid max-w-[42rem] gap-2 text-sm sm:grid-cols-2">
                     <Link
                       href="/muziekduo-boeken"
-                      className="inline-flex rounded-full border border-[var(--color-line-muted)] px-4 py-2 font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-center font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
                     >
                       Muziekduo boeken
                     </Link>
                     <Link
                       href="/theaterconcert-boeken"
-                      className="inline-flex rounded-full border border-[var(--color-line-muted)] px-4 py-2 font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-center font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
                     >
                       Theaterconcert boeken
                     </Link>
                     <Link
                       href="/huiskamerconcert-boeken"
-                      className="inline-flex rounded-full border border-[var(--color-line-muted)] px-4 py-2 font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-center font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] sm:col-span-2 sm:justify-self-start"
                     >
                       Huiskamerconcert boeken
                     </Link>

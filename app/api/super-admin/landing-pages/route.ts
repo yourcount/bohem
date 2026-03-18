@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { requireBackendAdmin } from "@/lib/auth/guards";
 import { revalidatePublicSiteCaches } from "@/lib/cache/revalidate-site";
+import { sanitizeSiteContent } from "@/lib/content/sanitize-site-content";
 import { validateAndSanitizeFullSiteContent } from "@/lib/content/full-content-contract";
 import { FullContentStorageError, readFullSiteContent, updateFullSiteContent } from "@/lib/db/full-site-content-db";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
@@ -27,10 +28,12 @@ export async function GET() {
       return NextResponse.json({ error: "Geen content gevonden.", code: "CONTENT_NOT_FOUND" }, { status: 404 });
     }
 
+    const hydrated = sanitizeSiteContent(record.content);
+
     return NextResponse.json(
       {
         ok: true,
-        content: record.content.landingPages,
+        landingPages: hydrated.landingPages,
         updated_at: record.updated_at,
         updated_by: record.updated_by
       },
@@ -57,9 +60,12 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Ongeldige JSON body.", code: "INVALID_BODY" }, { status: 400 });
   }
 
-  const candidate = body && typeof body === "object" && "content" in (body as Record<string, unknown>)
-    ? (body as { content: unknown }).content
-    : body;
+  const candidate =
+    body && typeof body === "object" && "landingPages" in (body as Record<string, unknown>)
+      ? (body as { landingPages: unknown }).landingPages
+      : body && typeof body === "object" && "content" in (body as Record<string, unknown>)
+        ? (body as { content: unknown }).content
+        : body;
 
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
     return NextResponse.json({ error: "Gebruik een geldig landingPages object.", code: "INVALID_BODY" }, { status: 400 });
@@ -116,7 +122,7 @@ export async function PATCH(request: Request) {
     return NextResponse.json(
       {
         ok: true,
-        content: updated.content.landingPages,
+        landingPages: sanitizeSiteContent(updated.content).landingPages,
         updated_at: updated.updated_at,
         updated_by: updated.updated_by
       },

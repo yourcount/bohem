@@ -951,6 +951,36 @@
   "footer": {
     "copyright": "Bohèm",
     "youtubeHref": "https://www.youtube.com/@VideoBoh%C3%A8m",
-    "instagramHref": "https://www.instagram.com/musicbybohem/?__d=1%2F"
+    "instagramHref": "https://www.instagram.com/musicbybohem/?__d=1%2F",
+    "links": [
+      {
+        "label": "Home",
+        "href": "/"
+      },
+      {
+        "label": "Muziekduo boeken",
+        "href": "/muziekduo-boeken"
+      },
+      {
+        "label": "Theaterconcert boeken",
+        "href": "/theaterconcert-boeken"
+      },
+      {
+        "label": "Kampvuurklanken",
+        "href": "/kampvuurklanken"
+      },
+      {
+        "label": "Huiskamerconcert boeken",
+        "href": "/huiskamerconcert-boeken"
+      },
+      {
+        "label": "Pers",
+        "href": "/pers"
+      },
+      {
+        "label": "Contact",
+        "href": "/#contact"
+      }
+    ]
   }
 }

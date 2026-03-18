@@ -214,7 +214,9 @@ const PATH_LABELS: Record<string, string> = {
   "bookings.faqItems.0.question": "Vraag 1 in veelgestelde vragen",
   "bookings.faqItems.0.answer": "Antwoord 1 in veelgestelde vragen",
   "footer.youtubeHref": "YouTube-link in de footer",
-  "footer.instagramHref": "Instagram-link in de footer"
+  "footer.instagramHref": "Instagram-link in de footer",
+  "footer.links.0.label": "Naam van footerlink 1",
+  "footer.links.0.href": "Link van footerlink 1"
 };
 
 const PATH_HELPERS: Record<string, string> = {
@@ -226,7 +228,9 @@ const PATH_HELPERS: Record<string, string> = {
   "bookings.faqItems.0.question": "Gebruik hier een echte vraag die organisatoren of boekers vaak stellen.",
   "bookings.faqItems.0.answer": "Geef een kort, duidelijk antwoord dat ook op de site prettig leest.",
   "footer.youtubeHref": "Als je dit leeg laat, wordt het YouTube-icoon in de footer niet getoond.",
-  "footer.instagramHref": "Als je dit leeg laat, wordt het Instagram-icoon in de footer niet getoond."
+  "footer.instagramHref": "Als je dit leeg laat, wordt het Instagram-icoon in de footer niet getoond.",
+  "footer.links.0.label": "Deze naam staat in het blok met belangrijke links onderaan de site.",
+  "footer.links.0.href": "Gebruik een volledige link, een route zoals /pers of een anker zoals /#contact."
 };
 
 const PATH_VISIBILITY_HINTS: Record<string, string> = {
@@ -244,7 +248,9 @@ const PATH_VISIBILITY_HINTS: Record<string, string> = {
   "bookings.press.contactEmail": "Leeg = de e-mailknop in Pers wordt niet getoond.",
   "bookings.press.contactPhone": "Leeg = de telefoonknop in Pers wordt niet getoond.",
   "footer.youtubeHref": "Leeg = het YouTube-icoon in de footer verdwijnt.",
-  "footer.instagramHref": "Leeg = het Instagram-icoon in de footer verdwijnt."
+  "footer.instagramHref": "Leeg = het Instagram-icoon in de footer verdwijnt.",
+  "footer.links.0.label": "Lege naam of lege link = deze footerlink wordt niet getoond.",
+  "footer.links.0.href": "Lege naam of lege link = deze footerlink wordt niet getoond."
 };
 
 const SECTION_SEARCH_TERMS: Record<string, string[]> = {
@@ -255,7 +261,7 @@ const SECTION_SEARCH_TERMS: Record<string, string[]> = {
   Kampvuurklanken: ["kampvuur", "kampvuurklanken", "teams", "management", "team sessie", "vuur"],
   Boekingen: ["boekingen", "live", "optredens", "agenda", "aanvragen", "beschikbaarheid", "pers", "coverkoffer"],
   Contact: ["contact", "formulier", "stuur bericht", "mail", "telefoon"],
-  "Onderaan de pagina en socials": ["footer", "onderaan", "onderkant", "socials", "instagram", "youtube"],
+  "Onderaan de pagina en socials": ["footer", "onderaan", "onderkant", "socials", "instagram", "youtube", "belangrijke links", "footer menu"],
   [DISC_SECTION_TITLE]: ["releases", "liedjes", "muziek", "single", "ep", "album", "nummers"],
   [SHOWS_SECTION_TITLE]: ["shows", "optredens", "agenda", "live agenda", "volgende optredens", "tickets", "extra info"]
 };
@@ -282,7 +288,9 @@ const FIELD_SEARCH_TERMS: Record<string, string[]> = {
   "contact.emailTemplates.admin.subject": ["mail naar bohem", "melding voor bohem", "admin mail"],
   "contact.emailTemplates.sender.subject": ["bevestigingsmail", "mail naar afzender", "antwoordmail"],
   "footer.instagramHref": ["instagram", "instagram link", "socials"],
-  "footer.youtubeHref": ["youtube", "youtube link", "socials"]
+  "footer.youtubeHref": ["youtube", "youtube link", "socials"],
+  "footer.links.0.label": ["footer link", "belangrijke link", "menu link", "onderaan link"],
+  "footer.links.0.href": ["footer link url", "menu link url", "onderaan link url"]
 };
 
 function pathParts(path: string) {

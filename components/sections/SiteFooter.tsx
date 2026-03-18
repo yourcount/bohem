@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import type { SiteContent } from "@/lib/types";
 
@@ -8,6 +9,9 @@ type SiteFooterProps = {
 
 export function SiteFooter({ footer }: SiteFooterProps) {
   const footerText = footer.copyright?.trim() ?? "";
+  const footerLinks = (footer.links ?? [])
+    .map((item) => ({ label: item.label?.trim() ?? "", href: item.href?.trim() ?? "" }))
+    .filter((item) => item.label.length > 0 && item.href.length > 0);
   const socialLinks = [
     {
       href: footer.youtubeHref?.trim() ?? "",
@@ -31,17 +35,40 @@ export function SiteFooter({ footer }: SiteFooterProps) {
 
   return (
     <footer aria-label="Footer" className="border-t border-[var(--color-line-muted)] bg-[#111d30] py-8 text-[#d6e3ec]">
-      <div className="mx-auto flex w-full max-w-[1120px] flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center sm:px-6">
-        <Image
-          src="/brand/logos/bohem-logo-white-moon-color.webp"
-          alt={footerText || "Bohèm"}
-          width={180}
-          height={68}
-          className="h-8 w-auto"
-        />
-        <span className="block mt-3 text-sm text-[#cfd9e2] sm:mt-0">
+      <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-4 sm:px-6 lg:grid-cols-[auto_1fr_auto] lg:items-start">
+        <div>
+          <Image
+            src="/brand/logos/bohem-logo-white-moon-color.webp"
+            alt={footerText || "Bohèm"}
+            width={180}
+            height={68}
+            className="h-8 w-auto"
+          />
+        </div>
+
+        {footerLinks.length > 0 ? (
+          <nav aria-label="Belangrijke links" className="w-full">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Belangrijke links</p>
+            <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+              {footerLinks.map((link) => (
+                <li key={`${link.label}-${link.href}`}>
+                  <Link
+                    href={link.href}
+                    className="inline-flex text-sm text-[#d6e3ec] transition-colors hover:text-white"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ) : (
+          <div />
+        )}
+
+        <div className="text-sm text-[#cfd9e2] lg:text-right">
           {socialLinks.length > 0 ? (
-            <span className="mb-3 flex items-center gap-2">
+            <div className="mb-3 flex items-center gap-2 lg:justify-end">
               {socialLinks.map((link) => (
                 <a
                   key={link.label}
@@ -54,21 +81,23 @@ export function SiteFooter({ footer }: SiteFooterProps) {
                   {link.icon}
                 </a>
               ))}
-            </span>
+            </div>
           ) : null}
-          {footerText ? <span className="mb-3 block text-sm text-[#d6e3ec]">{footerText}</span> : null}
-          Designed &amp; Developed by{" "}
-          <a
-            id="footer-designer-link"
-            href="https://www.instagram.com/yourcounter/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline transition-colors hover:text-white"
-          >
-            Tijmen de Graaf
-          </a>
-          .
-        </span>
+          {footerText ? <p className="mb-3 text-sm text-[#d6e3ec]">{footerText}</p> : null}
+          <p>
+            Designed &amp; Developed by{" "}
+            <a
+              id="footer-designer-link"
+              href="https://www.instagram.com/yourcounter/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline transition-colors hover:text-white"
+            >
+              Tijmen de Graaf
+            </a>
+            .
+          </p>
+        </div>
       </div>
     </footer>
   );

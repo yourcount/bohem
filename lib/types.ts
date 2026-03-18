@@ -309,5 +309,9 @@ export type SiteContent = {
     copyright: string;
     youtubeHref?: string;
     instagramHref?: string;
+    links?: Array<{
+      label: string;
+      href: string;
+    }>;
   };
 };

@@ -159,6 +159,22 @@ function sanitizeLandingSocialProofItems(
     .filter((item) => item.quote.length > 0);
 }
 
+function sanitizeFooterLinks(
+  items: Array<{ label?: string; href?: string }> | undefined,
+  fallback: Array<{ label?: string; href?: string }> | undefined
+) {
+  return (items ?? fallback ?? [])
+    .map((item, index) => {
+      const fallbackItem = fallback?.[index];
+      const label = item.label?.trim() || fallbackItem?.label?.trim() || "";
+      const fallbackHref = fallbackItem?.href?.trim() || "/";
+      const href = sanitizeHref(item.href ?? fallbackHref, fallbackHref);
+
+      return { label, href };
+    })
+    .filter((item) => item.label.length > 0 && item.href.length > 0);
+}
+
 export function sanitizeNavigationItems(items: SiteContent["navigation"]): SiteContent["navigation"] {
   return items.map((item, index) => {
     const fallback = siteContent.navigation[index]?.href ?? "#contact";
@@ -389,7 +405,8 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
       ...content.footer,
       copyright: content.footer.copyright?.trim() ?? siteContent.footer.copyright,
       youtubeHref: sanitizeOptionalHref(content.footer.youtubeHref, siteContent.footer.youtubeHref ?? ""),
-      instagramHref: sanitizeOptionalHref(content.footer.instagramHref, siteContent.footer.instagramHref ?? "")
+      instagramHref: sanitizeOptionalHref(content.footer.instagramHref, siteContent.footer.instagramHref ?? ""),
+      links: sanitizeFooterLinks(content.footer.links, siteContent.footer.links)
     }
   };
 }

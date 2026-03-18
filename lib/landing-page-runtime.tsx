@@ -114,6 +114,7 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
         title={view.intro.title}
         intro={view.intro.intro}
         note={view.intro.note}
+        quickPanel={view.intro.quickPanel}
         image={view.intro.image}
         primaryCta={view.intro.primaryCta}
         secondaryCta={view.intro.secondaryCta}

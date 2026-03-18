@@ -12,6 +12,12 @@ type LandingHeroProps = {
   title: string;
   intro: string;
   note?: string;
+  quickPanel?: {
+    title: string;
+    items?: string[];
+    primaryCta?: Cta;
+    secondaryCta?: Cta;
+  };
   image?: ImageAsset & {
     width?: number;
     height?: number;
@@ -24,10 +30,14 @@ function hasText(value: string | undefined | null) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-export function LandingHero({ id = "intro", eyebrow, audienceLabel, title, intro, note, image, primaryCta, secondaryCta }: LandingHeroProps) {
+export function LandingHero({ id = "intro", eyebrow, audienceLabel, title, intro, note, quickPanel, image, primaryCta, secondaryCta }: LandingHeroProps) {
   const actions = [primaryCta, secondaryCta].filter(
     (cta): cta is Cta => Boolean(cta && hasText(cta.label) && hasText(cta.href))
   );
+  const quickPanelActions = [quickPanel?.primaryCta, quickPanel?.secondaryCta].filter(
+    (cta): cta is Cta => Boolean(cta && hasText(cta.label) && hasText(cta.href))
+  );
+  const quickPanelItems = (quickPanel?.items ?? []).filter((item) => hasText(item));
   const hasImage = Boolean(image?.src);
   const imageWidth = image?.width ?? 1536;
   const imageHeight = image?.height ?? 864;
@@ -65,6 +75,30 @@ export function LandingHero({ id = "intro", eyebrow, audienceLabel, title, intro
                     {cta.label}
                   </ButtonLink>
                 ))}
+              </div>
+            ) : null}
+            {quickPanel && hasText(quickPanel.title) ? (
+              <div className="mt-7 max-w-[62ch] rounded-3xl border border-[rgba(243,215,176,0.22)] bg-[rgba(248,241,229,0.06)] p-5 shadow-[0_12px_28px_rgba(0,0,0,0.18)]">
+                <p className="text-sm font-semibold uppercase tracking-[0.1em] text-[#f3d7b0]">{quickPanel.title}</p>
+                {quickPanelItems.length > 0 ? (
+                  <ul className="mt-3 space-y-2 text-sm leading-7 text-[#ead7bc]">
+                    {quickPanelItems.map((item) => (
+                      <li key={item} className="flex gap-3">
+                        <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 rounded-full bg-[var(--color-accent-amber)]" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {quickPanelActions.length > 0 ? (
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    {quickPanelActions.map((cta) => (
+                      <ButtonLink key={`${cta.label}-${cta.href}`} href={cta.href} variant={cta.variant ?? "primary"} dataCta={`landing_${id}_panel_${cta.label}`}>
+                        {cta.label}
+                      </ButtonLink>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             ) : null}
           </div>

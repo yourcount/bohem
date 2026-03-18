@@ -10,6 +10,12 @@ export type LandingRouteView = {
     title: string;
     intro: string;
     note?: string;
+    quickPanel?: {
+      title: string;
+      items?: string[];
+      primaryCta?: { label: string; href: string; variant?: "primary" | "secondary" };
+      secondaryCta?: { label: string; href: string; variant?: "primary" | "secondary" };
+    };
     image?: SiteContent["hero"]["image"] | SiteContent["musicExperience"]["image"] | SiteContent["kampvuur"]["image"];
     primaryCta: { label: string; href: string; variant?: "primary" | "secondary" };
     secondaryCta?: { label: string; href: string; variant?: "primary" | "secondary" };
@@ -452,6 +458,18 @@ export function buildPersLanding(siteContent: SiteContent): LandingRouteView {
       title: content.title,
       intro: content.intro,
       note: content.positioningBody || press?.boilerplate || "Alles wat een redacteur, programmeur of venue snel nodig heeft.",
+      quickPanel: {
+        title: "Direct beschikbaar",
+        items: [
+          press?.kitLabel ? `${press.kitLabel} staat direct voor je klaar.` : "",
+          press?.contactEmail ? `Pers en boekingen: ${press.contactEmail}` : "",
+          press?.contactPhone ? `Telefoon: ${press.contactPhone}` : ""
+        ].filter((item) => hasText(item)),
+        primaryCta: pressKitCta,
+        secondaryCta: press?.contactEmail
+          ? { label: "Mail direct", href: `mailto:${press.contactEmail}`, variant: "secondary" }
+          : undefined
+      },
       image: content.image || siteContent.bookings.highlightImage || siteContent.about.photoMoments?.[0] || siteContent.hero.image,
       primaryCta: content.cta ?? pressKitCta ?? { label: "Bekijk de kernfeiten", href: "#highlights" },
       secondaryCta: { label: "Lees de FAQ", href: "#faq", variant: "secondary" }

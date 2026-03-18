@@ -52,6 +52,7 @@ export function ShowsSection({ shows, eyebrow, title, badgeLabel }: ShowsSection
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {visibleShows.map((show, index) => {
                 const showSlug = (show.venue || show.city || `show-${index}`).toLowerCase().replace(/\s+/g, "_");
+                const freeEntryHref = show.freeEntry && hasText(show.infoHref) ? show.infoHref! : null;
                 return (
                 <Reveal key={`${show.date}-${show.venue}-${index}`} delayMs={index * 90}>
                   <article
@@ -67,9 +68,26 @@ export function ShowsSection({ shows, eyebrow, title, badgeLabel }: ShowsSection
                     {show.freeEntry || hasText(show.ticketsHref) || hasText(show.infoHref) ? (
                       <div className="mt-5 flex flex-col gap-2">
                       {show.freeEntry ? (
-                        <span className="inline-flex w-full items-center justify-center rounded-full border border-[rgba(118,203,147,0.42)] bg-[rgba(118,203,147,0.14)] px-4 py-2.5 text-sm font-bold text-[#d6f0d0]">
-                          Gratis toegang
-                        </span>
+                        freeEntryHref ? (
+                          <Link
+                            href={freeEntryHref}
+                            {...getExternalLinkProps(freeEntryHref)}
+                            data-cta={`show_free_entry_${showSlug}`}
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[rgba(118,203,147,0.46)] bg-[linear-gradient(180deg,rgba(118,203,147,0.26)_0%,rgba(79,162,113,0.22)_100%)] px-4 py-2.5 text-sm font-bold text-[#ecffe7] shadow-[0_10px_24px_rgba(44,87,59,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgba(118,203,147,0.7)] hover:bg-[linear-gradient(180deg,rgba(118,203,147,0.34)_0%,rgba(79,162,113,0.3)_100%)] hover:shadow-[0_14px_28px_rgba(44,87,59,0.32)]"
+                          >
+                            <span aria-hidden="true" className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[rgba(12,24,16,0.26)] text-base leading-none">
+                              ✓
+                            </span>
+                            <span>Gratis toegang</span>
+                          </Link>
+                        ) : (
+                          <span className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[rgba(118,203,147,0.42)] bg-[linear-gradient(180deg,rgba(118,203,147,0.22)_0%,rgba(79,162,113,0.18)_100%)] px-4 py-2.5 text-sm font-bold text-[#dff7d8] shadow-[0_8px_20px_rgba(44,87,59,0.18)]">
+                            <span aria-hidden="true" className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[rgba(12,24,16,0.26)] text-base leading-none">
+                              ✓
+                            </span>
+                            <span>Gratis toegang</span>
+                          </span>
+                        )
                       ) : hasText(show.ticketsHref) ? (
                         <Link
                           href={show.ticketsHref!}
@@ -80,7 +98,7 @@ export function ShowsSection({ shows, eyebrow, title, badgeLabel }: ShowsSection
                           <span className="ticket-burst-label">Tickets</span>
                         </Link>
                       ) : null}
-                      {hasText(show.infoHref) ? (
+                      {!show.freeEntry && hasText(show.infoHref) ? (
                         <Link
                           href={show.infoHref!}
                           {...getExternalLinkProps(show.infoHref)}

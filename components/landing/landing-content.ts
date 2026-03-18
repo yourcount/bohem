@@ -19,6 +19,14 @@ export type LandingRouteView = {
     intro?: string;
     items: LandingHighlightItem[];
   };
+  localArea?: {
+    title: string;
+    intro?: string;
+    cities: string[];
+    proofTitle?: string;
+    proofItems: string[];
+    cta?: { label: string; href: string; variant?: "primary" | "secondary" };
+  };
   faq?: {
     eyebrow?: string;
     title: string;
@@ -114,6 +122,36 @@ function buildFaq(
   };
 }
 
+function buildLocalArea(
+  title: string | undefined,
+  intro: string | undefined,
+  cities: string[] | undefined,
+  proofTitle: string | undefined,
+  proofItems: string[] | undefined,
+  cta: { label: string; href: string; variant?: "primary" | "secondary" } | undefined
+): LandingRouteView["localArea"] {
+  const visibleCities = (cities ?? []).map((city) => city.trim()).filter((city) => city.length > 0);
+  const visibleProof = (proofItems ?? []).map((item) => item.trim()).filter((item) => item.length > 0);
+  const hasContent =
+    hasText(title) ||
+    hasText(intro) ||
+    visibleCities.length > 0 ||
+    hasText(proofTitle) ||
+    visibleProof.length > 0 ||
+    Boolean(cta && hasText(cta.label) && hasText(cta.href));
+
+  if (!hasContent) return undefined;
+
+  return {
+    title: title?.trim() || "Ook te boeken in deze regio",
+    intro: intro?.trim(),
+    cities: visibleCities,
+    proofTitle: proofTitle?.trim(),
+    proofItems: visibleProof,
+    cta: cta && hasText(cta.label) && hasText(cta.href) ? cta : undefined
+  };
+}
+
 function toTelHref(phone: string | undefined | null) {
   if (!hasText(phone)) return undefined;
   const normalizedPhone = String(phone).trim().replace(/\s+/g, "");
@@ -151,6 +189,14 @@ export function buildMusicDuoLanding(siteContent: SiteContent): LandingRouteView
       intro: content.positioningBody || content.intro,
       items: combineSections(content.highlights, content.fitItems, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6)
     },
+    localArea: buildLocalArea(
+      content.localAreaTitle,
+      content.localAreaIntro,
+      content.priorityCities,
+      content.localProofTitle,
+      content.localProofItems,
+      content.localLinkLabel && content.localLinkHref ? { label: content.localLinkLabel, href: content.localLinkHref, variant: "secondary" } : undefined
+    ),
     faq,
     shows: visibleShows.length > 0 ? {
       eyebrow: siteContent.bookings.showsEyebrow ?? "Live agenda",
@@ -200,6 +246,14 @@ export function buildTheaterConcertLanding(siteContent: SiteContent): LandingRou
       intro: content.positioningBody || "Klein genoeg om dichtbij te voelen, rijk genoeg om een avond te dragen.",
       items: combineSections(content.highlights, content.fitItems, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6)
     },
+    localArea: buildLocalArea(
+      content.localAreaTitle,
+      content.localAreaIntro,
+      content.priorityCities,
+      content.localProofTitle,
+      content.localProofItems,
+      content.localLinkLabel && content.localLinkHref ? { label: content.localLinkLabel, href: content.localLinkHref, variant: "secondary" } : undefined
+    ),
     faq,
     shows: visibleShows.length > 0 ? {
       eyebrow: siteContent.bookings.showsEyebrow ?? "Speeldata",
@@ -292,6 +346,14 @@ export function buildHuiskamerConcertLanding(siteContent: SiteContent): LandingR
       intro: content.positioningBody || "De ruimte is klein, de beleving juist groot.",
       items: combineSections(content.highlights, content.fitItems, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6)
     },
+    localArea: buildLocalArea(
+      content.localAreaTitle,
+      content.localAreaIntro,
+      content.priorityCities,
+      content.localProofTitle,
+      content.localProofItems,
+      content.localLinkLabel && content.localLinkHref ? { label: content.localLinkLabel, href: content.localLinkHref, variant: "secondary" } : undefined
+    ),
     faq,
     cta: {
       eyebrow: "Contact",

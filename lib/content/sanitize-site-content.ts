@@ -130,6 +130,22 @@ function sanitizeLandingCta(
   };
 }
 
+function sanitizeLandingFaqItems(
+  items: Array<{ question: string; answer: string }> | undefined,
+  fallback: Array<{ question: string; answer: string }> | undefined
+) {
+  return (items ?? fallback ?? [])
+    .map((item, index) => ({
+      question: item.question?.trim() || fallback?.[index]?.question || "",
+      answer: item.answer?.trim() || fallback?.[index]?.answer || ""
+    }))
+    .filter((item) => item.question.length > 0 && item.answer.length > 0);
+}
+
+function sanitizeTextList(items: string[] | undefined, fallback: string[] | undefined) {
+  return (items ?? fallback ?? []).map((item) => item.trim()).filter((item) => item.length > 0);
+}
+
 export function sanitizeNavigationItems(items: SiteContent["navigation"]): SiteContent["navigation"] {
   return items.map((item, index) => {
     const fallback = siteContent.navigation[index]?.href ?? "#contact";
@@ -288,46 +304,43 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
         ...siteContent.landingPages.musicDuo,
         ...content.landingPages?.musicDuo,
         cta: sanitizeLandingCta(content.landingPages?.musicDuo?.cta, siteContent.landingPages.musicDuo.cta),
-        faqItems: (content.landingPages?.musicDuo?.faqItems ?? siteContent.landingPages.musicDuo.faqItems ?? []).map((item, index) => ({
-          question: item.question?.trim() || siteContent.landingPages.musicDuo.faqItems?.[index]?.question || "",
-          answer: item.answer?.trim() || siteContent.landingPages.musicDuo.faqItems?.[index]?.answer || ""
-        }))
+        faqItems: sanitizeLandingFaqItems(content.landingPages?.musicDuo?.faqItems, siteContent.landingPages.musicDuo.faqItems),
+        priorityCities: sanitizeTextList(content.landingPages?.musicDuo?.priorityCities, siteContent.landingPages.musicDuo.priorityCities),
+        localProofItems: sanitizeTextList(content.landingPages?.musicDuo?.localProofItems, siteContent.landingPages.musicDuo.localProofItems),
+        localFaqItems: sanitizeLandingFaqItems(content.landingPages?.musicDuo?.localFaqItems, siteContent.landingPages.musicDuo.localFaqItems),
+        localLinkHref: sanitizeOptionalHref(content.landingPages?.musicDuo?.localLinkHref, siteContent.landingPages.musicDuo.localLinkHref ?? "")
       },
       theaterConcert: {
         ...siteContent.landingPages.theaterConcert,
         ...content.landingPages?.theaterConcert,
         cta: sanitizeLandingCta(content.landingPages?.theaterConcert?.cta, siteContent.landingPages.theaterConcert.cta),
-        faqItems: (content.landingPages?.theaterConcert?.faqItems ?? siteContent.landingPages.theaterConcert.faqItems ?? []).map((item, index) => ({
-          question: item.question?.trim() || siteContent.landingPages.theaterConcert.faqItems?.[index]?.question || "",
-          answer: item.answer?.trim() || siteContent.landingPages.theaterConcert.faqItems?.[index]?.answer || ""
-        }))
+        faqItems: sanitizeLandingFaqItems(content.landingPages?.theaterConcert?.faqItems, siteContent.landingPages.theaterConcert.faqItems),
+        priorityCities: sanitizeTextList(content.landingPages?.theaterConcert?.priorityCities, siteContent.landingPages.theaterConcert.priorityCities),
+        localProofItems: sanitizeTextList(content.landingPages?.theaterConcert?.localProofItems, siteContent.landingPages.theaterConcert.localProofItems),
+        localFaqItems: sanitizeLandingFaqItems(content.landingPages?.theaterConcert?.localFaqItems, siteContent.landingPages.theaterConcert.localFaqItems),
+        localLinkHref: sanitizeOptionalHref(content.landingPages?.theaterConcert?.localLinkHref, siteContent.landingPages.theaterConcert.localLinkHref ?? "")
       },
       kampvuur: {
         ...siteContent.landingPages.kampvuur,
         ...content.landingPages?.kampvuur,
         cta: sanitizeLandingCta(content.landingPages?.kampvuur?.cta, siteContent.landingPages.kampvuur.cta),
-        faqItems: (content.landingPages?.kampvuur?.faqItems ?? siteContent.landingPages.kampvuur.faqItems ?? []).map((item, index) => ({
-          question: item.question?.trim() || siteContent.landingPages.kampvuur.faqItems?.[index]?.question || "",
-          answer: item.answer?.trim() || siteContent.landingPages.kampvuur.faqItems?.[index]?.answer || ""
-        }))
+        faqItems: sanitizeLandingFaqItems(content.landingPages?.kampvuur?.faqItems, siteContent.landingPages.kampvuur.faqItems)
       },
       huiskamerconcert: {
         ...siteContent.landingPages.huiskamerconcert,
         ...content.landingPages?.huiskamerconcert,
         cta: sanitizeLandingCta(content.landingPages?.huiskamerconcert?.cta, siteContent.landingPages.huiskamerconcert.cta),
-        faqItems: (content.landingPages?.huiskamerconcert?.faqItems ?? siteContent.landingPages.huiskamerconcert.faqItems ?? []).map((item, index) => ({
-          question: item.question?.trim() || siteContent.landingPages.huiskamerconcert.faqItems?.[index]?.question || "",
-          answer: item.answer?.trim() || siteContent.landingPages.huiskamerconcert.faqItems?.[index]?.answer || ""
-        }))
+        faqItems: sanitizeLandingFaqItems(content.landingPages?.huiskamerconcert?.faqItems, siteContent.landingPages.huiskamerconcert.faqItems),
+        priorityCities: sanitizeTextList(content.landingPages?.huiskamerconcert?.priorityCities, siteContent.landingPages.huiskamerconcert.priorityCities),
+        localProofItems: sanitizeTextList(content.landingPages?.huiskamerconcert?.localProofItems, siteContent.landingPages.huiskamerconcert.localProofItems),
+        localFaqItems: sanitizeLandingFaqItems(content.landingPages?.huiskamerconcert?.localFaqItems, siteContent.landingPages.huiskamerconcert.localFaqItems),
+        localLinkHref: sanitizeOptionalHref(content.landingPages?.huiskamerconcert?.localLinkHref, siteContent.landingPages.huiskamerconcert.localLinkHref ?? "")
       },
       press: {
         ...siteContent.landingPages.press,
         ...content.landingPages?.press,
         cta: sanitizeLandingCta(content.landingPages?.press?.cta, siteContent.landingPages.press.cta),
-        faqItems: (content.landingPages?.press?.faqItems ?? siteContent.landingPages.press.faqItems ?? []).map((item, index) => ({
-          question: item.question?.trim() || siteContent.landingPages.press.faqItems?.[index]?.question || "",
-          answer: item.answer?.trim() || siteContent.landingPages.press.faqItems?.[index]?.answer || ""
-        }))
+        faqItems: sanitizeLandingFaqItems(content.landingPages?.press?.faqItems, siteContent.landingPages.press.faqItems)
       }
     },
     contact: {

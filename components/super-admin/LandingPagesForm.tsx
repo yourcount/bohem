@@ -24,6 +24,8 @@ type LandingPagesApiError = {
   fieldErrors?: Record<string, string[]>;
 };
 
+const LOCAL_SEO_PAGE_KEYS: LandingPageKey[] = ["musicDuo", "theaterConcert", "huiskamerconcert"];
+
 const PAGE_META: Array<{
   key: LandingPageKey;
   title: string;
@@ -94,14 +96,18 @@ function normalizeFaqItems(value: unknown, fallback: LandingFaqItem[] = [createE
 function normalizeHighlightItems(value: unknown, fallback: LandingHighlightItem[] = [createEmptyHighlightItem()]) {
   if (!Array.isArray(value)) return fallback;
   const next = value
-    .map((item) => ({
-      title: typeof item === "object" && item !== null && typeof (item as { title?: unknown }).title === "string"
-        ? (item as { title: string }).title.trim()
-        : "",
-      body: typeof item === "object" && item !== null && typeof (item as { body?: unknown }).body === "string"
-        ? (item as { body: string }).body.trim()
-        : ""
-    }))
+    .map((item) =>
+      typeof item === "string"
+        ? { title: "", body: item.trim() }
+        : {
+            title: typeof item === "object" && item !== null && typeof (item as { title?: unknown }).title === "string"
+              ? (item as { title: string }).title.trim()
+              : "",
+            body: typeof item === "object" && item !== null && typeof (item as { body?: unknown }).body === "string"
+              ? (item as { body: string }).body.trim()
+              : ""
+          }
+    )
     .filter((item) => item.title.length > 0 || item.body.length > 0);
   return next.length > 0 ? next : fallback;
 }
@@ -166,6 +172,15 @@ function normalizeLandingPage(value: unknown): LandingPageDraft {
     extraSections: normalizeExtraSections(current.extraSections),
     faqTitle: typeof current.faqTitle === "string" ? current.faqTitle : "",
     faqItems: normalizeFaqItems(current.faqItems),
+    localAreaTitle: typeof current.localAreaTitle === "string" ? current.localAreaTitle : "",
+    localAreaIntro: typeof current.localAreaIntro === "string" ? current.localAreaIntro : "",
+    priorityCities: normalizeTextList(current.priorityCities, [""]),
+    localProofTitle: typeof current.localProofTitle === "string" ? current.localProofTitle : "",
+    localProofItems: normalizeTextList(current.localProofItems, [""]),
+    localFaqTitle: typeof current.localFaqTitle === "string" ? current.localFaqTitle : "",
+    localFaqItems: normalizeFaqItems(current.localFaqItems),
+    localLinkLabel: typeof current.localLinkLabel === "string" ? current.localLinkLabel : "",
+    localLinkHref: typeof current.localLinkHref === "string" ? current.localLinkHref : "",
     proofTitle: typeof current.proofTitle === "string" ? current.proofTitle : ""
   };
 }
@@ -221,7 +236,7 @@ function PageSection({
     });
   };
 
-  const updateList = (key: "fitItems", nextValue: string) => {
+  const updateList = (key: "fitItems" | "priorityCities" | "localProofItems", nextValue: string) => {
     update(key, splitLines(nextValue));
   };
 
@@ -249,6 +264,12 @@ function PageSection({
     update("faqItems", next);
   };
 
+  const updateLocalFaq = (index: number, key: keyof LandingFaqItem, nextValue: string) => {
+    const next = [...(value.localFaqItems ?? [])];
+    next[index] = { ...(next[index] ?? createEmptyFaqItem()), [key]: nextValue };
+    update("localFaqItems", next);
+  };
+
   const updateExtra = (index: number, key: keyof LandingExtraSection, nextValue: string) => {
     const next = [...(value.extraSections ?? [])];
     next[index] = { ...(next[index] ?? createEmptyExtraSection()), [key]: nextValue };
@@ -259,8 +280,11 @@ function PageSection({
   const removeHighlight = (index: number) => update("highlights", (value.highlights ?? []).filter((_, itemIndex) => itemIndex !== index));
   const addFaq = () => update("faqItems", [...(value.faqItems ?? []), createEmptyFaqItem()]);
   const removeFaq = (index: number) => update("faqItems", (value.faqItems ?? []).filter((_, itemIndex) => itemIndex !== index));
+  const addLocalFaq = () => update("localFaqItems", [...(value.localFaqItems ?? []), createEmptyFaqItem()]);
+  const removeLocalFaq = (index: number) => update("localFaqItems", (value.localFaqItems ?? []).filter((_, itemIndex) => itemIndex !== index));
   const addExtra = () => update("extraSections", [...(value.extraSections ?? []), createEmptyExtraSection()]);
   const removeExtra = (index: number) => update("extraSections", (value.extraSections ?? []).filter((_, itemIndex) => itemIndex !== index));
+  const showLocalSeo = LOCAL_SEO_PAGE_KEYS.includes(page);
 
   return (
     <details id={page} className="scroll-mt-6 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.45)] p-5" open={page === "musicDuo"}>
@@ -471,6 +495,102 @@ function PageSection({
             <input className={pageFieldClass()} value={value.faqTitle ?? ""} onChange={(event) => update("faqTitle", event.target.value)} />
           </label>
         </div>
+
+        {showLocalSeo ? (
+          <div className="grid gap-5 rounded-2xl border border-[rgba(67,135,133,0.45)] bg-[rgba(18,30,46,0.38)] p-5">
+            <div>
+              <h3 className="font-display text-2xl">Lokale SEO</h3>
+              <p className="text-sm text-[#d9c6ac]">Gebruik dit blok om deze landingspagina regionaal relevanter te maken zonder aparte stadspagina's te bouwen.</p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="text-sm md:col-span-2">
+                Titel boven lokaal speelgebied
+                <input className={pageFieldClass()} value={value.localAreaTitle ?? ""} onChange={(event) => update("localAreaTitle", event.target.value)} />
+              </label>
+
+              <label className="text-sm md:col-span-2">
+                Korte uitleg over waar Bohèm goed past
+                <textarea className={pageFieldClass("min-h-24 resize-y")} value={value.localAreaIntro ?? ""} onChange={(event) => update("localAreaIntro", event.target.value)} />
+              </label>
+
+              <label className="text-sm md:col-span-2">
+                Plaatsen die je wilt benoemen, één per regel
+                <textarea className={pageFieldClass("min-h-24 resize-y")} value={joinLines(value.priorityCities)} onChange={(event) => updateList("priorityCities", event.target.value)} />
+              </label>
+
+              <label className="text-sm md:col-span-2">
+                Titel boven lokale overtuigingspunten
+                <input className={pageFieldClass()} value={value.localProofTitle ?? ""} onChange={(event) => update("localProofTitle", event.target.value)} />
+              </label>
+
+              <label className="text-sm md:col-span-2">
+                Waarom Bohèm hier goed past, één punt per regel
+                <textarea className={pageFieldClass("min-h-28 resize-y")} value={joinLines(value.localProofItems)} onChange={(event) => updateList("localProofItems", event.target.value)} />
+              </label>
+
+              <label className="text-sm">
+                Tekst van lokale knop
+                <input className={pageFieldClass()} value={value.localLinkLabel ?? ""} onChange={(event) => update("localLinkLabel", event.target.value)} />
+              </label>
+
+              <label className="text-sm">
+                Link van lokale knop
+                <input className={pageFieldClass()} value={value.localLinkHref ?? ""} onChange={(event) => update("localLinkHref", event.target.value)} />
+              </label>
+
+              <label className="text-sm md:col-span-2">
+                Titel boven lokale veelgestelde vragen
+                <input className={pageFieldClass()} value={value.localFaqTitle ?? ""} onChange={(event) => update("localFaqTitle", event.target.value)} />
+              </label>
+            </div>
+
+            <div className="grid gap-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h4 className="font-display text-2xl">Lokale veelgestelde vragen</h4>
+                  <p className="text-sm text-[#d9c6ac]">Deze vragen worden toegevoegd aan de bestaande FAQ van deze pagina en ook meegenomen in schema.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={addLocalFaq}
+                  className="rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                >
+                  Vraag toevoegen
+                </button>
+              </div>
+
+              <div className="grid gap-3">
+                {(value.localFaqItems ?? []).map((item, index) => (
+                  <div key={`${page}-local-faq-${index}`} className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-[var(--color-text-primary)]">Lokale vraag {index + 1}</p>
+                      <button
+                        type="button"
+                        onClick={() => removeLocalFaq(index)}
+                        className="rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[#d9c6ac] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                      >
+                        Verwijder
+                      </button>
+                    </div>
+
+                    <div className="mt-3 grid gap-3">
+                      <label className="text-sm">
+                        Lokale vraag
+                        <input className={pageFieldClass()} value={item.question} onChange={(event) => updateLocalFaq(index, "question", event.target.value)} />
+                      </label>
+
+                      <label className="text-sm">
+                        Antwoord op deze lokale vraag
+                        <textarea className={pageFieldClass("min-h-24 resize-y")} value={item.answer} onChange={(event) => updateLocalFaq(index, "answer", event.target.value)} />
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         <div className="grid gap-4">
           <div className="flex items-center justify-between gap-3">

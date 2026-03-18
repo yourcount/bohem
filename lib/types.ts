@@ -54,6 +54,15 @@ export type LandingPageContent = {
   extraSections?: LandingExtraSection[];
   faqTitle?: string;
   faqItems?: LandingFaqItem[];
+  localAreaTitle?: string;
+  localAreaIntro?: string;
+  priorityCities?: string[];
+  localProofTitle?: string;
+  localProofItems?: string[];
+  localFaqTitle?: string;
+  localFaqItems?: LandingFaqItem[];
+  localLinkLabel?: string;
+  localLinkHref?: string;
   proofTitle?: string;
 };
 

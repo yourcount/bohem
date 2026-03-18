@@ -68,13 +68,14 @@ export function getLandingPageContent(content: SiteContent, key: LandingPageKey)
 
 export function getLandingFaqItems(content: SiteContent, key: LandingPageKey): LandingFaqItem[] {
   const landingFaq = (content.landingPages[key].faqItems ?? []).filter(hasFaqItem);
+  const localFaq = (content.landingPages[key].localFaqItems ?? []).filter(hasFaqItem);
   if (landingFaq.length > 0) {
-    return landingFaq;
+    return [...landingFaq, ...localFaq];
   }
 
   if (key === "kampvuur") {
-    return [];
+    return localFaq;
   }
 
-  return (content.bookings.faqItems ?? []).filter(hasFaqItem);
+  return [...(content.bookings.faqItems ?? []).filter(hasFaqItem), ...localFaq];
 }

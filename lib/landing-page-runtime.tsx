@@ -4,6 +4,7 @@ import { LandingCtaBand } from "@/components/landing/LandingCtaBand";
 import { LandingFaq } from "@/components/landing/LandingFaq";
 import { LandingHero } from "@/components/landing/LandingHero";
 import { LandingHighlights } from "@/components/landing/LandingHighlights";
+import { LandingLocalArea } from "@/components/landing/LandingLocalArea";
 import {
   buildHuiskamerConcertLanding,
   buildKampvuurLanding,
@@ -93,6 +94,19 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
           eyebrow={view.shows?.eyebrow}
           title={view.shows?.title}
           badgeLabel={view.shows?.badgeLabel}
+        />
+      ) : null}
+
+      {view.localArea ? <SectionMotifDivider /> : null}
+      {view.localArea ? (
+        <LandingLocalArea
+          id="regio"
+          title={view.localArea.title}
+          intro={view.localArea.intro}
+          cities={view.localArea.cities}
+          proofTitle={view.localArea.proofTitle}
+          proofItems={view.localArea.proofItems}
+          cta={view.localArea.cta}
         />
       ) : null}
 

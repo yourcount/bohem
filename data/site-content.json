@@ -385,322 +385,369 @@
   },
   "landingPages": {
     "musicDuo": {
-      "heroLabel": "Bohèm live boeken",
-      "title": "Muziekduo boeken",
-      "intro": "Bohèm is het live muziekduo van Arthur Bont en Bettina Kraaieveld voor theater, culturele events, intieme concerten en andere avonden waar verhaal, sfeer en persoonlijk contact centraal staan.",
-      "seoTitle": "Muziekduo boeken | Bohèm | Arthur Bont & Bettina Kraaieveld",
-      "seoDescription": "Muziekduo boeken voor theater, culturele events of een intieme liveavond? Ontdek Bohèm: Arthur Bont en Bettina Kraaieveld met verhalende songs, warmte en theatrale zeggingskracht.",
+      "title": "Bohèm boeken als muziekduo",
+      "intro": "Bohèm is te boeken als live muziekduo voor theaters, culturele avonden, intieme concerten en bijzondere momenten waar een luisterend publiek centraal staat.",
+      "seoTitle": "Muziekduo boeken | Bohèm",
+      "seoDescription": "Boek Bohèm als live muziekduo in Utrecht, Amersfoort, Hilversum en Leiden voor theater, culturele events, huiskamerconcerten en intieme avonden met verhalende songs.",
       "ogTitle": "Muziekduo boeken | Bohèm",
-      "ogDescription": "Boek Bohèm als live muziekduo voor een avond met verhaal, sfeer en persoonlijk contact.",
-      "cta": {
-        "label": "Vraag beschikbaarheid aan",
-        "href": "/#contact",
-        "variant": "primary"
-      },
-      "image": {
-        "src": "/images/bohem-hero.jpg",
-        "alt": "Arthur Bont en Bettina Kraaieveld in warm podiumlicht als live muziekduo Bohèm",
-        "width": 1536,
-        "height": 864,
-        "focusX": 50,
-        "focusY": 12
-      },
-      "positioningTitle": "Waarom Bohèm past op een live avond",
-      "positioningBody": "Bohèm combineert melodische Nederlandstalige en Engelstalige songs met theatrale zeggingskracht, warmte en ruimte voor een echt luistermoment. Daardoor past het duo zowel in culturele programmering als in kleinschalige settings waar contact met het publiek belangrijk is.",
-      "fitTitle": "Geschikt voor",
+      "ogDescription": "Boek Bohèm als live muziekduo in Utrecht, Amersfoort, Hilversum en Leiden voor theater, culturele events en intieme concerten.",
+      "heroLabel": "Live muziekduo",
+      "positioningTitle": "Waarom Bohèm als muziekduo werkt",
+      "positioningBody": "De songs zijn melodisch, persoonlijk en direct. Daardoor voelt het duo compact en dichtbij, maar met genoeg dynamiek voor een volle zaal.",
+      "fitTitle": "Past goed bij",
       "fitItems": [
-        "Theaterprogramma's en kleinschalige cultuuravonden",
-        "Culturele events en seizoensopeningen",
-        "Luisterconcerten, huiskamers en intieme podia"
+        "Theateravonden en culturele programmeersporen",
+        "Intieme concerten en luisterpubliek",
+        "Avonden met ruimte voor verhaal en contact"
       ],
       "highlights": [
         {
-          "title": "Verhalende live muziek",
-          "body": "Songs met een duidelijke lijn, afwisseling in dynamiek en ruimte voor verstilling."
+          "title": "Direct contact",
+          "body": "Arthur Bont en Bettina Kraaieveld spelen als duo zonder afstand."
         },
         {
-          "title": "Warm en persoonlijk",
-          "body": "Geen afstandelijk optreden, maar een muzikale avond waarin sfeer en contact voelbaar zijn."
+          "title": "Verhalende songs",
+          "body": "Nederlandstalige en Engelstalige songs in een verhalende lijn."
         },
         {
-          "title": "Flexibel inzetbaar",
-          "body": "Geschikt voor theater, intieme concerten en bijzondere culturele settings."
+          "title": "Flexibele setting",
+          "body": "Geschikt voor kleine en grotere settings."
         }
       ],
-      "extraSections": [
-        {
-          "title": "Zo verloopt een boeking",
-          "body": "Je deelt datum, locatie en type avond. Daarna ontvang je snel een concreet voorstel dat past bij de setting, speelduur en gewenste sfeer."
-        }
-      ],
-      "faqTitle": "Veelgestelde vragen over Bohèm als muziekduo",
+      "faqTitle": "Veelgestelde vragen over muziekduo boeken",
       "faqItems": [
         {
-          "question": "Voor welke avonden is Bohèm als muziekduo te boeken?",
-          "answer": "Bohèm speelt op theateravonden, culturele events, huiskamerconcerten en andere kleinschalige live settings waar luistermuziek en sfeer belangrijk zijn."
+          "question": "Voor welke gelegenheden is Bohèm te boeken?",
+          "answer": "Voor theaters, culturele avonden, intieme concerten, huiskamerpodia en andere settings waar luisteren centraal staat."
         },
         {
-          "question": "Speelt Bohèm alleen eigen werk?",
-          "answer": "Het hart van Bohèm ligt bij eigen repertoire, maar afhankelijk van de context kan ook een passende live-invulling worden afgestemd."
+          "question": "Hoe klinkt Bohèm live als muziekduo?",
+          "answer": "Verhalend, melodisch en persoonlijk, met ruimte voor spanning, rust en directe interactie."
         },
         {
-          "question": "Hoe snel ontvangen we een voorstel?",
-          "answer": "Na een aanvraag met datum, locatie en type avond reageert Bohèm meestal binnen 2 werkdagen."
+          "question": "Is Bohèm geschikt voor een kleinere locatie?",
+          "answer": "Ja. De duo-opstelling werkt juist sterk in intieme zalen en kleinere settings."
         }
       ],
-      "proofTitle": "Wat organisatoren teruggeven"
-    },
-    "theaterConcert": {
-      "heroLabel": "Voor programmeurs en podia",
-      "title": "Theaterconcert boeken",
-      "intro": "Bohèm brengt een theaterconcert met verhalende songs, theatrale zeggingskracht en een warme podiumpresentatie die goed werkt voor luisterpubliek en culturele programmering.",
-      "seoTitle": "Theaterconcert boeken | Bohèm | Live muziekduo voor culturele programmering",
-      "seoDescription": "Theaterconcert boeken voor een cultureel podium of luisterpubliek? Bohèm brengt verhalende songs, theatrale zeggingskracht en een intieme live-ervaring.",
-      "ogTitle": "Theaterconcert boeken | Bohèm",
-      "ogDescription": "Boek Bohèm voor een theaterconcert met verhalende songs en een sterke luisterervaring.",
+      "localAreaTitle": "Ook te boeken in Utrecht, Amersfoort, Hilversum en Leiden",
+      "localAreaIntro": "Bohèm past goed bij culturele avonden, luisterconcerten en kleinschalige events in Midden-Nederland en de Randstad. Voor deze eerste lokale SEO-laag richten we ons op steden waar een theater- of huiskamerpubliek logisch aansluit op het karakter van het duo.",
+      "priorityCities": [
+        "Utrecht",
+        "Amersfoort",
+        "Hilversum",
+        "Leiden"
+      ],
+      "localProofTitle": "Waarom dit regionaal logisch is",
+      "localProofItems": [
+        "In Utrecht en Amersfoort sluit Bohèm goed aan op culturele podia en luistergerichte avondprogramma’s.",
+        "Hilversum en Leiden combineren een cultureel profiel met relatief weinig scherpe muziekduo-landingspagina’s.",
+        "Deze steden zijn sterk genoeg om regionaal genoemd te worden zonder dat er meteen dunne aparte stadspagina’s nodig zijn."
+      ],
+      "localFaqTitle": "Lokale vragen over muziekduo boeken",
+      "localFaqItems": [
+        {
+          "question": "Speelt Bohèm ook in Utrecht en Amersfoort?",
+          "answer": "Ja. Bohèm is te boeken in Utrecht, Amersfoort en omliggende plaatsen voor theateravonden, culturele events en intieme concertsettings."
+        },
+        {
+          "question": "Past Bohèm ook op een kleiner podium in Hilversum of Leiden?",
+          "answer": "Ja. Juist in kleinere zalen en luistergerichte settings komt het verhalende karakter van Bohèm sterk naar voren."
+        }
+      ],
+      "localLinkLabel": "Vraag een regionale boeking aan",
+      "localLinkHref": "/#contact",
       "cta": {
-        "label": "Bespreek een theateravond",
-        "href": "/#contact",
+        "label": "Vraag beschikbaarheid aan",
+        "href": "#contact",
         "variant": "primary"
       },
-      "image": {
-        "src": "/images/nieuw/bohem-nieuw-tree.webp",
-        "alt": "Bohèm in een open veld als beeld voor een theaterconcert met sfeer en verhaal",
-        "width": 2200,
-        "height": 1573,
-        "focusX": 50,
-        "focusY": 50
-      },
-      "positioningTitle": "Theaterconcert met luisterwaarde",
-      "positioningBody": "Voor theaters en culturele programmeurs biedt Bohèm een avond waarin liedjes, sfeer, contrast en podiumpresentatie samenkomen. Het repertoire is geschikt voor luisterpubliek en werkt goed in een intiem theatrale setting.",
+      "extraSections": [
+        {
+          "title": "Boekingsproces",
+          "body": "Stuur datum, locatie en gewenste setting door. Dan ontvang je een concreet voorstel dat past bij de avond."
+        }
+      ]
+    },
+    "theaterConcert": {
+      "title": "Theaterconcert boeken",
+      "intro": "Voor theaters en culturele programmering maakt Bohèm een programma waarin songs, verhaal en podiumsfeer samenkomen.",
+      "seoTitle": "Theaterconcert boeken | Bohèm",
+      "seoDescription": "Boek Bohèm voor een theaterconcert in Utrecht, Hilversum en Leiden met verhalende songs, theatrale zeggingskracht en een warm akoestisch karakter.",
+      "ogTitle": "Theaterconcert boeken | Bohèm",
+      "ogDescription": "Boek Bohèm voor een theaterconcert in Utrecht, Hilversum en Leiden met verhalende songs en theatrale zeggingskracht.",
+      "heroLabel": "Theaterconcert",
+      "positioningTitle": "Waarom Bohèm past in het theater",
+      "positioningBody": "De combinatie van verhalende songs, tekstbeleving en podiumpresentatie maakt dat Bohèm zich natuurlijk beweegt in een theatercontext.",
       "fitTitle": "Past goed bij",
       "fitItems": [
         "Theateravonden en vlakkevloerprogramma's",
-        "Culturele programmering met luisterpubliek",
-        "Podiummomenten waar verhaal en sfeer centraal staan"
+        "Culturele seizoensopeningen",
+        "Luisterpubliek dat graag dicht op het verhaal zit"
       ],
       "highlights": [
         {
-          "title": "Theatrale zeggingskracht",
-          "body": "De songs worden niet alleen gespeeld, maar ook gedragen door aanwezigheid, timing en opbouw."
+          "title": "Intieme live-ervaring",
+          "body": "Een intieme maar uitgesproken live-ervaring."
         },
         {
-          "title": "Programmeerbaar formaat",
-          "body": "Bohèm is goed in te passen in theateravonden, kleinschalige podia en culturele series."
+          "title": "Dramaturgische lijn",
+          "body": "Podiumwerk met ruimte voor spanningsopbouw en relativering."
         },
         {
-          "title": "Afwisseling in dynamiek",
-          "body": "Van verstild tot energiek, zonder de luisterlijn van de avond te verliezen."
+          "title": "Culturele fit",
+          "body": "Ook geschikt als onderdeel van een bredere culturele avond."
         }
       ],
-      "extraSections": [
-        {
-          "title": "Voor een publiek dat echt wil luisteren",
-          "body": "Deze pagina is bedoeld voor programmeurs, podia en organisatoren die zoeken naar een theaterconcert met inhoud, muzikaliteit en een directe connectie met het publiek."
-        }
-      ],
-      "faqTitle": "Veelgestelde vragen over een theaterconcert van Bohèm",
+      "faqTitle": "Veelgestelde vragen over theaterconcert boeken",
       "faqItems": [
         {
-          "question": "Is Bohèm geschikt voor een klein theater of vlakkevloerpodium?",
-          "answer": "Ja. Bohèm werkt juist goed in intieme zalen waar tekst, sfeer en podiumpresentatie dicht bij het publiek mogen komen."
+          "question": "Past Bohèm in een theaterprogramma?",
+          "answer": "Ja. De songs en presentatie zijn juist sterk in een luistergerichte setting."
         },
         {
-          "question": "Kan het programma worden afgestemd op een culturele avond of thema?",
-          "answer": "Ja. Binnen de context van de avond kan worden afgestemd op speelduur, sfeer en programmatische opbouw."
+          "question": "Is het vooral muziek of ook verhaal?",
+          "answer": "Beide. Verhaal en song ondersteunen elkaar, zodat het concert een duidelijke lijn heeft."
+        },
+        {
+          "question": "Kunnen jullie aansluiten op een seizoensopening of cultureel event?",
+          "answer": "Ja. De set kan worden afgestemd op het karakter van de avond."
         }
       ],
-      "proofTitle": "Theater en cultuur"
-    },
-    "kampvuur": {
-      "heroLabel": "Voor teams en organisaties",
-      "title": "Kampvuurklanken",
-      "intro": "Kampvuurklanken is de muzikale teamervaring van Bohèm voor organisaties, teams en managementgroepen die ruimte willen maken voor verbinding, reflectie en een echt gesprek.",
-      "seoTitle": "Kampvuurklanken | Bohèm | Muzikale teamervaring voor organisaties",
-      "seoDescription": "Kampvuurklanken van Bohèm is een muzikale teamervaring voor teams, management en organisaties rond verbinding, reflectie en menselijkheid.",
-      "ogTitle": "Kampvuurklanken | Bohèm",
-      "ogDescription": "Een muzikale avond voor teams en organisaties met liedjes, verhalen en verbinding.",
+      "localAreaTitle": "Theaterconcerten in Utrecht, Hilversum en Leiden",
+      "localAreaIntro": "Voor lokale SEO op theatertermen kiezen we steden waar cultuurpubliek, programmering en een luistercontext logisch samenkomen. Utrecht, Hilversum en Leiden zijn in deze batch de eerste focusplaatsen.",
+      "priorityCities": [
+        "Utrecht",
+        "Hilversum",
+        "Leiden"
+      ],
+      "localProofTitle": "Waarom deze steden passen bij theaterintentie",
+      "localProofItems": [
+        "Utrecht biedt de sterkste culturele vraag, maar vraagt ook om heldere positionering.",
+        "Hilversum en Leiden laten ruimte zien voor een artistieke, verhalende theaterpagina zonder zware bureauconcurrentie.",
+        "Deze mix maakt het mogelijk om nu al regionaal relevant te zijn zonder losse stadspagina’s te bouwen."
+      ],
+      "localFaqTitle": "Lokale vragen over theaterconcerten",
+      "localFaqItems": [
+        {
+          "question": "Is Bohèm beschikbaar voor een theaterconcert in Utrecht?",
+          "answer": "Ja. Voor Utrecht en omgeving is Bohèm beschikbaar voor luistergerichte theateravonden en culturele programmering."
+        },
+        {
+          "question": "Past Bohèm ook bij kleinere culturele podia in Leiden of Hilversum?",
+          "answer": "Ja. Juist kleinere podia en luisterpubliek passen goed bij de verhalende en directe vorm van Bohèm."
+        }
+      ],
+      "localLinkLabel": "Bespreek een theateravond",
+      "localLinkHref": "/#contact",
       "cta": {
-        "label": "Plan een verkenning",
-        "href": "/#contact",
+        "label": "Vraag een theateroptie aan",
+        "href": "#contact",
         "variant": "primary"
       },
-      "image": {
-        "src": "/images/nieuw/bohem-nieuw-sunset-portrait.webp",
-        "alt": "Bohèm in warm avondlicht als uitnodiging voor Kampvuurklanken",
-        "width": 1800,
-        "height": 1202,
-        "focusX": 50,
-        "focusY": 50
-      },
-      "positioningTitle": "Meer dan een gewone teamsessie",
-      "positioningBody": "Kampvuurklanken is geen standaard presentatie of workshop. Het is een muzikale avond waarin liedjes en verhalen helpen om tot rust, herkenning en echte ontmoeting te komen.",
-      "fitTitle": "Geschikt voor",
+      "extraSections": [
+        {
+          "title": "Programmering en sfeer",
+          "body": "Bohèm werkt goed als losse voorstelling of als onderdeel van een avond waarin publiek echt wil luisteren."
+        }
+      ]
+    },
+    "kampvuur": {
+      "title": "Kampvuurklanken",
+      "intro": "Kampvuurklanken is de muzikale teamavond van Bohèm voor organisaties die ruimte willen maken voor verbinding, reflectie en een echt gesprek.",
+      "seoTitle": "Kampvuurklanken | Bohèm",
+      "seoDescription": "Kampvuurklanken is een muzikale teamavond van Bohèm voor teams, management en organisaties die verbinding en reflectie willen versterken.",
+      "ogTitle": "Kampvuurklanken | Bohèm",
+      "ogDescription": "Kampvuurklanken is een muzikale teamavond van Bohèm voor teams, management en organisaties die verbinding en reflectie willen versterken.",
+      "heroLabel": "Teamavond",
+      "positioningTitle": "Wat deze avond doet",
+      "positioningBody": "De setting is warm, menselijk en direct. Daardoor ontstaat er ruimte voor herkenning, verbinding en een gesprek dat niet stilstaat bij alleen werk.",
+      "fitTitle": "Past goed bij",
       "fitItems": [
-        "Teams in drukke periodes die ruimte willen maken voor verbinding",
-        "Managementgroepen die willen vertragen en verdiepen",
-        "Organisaties die een menselijk alternatief zoeken voor klassieke teambuilding"
+        "Teams die verdieping willen in plaats van een standaard sessie",
+        "Managementdagen en reflectiemomenten",
+        "Organisaties die verbinding willen versterken"
       ],
       "highlights": [
         {
-          "title": "Verbinding zonder geforceerde werkvormen",
-          "body": "Muziek en verhaal openen het gesprek zonder dat het zwaar of kunstmatig hoeft te worden."
+          "title": "Verhalende liedjes",
+          "body": "Verhalende liedjes rond menselijkheid en veerkracht."
         },
         {
-          "title": "Rustpunt in drukte",
-          "body": "De avond helpt teams om even uit de waan van de dag te stappen."
+          "title": "Aandachtige setting",
+          "body": "Een setting die rust en aandacht brengt."
         },
         {
-          "title": "Menselijkheid en humor",
-          "body": "De sfeer is warm, herkenbaar en niet zweverig."
-        }
-      ],
-      "extraSections": [
-        {
-          "title": "Voor teams, management en organisaties",
-          "body": "Kampvuurklanken werkt vooral goed als je een bijeenkomst zoekt die niet alleen informeert, maar iets voelbaars in gang zet binnen een groep."
+          "title": "Schaalbaar concept",
+          "body": "Geschikt als onderdeel van een teamdag of avondprogramma."
         }
       ],
       "faqTitle": "Veelgestelde vragen over Kampvuurklanken",
       "faqItems": [
         {
-          "question": "Voor wat voor organisaties is Kampvuurklanken geschikt?",
-          "answer": "Voor teams, managementgroepen en organisaties die ruimte willen maken voor verbinding, reflectie en een menselijk gesprek."
+          "question": "Voor wie is Kampvuurklanken bedoeld?",
+          "answer": "Voor teams, management en organisaties die een verdiepende muzikale avond zoeken."
         },
         {
-          "question": "Is het een workshop of een optreden?",
-          "answer": "Kampvuurklanken zit ertussenin: het is een muzikale avond met liedjes en verhalen, zonder de sfeer van een standaard training of presentatie."
+          "question": "Is dit geschikt als teambuilding?",
+          "answer": "Ja, maar dan wel in een vorm die rust, reflectie en gesprek centraal zet."
         },
         {
-          "question": "Kan dit ook op locatie bij ons?",
-          "answer": "Ja. De invulling wordt afgestemd op de groep, de locatie en de gewenste duur van de avond."
+          "question": "Kunnen jullie de avond afstemmen op onze groep?",
+          "answer": "Ja. De inhoud en duur kunnen worden afgestemd op de setting en de groep."
         }
       ],
-      "proofTitle": "Waarom dit blijft hangen"
+      "cta": {
+        "label": "Plan een verkenning",
+        "href": "#contact",
+        "variant": "primary"
+      },
+      "extraSections": [
+        {
+          "title": "Opzet van de avond",
+          "body": "Van compacte sessie tot complete avond: de vorm kan mee schalen met de wens van de organisatie."
+        }
+      ]
     },
     "huiskamerconcert": {
-      "heroLabel": "Intiem en persoonlijk",
       "title": "Huiskamerconcert boeken",
-      "intro": "Bohèm is te boeken voor een huiskamerconcert of andere kleinschalige live-setting waarin persoonlijk contact, sfeer en luistermuziek centraal staan.",
-      "seoTitle": "Huiskamerconcert boeken | Bohèm | Intieme live muziek",
-      "seoDescription": "Huiskamerconcert boeken? Bohèm brengt intieme live muziek met verhaal, warmte en direct contact met het publiek.",
+      "intro": "Bohèm speelt ook in huiskamers, kleine zalen en intieme settings waar nabijheid en direct contact het verschil maken.",
+      "seoTitle": "Huiskamerconcert boeken | Bohèm",
+      "seoDescription": "Boek Bohèm voor een huiskamerconcert in Amersfoort, Leiden en Utrecht met intieme sfeer, verhalende songs en direct contact met het publiek.",
       "ogTitle": "Huiskamerconcert boeken | Bohèm",
-      "ogDescription": "Boek Bohèm voor een huiskamerconcert of kleinschalige live-avond met sfeer en persoonlijk contact.",
-      "cta": {
-        "label": "Vraag een huiskamerconcert aan",
-        "href": "/#contact",
-        "variant": "primary"
-      },
-      "image": {
-        "src": "/images/nieuw/bohem-nieuw-road.webp",
-        "alt": "Bohèm in een verstilde setting, passend bij een huiskamerconcert",
-        "width": 1800,
-        "height": 2165,
-        "focusX": 50,
-        "focusY": 50
-      },
-      "positioningTitle": "Kleinschalig, warm en dichtbij",
-      "positioningBody": "Een huiskamerconcert van Bohèm draait om nabijheid: een kleine setting, luisterende mensen en songs die juist in een intieme ruimte sterk binnenkomen.",
+      "ogDescription": "Boek Bohèm voor een huiskamerconcert in Amersfoort, Leiden en Utrecht met intieme sfeer en direct publiekcontact.",
+      "heroLabel": "Intieme setting",
+      "positioningTitle": "Waarom een huiskamerconcert werkt",
+      "positioningBody": "Een kleine ruimte haalt de songs dichterbij en maakt de live-ervaring persoonlijk en direct. Dat past goed bij het verhalende karakter van Bohèm.",
       "fitTitle": "Past goed bij",
       "fitItems": [
-        "Huiskamers en kleinschalige woonkamersessies",
-        "Kleine luisterpodia en intieme concerten",
-        "Avonden waar persoonlijk contact en sfeer belangrijk zijn"
+        "Huiskamerconcerten en kleine podia",
+        "Private avonden met een luisterend publiek",
+        "Samenkomsten waar intimiteit belangrijk is"
       ],
       "highlights": [
         {
-          "title": "Direct contact met het publiek",
-          "body": "De kracht zit in de nabijheid en het luistermoment."
+          "title": "Kleine setting",
+          "body": "Kleine setting, grote aandacht."
         },
         {
-          "title": "Geschikt voor kleine ruimtes",
-          "body": "Bohèm werkt goed in compacte settings waar grote productie niet nodig is."
+          "title": "Directe impact",
+          "body": "Songs en verhalen komen direct binnen."
         },
         {
-          "title": "Persoonlijk en sfeervol",
-          "body": "Ideaal voor een avond die klein voelt maar artistiek sterk staat."
+          "title": "Praktisch flexibel",
+          "body": "Makkelijk af te stemmen op de ruimte."
         }
       ],
-      "extraSections": [
-        {
-          "title": "Een avond die dichtbij mag komen",
-          "body": "Huiskamerconcerten vragen om muzikaliteit zonder afstand. Bohèm sluit daar goed op aan door de combinatie van sfeer, verhaal en directe podiumpresentatie."
-        }
-      ],
-      "faqTitle": "Veelgestelde vragen over een huiskamerconcert van Bohèm",
+      "faqTitle": "Veelgestelde vragen over huiskamerconcert boeken",
       "faqItems": [
         {
-          "question": "Heeft Bohèm veel techniek nodig voor een huiskamerconcert?",
-          "answer": "Nee. Juist in kleinschalige settings werkt Bohèm goed met een compacte technische opzet."
+          "question": "Hoe groot mag de ruimte zijn?",
+          "answer": "Dat hangt af van de opstelling, maar de vorm is juist bedoeld voor intieme en kleinschalige locaties."
         },
         {
-          "question": "Past Bohèm ook bij een klein privépubliek?",
-          "answer": "Ja. Het duo voelt zich thuis in settings waar de muziek dichtbij mag komen en het publiek echt luistert."
+          "question": "Hebben jullie veel techniek nodig?",
+          "answer": "De opstelling blijft compact en kan meestal eenvoudig worden afgestemd op de ruimte."
+        },
+        {
+          "question": "Is dit geschikt voor een privéavond?",
+          "answer": "Ja. Huiskamerconcerten zijn juist sterk in een persoonlijke en kleine setting."
         }
       ],
-      "proofTitle": "Kleinschalig maar rijk"
-    },
-    "press": {
-      "heroLabel": "Voor pers en programmeurs",
-      "title": "Pers",
-      "intro": "Zoek je snel de kern van Bohèm voor pers, programmering of aankondiging? Hier staat de basis: wie Bohèm is, waar het duo voor staat en hoe je contact opneemt of de perskit opent.",
-      "seoTitle": "Pers | Bohèm | Informatie voor programmeurs, venues en media",
-      "seoDescription": "Persinformatie over Bohèm voor programmeurs, venues en media. Inclusief korte boilerplate, kernfeiten, perskit en contact.",
-      "ogTitle": "Pers | Bohèm",
-      "ogDescription": "Persinformatie, kernfeiten en contact voor Bohèm.",
+      "localAreaTitle": "Huiskamerconcerten in Amersfoort, Leiden en Utrecht",
+      "localAreaIntro": "Voor huiskamerconcert-intentie kiezen we steden waar een culturele of kleinschalige concertsetting logisch voelt. Deze pagina gebruikt Utrecht, Amersfoort en Leiden als eerste regionale signalen.",
+      "priorityCities": [
+        "Amersfoort",
+        "Leiden",
+        "Utrecht"
+      ],
+      "localProofTitle": "Waarom deze steden logisch zijn voor een huiskamerconcert",
+      "localProofItems": [
+        "Amersfoort en Leiden zijn kansrijk voor kleinschalige, luistergerichte live-intentie.",
+        "Utrecht is competitiever, maar inhoudelijk te belangrijk om niet regionaal mee te nemen.",
+        "Huiskamerconcerten vragen om geloofwaardige, persoonlijke copy; daarom beperken we ons in batch 1 tot een korte shortlist."
+      ],
+      "localFaqTitle": "Lokale vragen over huiskamerconcerten",
+      "localFaqItems": [
+        {
+          "question": "Kan Bohèm ook een huiskamerconcert in Amersfoort of Leiden verzorgen?",
+          "answer": "Ja. Bohèm is te boeken voor huiskamerconcerten en kleine luistersettings in Amersfoort, Leiden en omliggende plaatsen."
+        },
+        {
+          "question": "Werkt een huiskamerconcert van Bohèm ook in Utrecht?",
+          "answer": "Ja. De compacte opstelling en directe vorm werken juist goed in kleinere ruimtes en persoonlijke settings in en rond Utrecht."
+        }
+      ],
+      "localLinkLabel": "Vraag een huiskamerconcert aan",
+      "localLinkHref": "/#contact",
       "cta": {
-        "label": "Open de perskit",
-        "href": "/brand/docs/bohem-press-kit.pdf",
+        "label": "Vraag een huiskameroptie aan",
+        "href": "#contact",
         "variant": "primary"
       },
-      "image": {
-        "src": "/images/nieuw/bohem-nieuw-field-wide.webp",
-        "alt": "Bohèm als persbeeld voor programmeurs en media",
-        "width": 2200,
-        "height": 1469,
-        "focusX": 50,
-        "focusY": 30
-      },
-      "positioningTitle": "Kern van Bohèm in één oogopslag",
-      "positioningBody": "Bohèm is het muziekduo van Arthur Bont en Bettina Kraaieveld. Het repertoire bestaat uit melodische, verhalende songs in het Nederlands en Engels, met een live-benadering waarin sfeer, theatrale zeggingskracht en direct publiekcontact samenkomen.",
-      "fitTitle": "Relevant voor",
+      "extraSections": [
+        {
+          "title": "Directe sfeer",
+          "body": "De kracht zit in nabijheid: een kleine afstand tussen artiest en publiek, zonder dat het formeel voelt."
+        }
+      ]
+    },
+    "press": {
+      "title": "Pers & media",
+      "intro": "Voor pers, programmeurs en venues is hier in een paar regels te zien wie Bohèm is, wat het duo doet en waar je snel meer informatie vindt.",
+      "seoTitle": "Persinformatie | Bohèm",
+      "seoDescription": "Persinformatie over Bohèm: het duo van Arthur Bont en Bettina Kraaieveld, inclusief perskit, kernfeiten en contact.",
+      "ogTitle": "Persinformatie | Bohèm",
+      "ogDescription": "Persinformatie over Bohèm: het duo van Arthur Bont en Bettina Kraaieveld, inclusief perskit, kernfeiten en contact.",
+      "heroLabel": "Persinformatie",
+      "positioningTitle": "Kern in 1 alinea",
+      "positioningBody": "Bohèm maakt melodische, verhalende songs in het Nederlands en Engels. In live vorm combineren Arthur Bont en Bettina Kraaieveld theatrale zeggingskracht met direct contact en een warm akoestisch geluid.",
+      "fitTitle": "Snel overzicht",
       "fitItems": [
-        "Programmeurs van theaters en culturele podia",
-        "Journalisten, redacties en cultuurmedia",
-        "Venues en organisatoren die snel kerninformatie nodig hebben"
+        "Arthur Bont + Bettina Kraaieveld",
+        "EP Wolkentranen (2026)",
+        "Single Vroeger",
+        "Live-concept Reizigers"
       ],
       "highlights": [
         {
-          "title": "Direct bruikbare kernfeiten",
-          "body": "Voor aankondiging, programmatoelichting of persintro."
+          "title": "Voor pers en programmeurs",
+          "body": "Geschikt voor pers, venues en programmeurs."
         },
         {
-          "title": "Perskit en contact",
-          "body": "Alles om snel door te kunnen naar beeldmateriaal of afstemming."
+          "title": "Kernfeiten snel bij elkaar",
+          "body": "Kernfeiten en contact staan snel bij elkaar."
         },
         {
-          "title": "Sterke positionering",
-          "body": "Bohèm verbindt muziek, verhaal en theatrale zeggingskracht in een herkenbare live-signatuur."
+          "title": "Direct materiaal",
+          "body": "Perskit en boilerplate zijn direct beschikbaar."
         }
       ],
-      "extraSections": [
-        {
-          "title": "Voor wie snel wil schakelen",
-          "body": "Deze pagina helpt programmeurs, venues en media om Bohèm snel goed te positioneren, zonder door de hele site te hoeven zoeken."
-        }
-      ],
-      "faqTitle": "Veelgestelde vragen vanuit pers en programmering",
+      "faqTitle": "Veelgestelde vragen voor pers en programmeurs",
       "faqItems": [
         {
-          "question": "Waar vind ik beeld en kerninformatie voor publicatie?",
-          "answer": "Via de perskit en het perscontact op deze pagina krijg je snel toegang tot beeld, basisinformatie en afstemming."
+          "question": "Hoe vat je Bohèm kort samen?",
+          "answer": "Als een live muziekduo van Arthur Bont en Bettina Kraaieveld met verhalende songs en theatrale zeggingskracht."
         },
         {
-          "question": "Hoe omschrijf ik Bohèm kort?",
-          "answer": "Bohèm is het muziekduo van Arthur Bont en Bettina Kraaieveld, met melodische en verhalende songs in het Nederlands en Engels voor theater, intieme concerten en bijzondere culturele settings."
+          "question": "Waar vind ik de perskit?",
+          "answer": "Die staat centraal in de persinformatie en kan direct worden gedownload."
+        },
+        {
+          "question": "Met wie neem ik contact op?",
+          "answer": "Via het contactadres in de persinformatie of het algemene contactformulier."
         }
       ],
-      "proofTitle": "Snel inzetbaar voor aankondiging"
+      "cta": {
+        "label": "Download de perskit",
+        "href": "#pers",
+        "variant": "primary"
+      },
+      "extraSections": [
+        {
+          "title": "Gebruik voor publicatie",
+          "body": "De boilerplate en kernfeiten zijn bedoeld om snel en consistent te kunnen publiceren."
+        }
+      ]
     }
   },
   "contact": {
@@ -774,471 +821,6 @@
         "body": "We reageren meestal binnen 2 werkdagen. Hieronder vind je een kopie van je bericht.",
         "footer": "Hartelijke groet,\nBohèm"
       }
-    }
-  },
-  "landingPages": {
-    "musicDuo": {
-      "title": "Bohèm als live muziekduo boeken",
-      "intro": "Bohèm is het live muziekduo van Arthur Bont en Bettina Kraaieveld, met Nederlandstalige en Engelstalige songs voor theater, culturele events en intieme luisteravonden.",
-      "seoTitle": "Muziekduo boeken | Bohèm | Arthur Bont & Bettina Kraaieveld",
-      "seoDescription": "Bohèm boeken als live muziekduo voor theater, culturele events en intieme concerten. Bekijk repertoire, boekingsinformatie, shows en veelgestelde vragen.",
-      "ogTitle": "Muziekduo boeken | Bohèm",
-      "ogDescription": "Boek Bohèm als live muziekduo voor theater, culturele events en intieme concerten.",
-      "heroLabel": "SEO landingspagina",
-      "positioningTitle": "Voor avonden waar verhaal, sfeer en muzikaliteit samenkomen",
-      "positioningBody": "Bohèm past bij luisterende settings waar tekst, melodie en podiumpresentatie mogen landen. Van theaterprogramma tot cultureel event en van kleinschalig podium tot bijzonder huiskamerconcert.",
-      "fitTitle": "Waar Bohèm goed past",
-      "fitItems": [
-        "Theateravonden en kleinschalige podiumprogramma's",
-        "Culturele events en seizoensopeningen",
-        "Huiskamerconcerten en storytelling-sets"
-      ],
-      "highlights": [
-        "Live muziekduo met theatrale zeggingskracht",
-        "Nederlandstalige en Engelstalige songs",
-        "Persoonlijke setting, warme sfeer en duidelijke communicatie"
-      ],
-      "faqTitle": "Veelgestelde vragen over Bohèm als muziekduo boeken",
-      "faqItems": [
-        {
-          "question": "Voor welke gelegenheden is Bohèm te boeken?",
-          "answer": "Bohèm speelt in theaters, culturele settings, intieme concerten en andere luisterende avonden waar verhalende live muziek centraal staat."
-        },
-        {
-          "question": "Is Bohèm geschikt voor kleinere podia?",
-          "answer": "Ja. Bohèm voelt zich juist sterk op plekken waar nabijheid, tekst en sfeer belangrijk zijn, van theaterzaal tot huiskamersetting."
-        }
-      ],
-      "cta": {
-        "label": "Vraag beschikbaarheid aan",
-        "href": "#contact",
-        "variant": "primary"
-      },
-      "extraSections": [
-        {
-          "title": "Hoe een boeking verloopt",
-          "body": "Na een aanvraag met datum, locatie en type avond reageert Bohèm meestal binnen 2 werkdagen met een concreet voorstel."
-        }
-      ]
-    },
-    "theaterConcert": {
-      "title": "Theaterconcert boeken met Bohèm",
-      "intro": "Voor programmeurs en podia die zoeken naar een muzikaal duo met theatrale zeggingskracht, verhalende songs en een luisterend publieksmoment.",
-      "seoTitle": "Theaterconcert boeken | Bohèm | live muziekduo voor podia en cultuurhuizen",
-      "seoDescription": "Boek Bohèm voor een theaterconcert of cultureel podiumprogramma. Verhalende songs, theatrale zeggingskracht en een intieme live-ervaring.",
-      "ogTitle": "Theaterconcert boeken | Bohèm",
-      "ogDescription": "Boek Bohèm voor een theaterconcert of cultureel podiumprogramma.",
-      "heroLabel": "SEO landingspagina",
-      "positioningTitle": "Voor podia die zoeken naar een luisterconcert met karakter",
-      "positioningBody": "Bohèm combineert melodische songs, theatrale flair en een directe podiumpresentatie. Daardoor past het duo goed in theaters, vlakkevloersettings en culturele programmering met aandacht voor tekst en sfeer.",
-      "fitTitle": "Geschikt voor",
-      "fitItems": [
-        "Theateravonden en culturele programmering",
-        "Luisterconcerten en vlakkevloerprogramma's",
-        "Podiummomenten waar verhaal en sfeer belangrijk zijn"
-      ],
-      "highlights": [
-        "Theatrale live-presentatie zonder afstand",
-        "Sterk in luisterpubliek en kleinschalige zalen",
-        "Combinatie van persoonlijk repertoire en podiumpresence"
-      ],
-      "faqTitle": "Veelgestelde vragen over Bohèm voor theaterconcerten",
-      "faqItems": [
-        {
-          "question": "Past Bohèm in een cultureel podiumprogramma?",
-          "answer": "Ja. Bohèm sluit goed aan bij programma's waar muziek, tekst, sfeer en publieksbeleving samenkomen."
-        },
-        {
-          "question": "Is Bohèm alleen geschikt voor grote theaterzalen?",
-          "answer": "Nee. Het duo werkt juist sterk in kleinschalige en middelgrote zalen waar nabijheid en aandacht voor de songs goed tot hun recht komen."
-        }
-      ],
-      "cta": {
-        "label": "Plan een theateraanvraag",
-        "href": "#contact",
-        "variant": "primary"
-      },
-      "extraSections": [
-        {
-          "title": "Waarom programmeurs kiezen voor Bohèm",
-          "body": "Omdat het duo muzikaal volwassen klinkt, snel schakelt in communicatie en een setting weet te dragen met warmte, flair en inhoud."
-        }
-      ]
-    },
-    "kampvuur": {
-      "title": "Kampvuurklanken voor teams en organisaties",
-      "intro": "Kampvuurklanken is de muzikale teamervaring van Bohèm voor organisaties die ruimte willen maken voor verbinding, reflectie en menselijkheid.",
-      "seoTitle": "Kampvuurklanken | Bohèm | muzikale teamavond voor organisaties",
-      "seoDescription": "Kampvuurklanken van Bohèm is een muzikale avond voor teams, management en organisaties. Voor verbinding, reflectie en een echt gesprek.",
-      "ogTitle": "Kampvuurklanken | Bohèm",
-      "ogDescription": "Een muzikale teamavond voor verbinding, reflectie en menselijkheid.",
-      "heroLabel": "SEO landingspagina",
-      "positioningTitle": "Voor teams die verder willen gaan dan standaard teambuilding",
-      "positioningBody": "Kampvuurklanken brengt songs, verhalen en een gedeeld moment rond herkenbare thema's. Geen trucje, maar een avond die ruimte maakt voor openheid, rust en verbinding.",
-      "fitTitle": "Geschikt voor",
-      "fitItems": [
-        "Teamdagen en managementsessies",
-        "Organisaties in verandering of onder druk",
-        "Bijeenkomsten rond verbinding, vertrouwen en reflectie"
-      ],
-      "highlights": [
-        "Muzikale teamervaring met echte inhoud",
-        "Ruimte voor humor, herkenning en gesprek",
-        "Sterk alternatief voor standaard teambuilding"
-      ],
-      "faqTitle": "Veelgestelde vragen over Kampvuurklanken",
-      "faqItems": [
-        {
-          "question": "Voor wat voor teams is Kampvuurklanken bedoeld?",
-          "answer": "Voor teams, management en organisaties die meer willen dan een standaard sessie en bewust willen werken aan verbinding, rust of reflectie."
-        },
-        {
-          "question": "Moet dit letterlijk rond een kampvuur plaatsvinden?",
-          "answer": "Nee. De sfeer en opzet zijn leidend; de setting kan worden afgestemd op locatie, seizoen en praktische mogelijkheden."
-        }
-      ],
-      "cta": {
-        "label": "Bespreek een teamavond",
-        "href": "#contact",
-        "variant": "primary"
-      },
-      "extraSections": [
-        {
-          "title": "Wat het oplevert",
-          "body": "Een bijeenkomst die blijft hangen, een opener gesprek en een team dat lichter de avond uitgaat."
-        }
-      ]
-    },
-    "huiskamerconcert": {
-      "title": "Huiskamerconcert boeken met Bohèm",
-      "intro": "Bohèm speelt intieme huiskamerconcerten waarin liedjes, verhalen en nabijheid centraal staan.",
-      "seoTitle": "Huiskamerconcert boeken | Bohèm | intiem live muziekduo",
-      "seoDescription": "Boek Bohèm voor een huiskamerconcert. Intieme live muziek met Nederlandstalige en Engelstalige songs, warme sfeer en direct contact met het publiek.",
-      "ogTitle": "Huiskamerconcert boeken | Bohèm",
-      "ogDescription": "Boek Bohèm voor een intiem huiskamerconcert met verhalende live muziek.",
-      "heroLabel": "SEO landingspagina",
-      "positioningTitle": "Voor kleinschalige avonden waar nabijheid het verschil maakt",
-      "positioningBody": "In een huiskamersetting komt Bohèm dicht op de huid. De songs, verhalen en kleine momenten tussen de nummers krijgen daar extra zeggingskracht.",
-      "fitTitle": "Past goed bij",
-      "fitItems": [
-        "Huiskamerconcerten en privéconcerten",
-        "Kleinschalige luisteravonden",
-        "Culturele avonden in een informele setting"
-      ],
-      "highlights": [
-        "Direct contact met het publiek",
-        "Compacte setting, groot effect",
-        "Warme sfeer en persoonlijke songs"
-      ],
-      "faqTitle": "Veelgestelde vragen over Bohèm voor huiskamerconcerten",
-      "faqItems": [
-        {
-          "question": "Werkt Bohèm ook zonder groot podium of uitgebreide techniek?",
-          "answer": "Ja. Het duo is juist sterk in kleinschalige settings waar nabijheid en eenvoud de avond dragen."
-        },
-        {
-          "question": "Is een huiskamerconcert alleen voor privéhuizen bedoeld?",
-          "answer": "Nee. Ook kleine culturele ruimtes, ateliers of informele podia kunnen uitstekend werken als huiskamersetting."
-        }
-      ],
-      "cta": {
-        "label": "Vraag een huiskamerconcert aan",
-        "href": "#contact",
-        "variant": "primary"
-      },
-      "extraSections": [
-        {
-          "title": "Waarom dit goed werkt",
-          "body": "Omdat Bohèm in een kleine setting precies kan doen waar het duo sterk in is: sfeer bouwen, verhalen laten landen en het publiek dichtbij houden."
-        }
-      ]
-    },
-    "press": {
-      "title": "Pers en programmatie rondom Bohèm",
-      "intro": "Voor programmeurs, podia, journalisten en redacties die snel een helder beeld willen van Bohèm, het repertoire en de persinformatie.",
-      "seoTitle": "Pers | Bohèm | informatie voor programmeurs, podia en media",
-      "seoDescription": "Persinformatie over Bohèm voor programmeurs, podia en media. Bekijk boilerplate, kernfeiten, contact en perskit.",
-      "ogTitle": "Pers | Bohèm",
-      "ogDescription": "Persinformatie voor programmeurs, podia en media.",
-      "heroLabel": "SEO landingspagina",
-      "positioningTitle": "Snel inzicht voor media en programmeurs",
-      "positioningBody": "Op deze pagina staat de kerninformatie over Bohèm overzichtelijk bij elkaar: korte boilerplate, context, contact en persmateriaal.",
-      "fitTitle": "Handig voor",
-      "fitItems": [
-        "Programmeurs en podia",
-        "Journalisten en redacties",
-        "Culturele agenda's en venues"
-      ],
-      "highlights": [
-        "Korte boilerplate en kernfeiten",
-        "Perscontact en downloadbare perskit",
-        "Snelle route naar muziek en achtergrondinformatie"
-      ],
-      "faqTitle": "Veelgestelde vragen vanuit pers en programmatie",
-      "faqItems": [
-        {
-          "question": "Waar vind ik snel de kerninformatie over Bohèm?",
-          "answer": "Op deze pagina staan de boilerplate, kernfeiten, contactgegevens en een link naar de perskit bij elkaar."
-        },
-        {
-          "question": "Kan ik rechtstreeks contact opnemen voor pers of programmering?",
-          "answer": "Ja. Via het perscontact of het contactformulier kun je direct een concrete vraag, aanvraag of interviewverzoek sturen."
-        }
-      ],
-      "cta": {
-        "label": "Open de perskit",
-        "href": "/brand/docs/bohem-press-kit.pdf",
-        "variant": "primary"
-      },
-      "extraSections": [
-        {
-          "title": "Boilerplate",
-          "body": "Bohèm maakt melodische, verhalende songs in het Nederlands en Engels over verbinding, afstand, twijfel en verlangen. Arthur Bont en Bettina Kraaieveld brengen die songs live met warmte, theatrale zeggingskracht en een persoonlijk karakter."
-        }
-      ]
-    }
-  },
-  "landingPages": {
-    "musicDuo": {
-      "title": "Bohèm boeken als muziekduo",
-      "intro": "Bohèm is te boeken als live muziekduo voor theaters, culturele avonden, intieme concerten en bijzondere momenten waar een luisterend publiek centraal staat.",
-      "seoTitle": "Muziekduo boeken | Bohèm",
-      "seoDescription": "Boek Bohèm als live muziekduo voor theater, culturele events, huiskamerconcerten en intieme avonden met verhalende songs.",
-      "ogTitle": "Muziekduo boeken | Bohèm",
-      "ogDescription": "Boek Bohèm als live muziekduo voor theater, culturele events, huiskamerconcerten en intieme avonden met verhalende songs.",
-      "heroLabel": "Live muziekduo",
-      "positioningTitle": "Waarom Bohèm als muziekduo werkt",
-      "positioningBody": "De songs zijn melodisch, persoonlijk en direct. Daardoor voelt het duo compact en dichtbij, maar met genoeg dynamiek voor een volle zaal.",
-      "fitTitle": "Past goed bij",
-      "fitItems": [
-        "Theateravonden en culturele programmeersporen",
-        "Intieme concerten en luisterpubliek",
-        "Avonden met ruimte voor verhaal en contact"
-      ],
-      "highlights": [
-        "Arthur Bont en Bettina Kraaieveld spelen als duo zonder afstand.",
-        "Nederlandstalige en Engelstalige songs in een verhalende lijn.",
-        "Geschikt voor kleine en grotere settings."
-      ],
-      "faqTitle": "Veelgestelde vragen over muziekduo boeken",
-      "faqItems": [
-        {
-          "question": "Voor welke gelegenheden is Bohèm te boeken?",
-          "answer": "Voor theaters, culturele avonden, intieme concerten, huiskamerpodia en andere settings waar luisteren centraal staat."
-        },
-        {
-          "question": "Hoe klinkt Bohèm live als muziekduo?",
-          "answer": "Verhalend, melodisch en persoonlijk, met ruimte voor spanning, rust en directe interactie."
-        },
-        {
-          "question": "Is Bohèm geschikt voor een kleinere locatie?",
-          "answer": "Ja. De duo-opstelling werkt juist sterk in intieme zalen en kleinere settings."
-        }
-      ],
-      "cta": {
-        "label": "Vraag beschikbaarheid aan",
-        "href": "#contact",
-        "variant": "primary"
-      },
-      "extraSections": [
-        {
-          "title": "Boekingsproces",
-          "body": "Stuur datum, locatie en gewenste setting door. Dan ontvang je een concreet voorstel dat past bij de avond."
-        }
-      ]
-    },
-    "theaterConcert": {
-      "title": "Theaterconcert boeken",
-      "intro": "Voor theaters en culturele programmering maakt Bohèm een programma waarin songs, verhaal en podiumsfeer samenkomen.",
-      "seoTitle": "Theaterconcert boeken | Bohèm",
-      "seoDescription": "Boek Bohèm voor een theaterconcert met verhalende songs, theatrale zeggingskracht en een warm akoestisch karakter.",
-      "ogTitle": "Theaterconcert boeken | Bohèm",
-      "ogDescription": "Boek Bohèm voor een theaterconcert met verhalende songs, theatrale zeggingskracht en een warm akoestisch karakter.",
-      "heroLabel": "Theaterconcert",
-      "positioningTitle": "Waarom Bohèm past in het theater",
-      "positioningBody": "De combinatie van verhalende songs, tekstbeleving en podiumpresentatie maakt dat Bohèm zich natuurlijk beweegt in een theatercontext.",
-      "fitTitle": "Past goed bij",
-      "fitItems": [
-        "Theateravonden en vlakkevloerprogramma's",
-        "Culturele seizoensopeningen",
-        "Luisterpubliek dat graag dicht op het verhaal zit"
-      ],
-      "highlights": [
-        "Een intieme maar uitgesproken live-ervaring.",
-        "Podiumwerk met ruimte voor spanningsopbouw en relativering.",
-        "Ook geschikt als onderdeel van een bredere culturele avond."
-      ],
-      "faqTitle": "Veelgestelde vragen over theaterconcert boeken",
-      "faqItems": [
-        {
-          "question": "Past Bohèm in een theaterprogramma?",
-          "answer": "Ja. De songs en presentatie zijn juist sterk in een luistergerichte setting."
-        },
-        {
-          "question": "Is het vooral muziek of ook verhaal?",
-          "answer": "Beide. Verhaal en song ondersteunen elkaar, zodat het concert een duidelijke lijn heeft."
-        },
-        {
-          "question": "Kunnen jullie aansluiten op een seizoensopening of cultureel event?",
-          "answer": "Ja. De set kan worden afgestemd op het karakter van de avond."
-        }
-      ],
-      "cta": {
-        "label": "Vraag een theateroptie aan",
-        "href": "#contact",
-        "variant": "primary"
-      },
-      "extraSections": [
-        {
-          "title": "Programmering en sfeer",
-          "body": "Bohèm werkt goed als losse voorstelling of als onderdeel van een avond waarin publiek echt wil luisteren."
-        }
-      ]
-    },
-    "kampvuur": {
-      "title": "Kampvuurklanken",
-      "intro": "Kampvuurklanken is de muzikale teamavond van Bohèm voor organisaties die ruimte willen maken voor verbinding, reflectie en een echt gesprek.",
-      "seoTitle": "Kampvuurklanken | Bohèm",
-      "seoDescription": "Kampvuurklanken is een muzikale teamavond van Bohèm voor teams, management en organisaties die verbinding en reflectie willen versterken.",
-      "ogTitle": "Kampvuurklanken | Bohèm",
-      "ogDescription": "Kampvuurklanken is een muzikale teamavond van Bohèm voor teams, management en organisaties die verbinding en reflectie willen versterken.",
-      "heroLabel": "Teamavond",
-      "positioningTitle": "Wat deze avond doet",
-      "positioningBody": "De setting is warm, menselijk en direct. Daardoor ontstaat er ruimte voor herkenning, verbinding en een gesprek dat niet stilstaat bij alleen werk.",
-      "fitTitle": "Past goed bij",
-      "fitItems": [
-        "Teams die verdieping willen in plaats van een standaard sessie",
-        "Managementdagen en reflectiemomenten",
-        "Organisaties die verbinding willen versterken"
-      ],
-      "highlights": [
-        "Verhalende liedjes rond menselijkheid en veerkracht.",
-        "Een setting die rust en aandacht brengt.",
-        "Geschikt als onderdeel van een teamdag of avondprogramma."
-      ],
-      "faqTitle": "Veelgestelde vragen over Kampvuurklanken",
-      "faqItems": [
-        {
-          "question": "Voor wie is Kampvuurklanken bedoeld?",
-          "answer": "Voor teams, management en organisaties die een verdiepende muzikale avond zoeken."
-        },
-        {
-          "question": "Is dit geschikt als teambuilding?",
-          "answer": "Ja, maar dan wel in een vorm die rust, reflectie en gesprek centraal zet."
-        },
-        {
-          "question": "Kunnen jullie de avond afstemmen op onze groep?",
-          "answer": "Ja. De inhoud en duur kunnen worden afgestemd op de setting en de groep."
-        }
-      ],
-      "cta": {
-        "label": "Plan een verkenning",
-        "href": "#contact",
-        "variant": "primary"
-      },
-      "extraSections": [
-        {
-          "title": "Opzet van de avond",
-          "body": "Van compacte sessie tot complete avond: de vorm kan mee schalen met de wens van de organisatie."
-        }
-      ]
-    },
-    "huiskamerconcert": {
-      "title": "Huiskamerconcert boeken",
-      "intro": "Bohèm speelt ook in huiskamers, kleine zalen en intieme settings waar nabijheid en direct contact het verschil maken.",
-      "seoTitle": "Huiskamerconcert boeken | Bohèm",
-      "seoDescription": "Boek Bohèm voor een huiskamerconcert met intieme sfeer, verhalende songs en direct contact met het publiek.",
-      "ogTitle": "Huiskamerconcert boeken | Bohèm",
-      "ogDescription": "Boek Bohèm voor een huiskamerconcert met intieme sfeer, verhalende songs en direct contact met het publiek.",
-      "heroLabel": "Intieme setting",
-      "positioningTitle": "Waarom een huiskamerconcert werkt",
-      "positioningBody": "Een kleine ruimte haalt de songs dichterbij en maakt de live-ervaring persoonlijk en direct. Dat past goed bij het verhalende karakter van Bohèm.",
-      "fitTitle": "Past goed bij",
-      "fitItems": [
-        "Huiskamerconcerten en kleine podia",
-        "Private avonden met een luisterend publiek",
-        "Samenkomsten waar intimiteit belangrijk is"
-      ],
-      "highlights": [
-        "Kleine setting, grote aandacht.",
-        "Songs en verhalen komen direct binnen.",
-        "Makkelijk af te stemmen op de ruimte."
-      ],
-      "faqTitle": "Veelgestelde vragen over huiskamerconcert boeken",
-      "faqItems": [
-        {
-          "question": "Hoe groot mag de ruimte zijn?",
-          "answer": "Dat hangt af van de opstelling, maar de vorm is juist bedoeld voor intieme en kleinschalige locaties."
-        },
-        {
-          "question": "Hebben jullie veel techniek nodig?",
-          "answer": "De opstelling blijft compact en kan meestal eenvoudig worden afgestemd op de ruimte."
-        },
-        {
-          "question": "Is dit geschikt voor een privéavond?",
-          "answer": "Ja. Huiskamerconcerten zijn juist sterk in een persoonlijke en kleine setting."
-        }
-      ],
-      "cta": {
-        "label": "Vraag een huiskameroptie aan",
-        "href": "#contact",
-        "variant": "primary"
-      },
-      "extraSections": [
-        {
-          "title": "Directe sfeer",
-          "body": "De kracht zit in nabijheid: een kleine afstand tussen artiest en publiek, zonder dat het formeel voelt."
-        }
-      ]
-    },
-    "press": {
-      "title": "Pers & media",
-      "intro": "Voor pers, programmeurs en venues is hier in een paar regels te zien wie Bohèm is, wat het duo doet en waar je snel meer informatie vindt.",
-      "seoTitle": "Persinformatie | Bohèm",
-      "seoDescription": "Persinformatie over Bohèm: het duo van Arthur Bont en Bettina Kraaieveld, inclusief perskit, kernfeiten en contact.",
-      "ogTitle": "Persinformatie | Bohèm",
-      "ogDescription": "Persinformatie over Bohèm: het duo van Arthur Bont en Bettina Kraaieveld, inclusief perskit, kernfeiten en contact.",
-      "heroLabel": "Persinformatie",
-      "positioningTitle": "Kern in 1 alinea",
-      "positioningBody": "Bohèm maakt melodische, verhalende songs in het Nederlands en Engels. In live vorm combineren Arthur Bont en Bettina Kraaieveld theatrale zeggingskracht met direct contact en een warm akoestisch geluid.",
-      "fitTitle": "Snel overzicht",
-      "fitItems": [
-        "Arthur Bont + Bettina Kraaieveld",
-        "EP Wolkentranen (2026)",
-        "Single Vroeger",
-        "Live-concept Reizigers"
-      ],
-      "highlights": [
-        "Geschikt voor pers, venues en programmeurs.",
-        "Kernfeiten en contact staan snel bij elkaar.",
-        "Perskit en boilerplate zijn direct beschikbaar."
-      ],
-      "faqTitle": "Veelgestelde vragen voor pers en programmeurs",
-      "faqItems": [
-        {
-          "question": "Hoe vat je Bohèm kort samen?",
-          "answer": "Als een live muziekduo van Arthur Bont en Bettina Kraaieveld met verhalende songs en theatrale zeggingskracht."
-        },
-        {
-          "question": "Waar vind ik de perskit?",
-          "answer": "Die staat centraal in de persinformatie en kan direct worden gedownload."
-        },
-        {
-          "question": "Met wie neem ik contact op?",
-          "answer": "Via het contactadres in de persinformatie of het algemene contactformulier."
-        }
-      ],
-      "cta": {
-        "label": "Download de perskit",
-        "href": "#pers",
-        "variant": "primary"
-      },
-      "extraSections": [
-        {
-          "title": "Gebruik voor publicatie",
-          "body": "De boilerplate en kernfeiten zijn bedoeld om snel en consistent te kunnen publiceren."
-        }
-      ]
     }
   },
   "footer": {

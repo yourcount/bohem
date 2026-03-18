@@ -54,20 +54,20 @@ function makeNav(items: Array<[string, string]>): NavItem[] {
   return items.map(([label, href]) => ({ label, href }));
 }
 
-function toHighlightItems(items: LandingHighlightItem[] | string[] | undefined, titlePrefix = "Punt"): LandingHighlightItem[] {
+function toHighlightItems(items: LandingHighlightItem[] | string[] | undefined): LandingHighlightItem[] {
   if (!items || items.length === 0) return [];
 
   return items
-    .map((item, index) => {
+    .map((item) => {
       if (typeof item === "string") {
         return {
-          title: `${titlePrefix} ${index + 1}`,
+          title: "",
           body: item.trim()
         };
       }
 
       return {
-        title: item.title?.trim() || `${titlePrefix} ${index + 1}`,
+        title: item.title?.trim() || "",
         body: item.body.trim()
       };
     })
@@ -89,11 +89,11 @@ function combineSections(
   const items: LandingHighlightItem[] = [];
 
   if (Array.isArray(highlights)) {
-    items.push(...toHighlightItems(highlights, "Punt"));
+    items.push(...toHighlightItems(highlights));
   }
 
   if (Array.isArray(fitItems)) {
-    items.push(...toHighlightItems(fitItems, "Pluspunt"));
+    items.push(...toHighlightItems(fitItems));
   }
 
   if (Array.isArray(extraSections)) {

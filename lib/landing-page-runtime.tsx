@@ -5,6 +5,8 @@ import { LandingFaq } from "@/components/landing/LandingFaq";
 import { LandingHero } from "@/components/landing/LandingHero";
 import { LandingHighlights } from "@/components/landing/LandingHighlights";
 import { LandingLocalArea } from "@/components/landing/LandingLocalArea";
+import { LandingPracticalInfo } from "@/components/landing/LandingPracticalInfo";
+import { LandingSocialProof } from "@/components/landing/LandingSocialProof";
 import {
   buildHuiskamerConcertLanding,
   buildKampvuurLanding,
@@ -17,11 +19,13 @@ import { LandingPageShell } from "@/components/landing/LandingPageShell";
 import { KampvuurSection } from "@/components/sections/KampvuurSection";
 import { ShowsSection } from "@/components/sections/ShowsSection";
 import { SectionMotifDivider } from "@/components/ui/SectionMotifDivider";
+import { StickyListenBar } from "@/components/ui/StickyListenBar";
 import { getLiveSiteContent } from "@/lib/content/live-content";
 import { filterFutureShows } from "@/lib/content/shows";
 import { buildLandingMetadata } from "@/lib/landing-page-seo";
 import { buildLandingJsonLd } from "@/lib/seo";
 import { getSeoSettingsSafe } from "@/lib/seo-settings";
+import { getFeatureFlagsSafe } from "@/lib/system/feature-flags";
 import type { SiteContent } from "@/lib/types";
 import { type LandingPageKey } from "@/lib/content/landing-pages";
 
@@ -42,6 +46,34 @@ function getLandingRouteView(siteContent: SiteContent, landingKey: LandingPageKe
   }
 }
 
+function hasText(value: string | undefined | null) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function getStickyLandingSectionIds(landingKey: LandingPageKey, options: { hasHighlights: boolean; hasShows: boolean; hasLocalArea: boolean }) {
+  const ids: string[] = [];
+
+  if (options.hasHighlights) ids.push("highlights");
+
+  if (landingKey === "musicDuo" || landingKey === "theaterConcert") {
+    if (options.hasShows) ids.push("shows");
+  }
+
+  if (landingKey === "huiskamerconcert" && options.hasLocalArea) {
+    ids.push("regio");
+  }
+
+  if (landingKey === "musicDuo" && options.hasLocalArea) {
+    ids.push("regio");
+  }
+
+  if (landingKey === "kampvuur") {
+    ids.push("kampvuurklanken");
+  }
+
+  return ids;
+}
+
 export async function generateLandingMetadata(landingKey: LandingPageKey): Promise<Metadata> {
   const siteContent = await getLiveSiteContent();
   const seoSettings = await getSeoSettingsSafe();
@@ -50,6 +82,7 @@ export async function generateLandingMetadata(landingKey: LandingPageKey): Promi
 
 export async function renderLandingPage(landingKey: LandingPageKey) {
   const siteContent = await getLiveSiteContent();
+  const flags = await getFeatureFlagsSafe();
   const jsonLd = buildLandingJsonLd(siteContent, landingKey);
   const view = getLandingRouteView(siteContent, landingKey);
   const visibleShows = filterFutureShows(siteContent.bookings.upcomingShows);
@@ -57,6 +90,18 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
     (landingKey === "musicDuo" || landingKey === "theaterConcert" || landingKey === "huiskamerconcert") &&
     visibleShows.length > 0 &&
     view.shows;
+  const stickyVisibleSectionIds =
+    flags.enable_sticky_listen_bar &&
+    landingKey !== "press" &&
+    hasText(siteContent.discography.featuredSingle.title) &&
+    hasText(siteContent.discography.featuredSingle.href)
+        ? getStickyLandingSectionIds(landingKey, {
+          hasHighlights: Boolean(view.highlights),
+          hasShows: Boolean(showLandingShows),
+          hasLocalArea: Boolean(view.localArea)
+        })
+      : [];
+  const showStickyListenBar = stickyVisibleSectionIds.length > 0;
 
   return (
     <LandingPageShell brandName={siteContent.brand.name} navigation={view.navigation} footer={siteContent.footer}>
@@ -65,6 +110,7 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
       <LandingHero
         id="intro"
         eyebrow={view.intro.eyebrow}
+        audienceLabel={view.intro.audienceLabel}
         title={view.intro.title}
         intro={view.intro.intro}
         note={view.intro.note}
@@ -110,6 +156,26 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
         />
       ) : null}
 
+      {view.socialProof ? <SectionMotifDivider /> : null}
+      {view.socialProof ? (
+        <LandingSocialProof
+          id="reacties"
+          eyebrow={view.socialProof.eyebrow}
+          title={view.socialProof.title}
+          items={view.socialProof.items}
+        />
+      ) : null}
+
+      {view.practicalInfo ? <SectionMotifDivider /> : null}
+      {view.practicalInfo ? (
+        <LandingPracticalInfo
+          id="praktisch"
+          eyebrow={view.practicalInfo.eyebrow}
+          title={view.practicalInfo.title}
+          items={view.practicalInfo.items}
+        />
+      ) : null}
+
       {view.faq ? <SectionMotifDivider /> : null}
       {view.faq ? <LandingFaq id="faq" eyebrow={view.faq.eyebrow} title={view.faq.title} items={view.faq.items} /> : null}
 
@@ -128,6 +194,21 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
           href: "/"
         }}
       />
+
+      {showStickyListenBar ? (
+        <StickyListenBar
+          visibleSectionIds={stickyVisibleSectionIds}
+          hiddenSectionIds={["contact"]}
+          eyebrow={siteContent.discography.featuredSingleEyebrow || "Nu luisteren"}
+          trackTitle={siteContent.discography.featuredSingle.title}
+          trackHref={siteContent.discography.featuredSingle.href}
+          ctaLabel={siteContent.discography.featuredSingle.ctaLabel || "Speel op Spotify"}
+          artworkSrc={siteContent.discography.featuredSingle.image?.src || "/images/music/vroeger-cover.webp"}
+          artworkAlt={siteContent.discography.featuredSingle.image?.alt || siteContent.discography.featuredSingle.title}
+          artworkFocusX={siteContent.discography.featuredSingle.image?.focusX}
+          artworkFocusY={siteContent.discography.featuredSingle.image?.focusY}
+        />
+      ) : null}
     </LandingPageShell>
   );
 }

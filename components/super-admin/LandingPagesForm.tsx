@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { StickyStatusBar, formatFieldErrors, useUnsavedChangesGuard, type StatusTone } from "@/components/super-admin/admin-ui";
-import type { LandingExtraSection, LandingFaqItem, LandingHighlightItem, LandingPageContent } from "@/lib/types";
+import type { LandingExtraSection, LandingFaqItem, LandingHighlightItem, LandingPageContent, LandingSocialProofItem } from "@/lib/types";
 
 type LandingPageKey = "musicDuo" | "theaterConcert" | "kampvuur" | "huiskamerconcert" | "press";
 
@@ -64,6 +64,10 @@ function createEmptyFaqItem(): LandingFaqItem {
 
 function createEmptyHighlightItem(): LandingHighlightItem {
   return { title: "", body: "" };
+}
+
+function createEmptySocialProofItem(): LandingSocialProofItem {
+  return { quote: "", source: "", context: "" };
 }
 
 function createEmptyExtraSection(): LandingExtraSection {
@@ -127,6 +131,27 @@ function normalizeExtraSections(value: unknown, fallback: LandingExtraSection[] 
   return next.length > 0 ? next : fallback;
 }
 
+function normalizeSocialProofItems(value: unknown, fallback: LandingSocialProofItem[] = [createEmptySocialProofItem()]) {
+  if (!Array.isArray(value)) return fallback;
+  const next = value
+    .map((item) => ({
+      quote:
+        typeof item === "object" && item !== null && typeof (item as { quote?: unknown }).quote === "string"
+          ? (item as { quote: string }).quote.trim()
+          : "",
+      source:
+        typeof item === "object" && item !== null && typeof (item as { source?: unknown }).source === "string"
+          ? (item as { source: string }).source.trim()
+          : "",
+      context:
+        typeof item === "object" && item !== null && typeof (item as { context?: unknown }).context === "string"
+          ? (item as { context: string }).context.trim()
+          : ""
+    }))
+    .filter((item) => item.quote.length > 0 || item.source.length > 0 || item.context.length > 0);
+  return next.length > 0 ? next : fallback;
+}
+
 function normalizeLandingPage(value: unknown): LandingPageDraft {
   const current = (value && typeof value === "object" ? (value as Record<string, unknown>) : {}) as Record<string, unknown>;
   const cta = current.cta && typeof current.cta === "object" ? (current.cta as Record<string, unknown>) : undefined;
@@ -134,6 +159,7 @@ function normalizeLandingPage(value: unknown): LandingPageDraft {
 
   return {
     heroLabel: typeof current.heroLabel === "string" ? current.heroLabel : "",
+    audienceLabel: typeof current.audienceLabel === "string" ? current.audienceLabel : "",
     title: typeof current.title === "string" ? current.title : "",
     intro: typeof current.intro === "string" ? current.intro : "",
     seoTitle: typeof current.seoTitle === "string" ? current.seoTitle : "",
@@ -168,10 +194,14 @@ function normalizeLandingPage(value: unknown): LandingPageDraft {
     positioningBody: typeof current.positioningBody === "string" ? current.positioningBody : "",
     fitTitle: typeof current.fitTitle === "string" ? current.fitTitle : "",
     fitItems: normalizeTextList(current.fitItems, [""]),
+    practicalInfoItems: normalizeTextList(current.practicalInfoItems, [""]),
     highlights: normalizeHighlightItems(current.highlights),
+    socialProofItems: normalizeSocialProofItems(current.socialProofItems),
     extraSections: normalizeExtraSections(current.extraSections),
     faqTitle: typeof current.faqTitle === "string" ? current.faqTitle : "",
     faqItems: normalizeFaqItems(current.faqItems),
+    ctaContextTitle: typeof current.ctaContextTitle === "string" ? current.ctaContextTitle : "",
+    ctaContextBody: typeof current.ctaContextBody === "string" ? current.ctaContextBody : "",
     localAreaTitle: typeof current.localAreaTitle === "string" ? current.localAreaTitle : "",
     localAreaIntro: typeof current.localAreaIntro === "string" ? current.localAreaIntro : "",
     priorityCities: normalizeTextList(current.priorityCities, [""]),
@@ -236,7 +266,7 @@ function PageSection({
     });
   };
 
-  const updateList = (key: "fitItems" | "priorityCities" | "localProofItems", nextValue: string) => {
+  const updateList = (key: "fitItems" | "practicalInfoItems" | "priorityCities" | "localProofItems", nextValue: string) => {
     update(key, splitLines(nextValue));
   };
 
@@ -256,6 +286,12 @@ function PageSection({
     const next = [...(value.highlights ?? [])];
     next[index] = { ...(next[index] ?? createEmptyHighlightItem()), [key]: nextValue };
     update("highlights", next);
+  };
+
+  const updateSocialProof = (index: number, key: keyof LandingSocialProofItem, nextValue: string) => {
+    const next = [...(value.socialProofItems ?? [])];
+    next[index] = { ...(next[index] ?? createEmptySocialProofItem()), [key]: nextValue };
+    update("socialProofItems", next);
   };
 
   const updateFaq = (index: number, key: keyof LandingFaqItem, nextValue: string) => {
@@ -278,6 +314,8 @@ function PageSection({
 
   const addHighlight = () => update("highlights", [...(value.highlights ?? []), createEmptyHighlightItem()]);
   const removeHighlight = (index: number) => update("highlights", (value.highlights ?? []).filter((_, itemIndex) => itemIndex !== index));
+  const addSocialProof = () => update("socialProofItems", [...(value.socialProofItems ?? []), createEmptySocialProofItem()]);
+  const removeSocialProof = (index: number) => update("socialProofItems", (value.socialProofItems ?? []).filter((_, itemIndex) => itemIndex !== index));
   const addFaq = () => update("faqItems", [...(value.faqItems ?? []), createEmptyFaqItem()]);
   const removeFaq = (index: number) => update("faqItems", (value.faqItems ?? []).filter((_, itemIndex) => itemIndex !== index));
   const addLocalFaq = () => update("localFaqItems", [...(value.localFaqItems ?? []), createEmptyFaqItem()]);
@@ -309,134 +347,151 @@ function PageSection({
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-sm">
-            Kleine boventitel
-            <input className={pageFieldClass()} value={value.heroLabel ?? ""} onChange={(event) => update("heroLabel", event.target.value)} />
-          </label>
+        <div className="grid gap-5 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(18,30,46,0.22)] p-5">
+          <div>
+            <h3 className="font-display text-2xl">Zoekresultaat</h3>
+            <p className="text-sm text-[#d9c6ac]">Wat mensen in Google of bij delen op social als eerste zien.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="text-sm">
+              SEO-titel in Google
+              <input className={pageFieldClass()} value={value.seoTitle} onChange={(event) => update("seoTitle", event.target.value)} />
+            </label>
 
-          <label className="text-sm">
-            Paginatitel
-            <input className={pageFieldClass()} value={value.title} onChange={(event) => update("title", event.target.value)} />
-          </label>
+            <label className="text-sm">
+              OpenGraph titel
+              <input className={pageFieldClass()} value={value.ogTitle} onChange={(event) => update("ogTitle", event.target.value)} />
+            </label>
 
-          <label className="text-sm md:col-span-2">
-            Korte intro
-            <textarea className={pageFieldClass("min-h-28 resize-y")} value={value.intro} onChange={(event) => update("intro", event.target.value)} />
-          </label>
+            <label className="text-sm md:col-span-2">
+              SEO-beschrijving in Google
+              <textarea className={pageFieldClass("min-h-24 resize-y")} value={value.seoDescription} onChange={(event) => update("seoDescription", event.target.value)} />
+            </label>
 
-          <label className="text-sm">
-            SEO-titel in Google
-            <input className={pageFieldClass()} value={value.seoTitle} onChange={(event) => update("seoTitle", event.target.value)} />
-          </label>
-
-          <label className="text-sm">
-            OpenGraph titel
-            <input className={pageFieldClass()} value={value.ogTitle} onChange={(event) => update("ogTitle", event.target.value)} />
-          </label>
-
-          <label className="text-sm md:col-span-2">
-            SEO-beschrijving in Google
-            <textarea
-              className={pageFieldClass("min-h-24 resize-y")}
-              value={value.seoDescription}
-              onChange={(event) => update("seoDescription", event.target.value)}
-            />
-          </label>
-
-          <label className="text-sm md:col-span-2">
-            OpenGraph beschrijving
-            <textarea
-              className={pageFieldClass("min-h-24 resize-y")}
-              value={value.ogDescription}
-              onChange={(event) => update("ogDescription", event.target.value)}
-            />
-          </label>
+            <label className="text-sm md:col-span-2">
+              OpenGraph beschrijving
+              <textarea className={pageFieldClass("min-h-24 resize-y")} value={value.ogDescription} onChange={(event) => update("ogDescription", event.target.value)} />
+            </label>
+          </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-sm md:col-span-2">
-            Knoptekst
-            <input className={pageFieldClass()} value={value.cta?.label ?? ""} onChange={(event) => updateCta("label", event.target.value)} />
-          </label>
+        <div className="grid gap-5 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(18,30,46,0.22)] p-5">
+          <div>
+            <h3 className="font-display text-2xl">Hero</h3>
+            <p className="text-sm text-[#d9c6ac]">Dit ziet iemand direct bovenaan de landingspagina.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="text-sm">
+              Kleine boventitel
+              <input className={pageFieldClass()} value={value.heroLabel ?? ""} onChange={(event) => update("heroLabel", event.target.value)} />
+            </label>
 
-          <label className="text-sm md:col-span-2">
-            Knoplink
-            <input className={pageFieldClass()} value={value.cta?.href ?? ""} onChange={(event) => updateCta("href", event.target.value)} />
-          </label>
+            <label className="text-sm">
+              Voor wie is deze pagina bedoeld?
+              <input className={pageFieldClass()} value={value.audienceLabel ?? ""} onChange={(event) => update("audienceLabel", event.target.value)} />
+            </label>
+
+            <label className="text-sm md:col-span-2">
+              Paginatitel
+              <input className={pageFieldClass()} value={value.title} onChange={(event) => update("title", event.target.value)} />
+            </label>
+
+            <label className="text-sm md:col-span-2">
+              Korte intro
+              <textarea className={pageFieldClass("min-h-28 resize-y")} value={value.intro} onChange={(event) => update("intro", event.target.value)} />
+            </label>
+
+            <label className="text-sm md:col-span-2">
+              Knoptekst bovenaan
+              <input className={pageFieldClass()} value={value.cta?.label ?? ""} onChange={(event) => updateCta("label", event.target.value)} />
+            </label>
+
+            <label className="text-sm md:col-span-2">
+              Link van de knop bovenaan
+              <input className={pageFieldClass()} value={value.cta?.href ?? ""} onChange={(event) => updateCta("href", event.target.value)} />
+            </label>
+
+            <label className="text-sm md:col-span-2">
+              Afbeelding op deze landingspagina
+              <input className={pageFieldClass()} value={value.image?.src ?? ""} onChange={(event) => updateImage("src", event.target.value)} />
+            </label>
+
+            <label className="text-sm md:col-span-2">
+              Omschrijving van de afbeelding
+              <input className={pageFieldClass()} value={value.image?.alt ?? ""} onChange={(event) => updateImage("alt", event.target.value)} />
+            </label>
+
+            <label className="text-sm">
+              Breedte van de afbeelding
+              <input
+                type="number"
+                min={1}
+                className={pageFieldClass()}
+                value={value.image?.width ?? 1536}
+                onChange={(event) => updateImage("width", Math.max(1, Number(event.target.value) || 1536))}
+              />
+            </label>
+
+            <label className="text-sm">
+              Hoogte van de afbeelding
+              <input
+                type="number"
+                min={1}
+                className={pageFieldClass()}
+                value={value.image?.height ?? 864}
+                onChange={(event) => updateImage("height", Math.max(1, Number(event.target.value) || 864))}
+              />
+            </label>
+          </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-sm md:col-span-2">
-            Afbeelding op deze landingspagina
-            <input className={pageFieldClass()} value={value.image?.src ?? ""} onChange={(event) => updateImage("src", event.target.value)} />
-          </label>
+        <div className="grid gap-5 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(18,30,46,0.22)] p-5">
+          <div>
+            <h3 className="font-display text-2xl">Waarom dit past</h3>
+            <p className="text-sm text-[#d9c6ac]">Leg uit wat voor avond dit wordt en waarom Bohèm hier sterk in is.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="text-sm md:col-span-2">
+              Titel boven het overtuigingsblok
+              <input className={pageFieldClass()} value={value.positioningTitle ?? ""} onChange={(event) => update("positioningTitle", event.target.value)} />
+            </label>
 
-          <label className="text-sm md:col-span-2">
-            Omschrijving van de afbeelding
-            <input className={pageFieldClass()} value={value.image?.alt ?? ""} onChange={(event) => updateImage("alt", event.target.value)} />
-          </label>
+            <label className="text-sm md:col-span-2">
+              Uitleg bij waarom dit past
+              <textarea className={pageFieldClass("min-h-24 resize-y")} value={value.positioningBody ?? ""} onChange={(event) => update("positioningBody", event.target.value)} />
+            </label>
 
-          <label className="text-sm">
-            Breedte van de afbeelding
-            <input
-              type="number"
-              min={1}
-              className={pageFieldClass()}
-              value={value.image?.width ?? 1536}
-              onChange={(event) => updateImage("width", Math.max(1, Number(event.target.value) || 1536))}
-            />
-          </label>
+            <label className="text-sm md:col-span-2">
+              Titel boven situaties of doelgroepen
+              <input className={pageFieldClass()} value={value.fitTitle ?? ""} onChange={(event) => update("fitTitle", event.target.value)} />
+            </label>
 
-          <label className="text-sm">
-            Hoogte van de afbeelding
-            <input
-              type="number"
-              min={1}
-              className={pageFieldClass()}
-              value={value.image?.height ?? 864}
-              onChange={(event) => updateImage("height", Math.max(1, Number(event.target.value) || 864))}
-            />
-          </label>
+            <label className="text-sm md:col-span-2">
+              Situaties of doelgroepen, één per regel
+              <textarea className={pageFieldClass("min-h-28 resize-y")} value={joinLines(value.fitItems)} onChange={(event) => updateList("fitItems", event.target.value)} />
+            </label>
+
+            <label className="text-sm md:col-span-2">
+              Praktische punten voor een organisator, één per regel
+              <textarea className={pageFieldClass("min-h-28 resize-y")} value={joinLines(value.practicalInfoItems)} onChange={(event) => updateList("practicalInfoItems", event.target.value)} />
+            </label>
+          </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-sm md:col-span-2">
-            Waarom deze pagina werkt
-            <input
-              className={pageFieldClass()}
-              value={value.positioningTitle ?? ""}
-              onChange={(event) => update("positioningTitle", event.target.value)}
-            />
-          </label>
+        <div className="grid gap-5 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(18,30,46,0.22)] p-5">
+          <div>
+            <h3 className="font-display text-2xl">Bewijs en vertrouwen</h3>
+            <p className="text-sm text-[#d9c6ac]">Gebruik dit blok voor kernpunten, reacties en vragen die helpen om contact op te nemen.</p>
+          </div>
 
-          <label className="text-sm md:col-span-2">
-            Uitleg bij waarom deze pagina werkt
-            <textarea
-              className={pageFieldClass("min-h-24 resize-y")}
-              value={value.positioningBody ?? ""}
-              onChange={(event) => update("positioningBody", event.target.value)}
-            />
-          </label>
-        </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="text-sm md:col-span-2">
+              Kleine titel boven het bewijsblok
+              <input className={pageFieldClass()} value={value.proofTitle ?? ""} onChange={(event) => update("proofTitle", event.target.value)} />
+            </label>
+          </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-sm md:col-span-2">
-            Voor wie / past goed bij
-            <input className={pageFieldClass()} value={value.fitTitle ?? ""} onChange={(event) => update("fitTitle", event.target.value)} />
-          </label>
-
-          <label className="text-sm md:col-span-2">
-            Punten voor deze pagina, één per regel
-            <textarea
-              className={pageFieldClass("min-h-28 resize-y")}
-              value={joinLines(value.fitItems)}
-              onChange={(event) => updateList("fitItems", event.target.value)}
-            />
-          </label>
-        </div>
-
-        <div className="grid gap-4">
+          <div className="grid gap-4">
           <div className="flex items-center justify-between gap-3">
             <div>
               <h3 className="font-display text-2xl">Kernpunten</h3>
@@ -489,17 +544,113 @@ function PageSection({
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-sm md:col-span-2">
-            Titel boven veelgestelde vragen
-            <input className={pageFieldClass()} value={value.faqTitle ?? ""} onChange={(event) => update("faqTitle", event.target.value)} />
-          </label>
+          <div className="grid gap-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="font-display text-2xl">Reacties en vertrouwen</h3>
+                <p className="text-sm text-[#d9c6ac]">Korte reacties of context die laat zien wat deze setting teweegbrengt.</p>
+              </div>
+              <button
+                type="button"
+                onClick={addSocialProof}
+                className="rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+              >
+                Reactie toevoegen
+              </button>
+            </div>
+
+            <div className="grid gap-3">
+              {(value.socialProofItems ?? []).map((item, index) => (
+                <div key={`${page}-social-${index}`} className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-[var(--color-text-primary)]">Reactie {index + 1}</p>
+                    <button
+                      type="button"
+                      onClick={() => removeSocialProof(index)}
+                      className="rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[#d9c6ac] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                    >
+                      Verwijder
+                    </button>
+                  </div>
+
+                  <div className="mt-3 grid gap-3">
+                    <label className="text-sm">
+                      Quote of reactie
+                      <textarea className={pageFieldClass("min-h-24 resize-y")} value={item.quote} onChange={(event) => updateSocialProof(index, "quote", event.target.value)} />
+                    </label>
+
+                    <label className="text-sm">
+                      Van wie of welke context komt dit?
+                      <input className={pageFieldClass()} value={item.source ?? ""} onChange={(event) => updateSocialProof(index, "source", event.target.value)} />
+                    </label>
+
+                    <label className="text-sm">
+                      Korte extra context
+                      <input className={pageFieldClass()} value={item.context ?? ""} onChange={(event) => updateSocialProof(index, "context", event.target.value)} />
+                    </label>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="text-sm md:col-span-2">
+              Titel boven veelgestelde vragen
+              <input className={pageFieldClass()} value={value.faqTitle ?? ""} onChange={(event) => update("faqTitle", event.target.value)} />
+            </label>
+          </div>
+
+          <div className="grid gap-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="font-display text-2xl">Veelgestelde vragen</h3>
+                <p className="text-sm text-[#d9c6ac]">Voeg hier vraag en antwoord toe. Leeg laten betekent: niet tonen op de site.</p>
+              </div>
+              <button
+                type="button"
+                onClick={addFaq}
+                className="rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+              >
+                Vraag toevoegen
+              </button>
+            </div>
+
+            <div className="grid gap-3">
+              {(value.faqItems ?? []).map((item, index) => (
+                <div key={`${page}-faq-${index}`} className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-[var(--color-text-primary)]">Vraag {index + 1}</p>
+                    <button
+                      type="button"
+                      onClick={() => removeFaq(index)}
+                      className="rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[#d9c6ac] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                    >
+                      Verwijder
+                    </button>
+                  </div>
+
+                  <div className="mt-3 grid gap-3">
+                    <label className="text-sm">
+                      Vraag
+                      <input className={pageFieldClass()} value={item.question} onChange={(event) => updateFaq(index, "question", event.target.value)} />
+                    </label>
+
+                    <label className="text-sm">
+                      Antwoord
+                      <textarea className={pageFieldClass("min-h-24 resize-y")} value={item.answer} onChange={(event) => updateFaq(index, "answer", event.target.value)} />
+                    </label>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {showLocalSeo ? (
           <div className="grid gap-5 rounded-2xl border border-[rgba(67,135,133,0.45)] bg-[rgba(18,30,46,0.38)] p-5">
             <div>
-              <h3 className="font-display text-2xl">Lokale SEO</h3>
+              <h3 className="font-display text-2xl">Lokaal</h3>
               <p className="text-sm text-[#d9c6ac]">Gebruik dit blok om deze landingspagina regionaal relevanter te maken zonder aparte stadspagina's te bouwen.</p>
             </div>
 
@@ -592,60 +743,29 @@ function PageSection({
           </div>
         ) : null}
 
-        <div className="grid gap-4">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h3 className="font-display text-2xl">Veelgestelde vragen</h3>
-              <p className="text-sm text-[#d9c6ac]">Voeg hier vraag en antwoord toe. Leeg laten betekent: niet tonen op de site.</p>
-            </div>
-            <button
-              type="button"
-              onClick={addFaq}
-              className="rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-            >
-              Vraag toevoegen
-            </button>
+        <div className="grid gap-5 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(18,30,46,0.22)] p-5">
+          <div>
+            <h3 className="font-display text-2xl">Slot-CTA</h3>
+            <p className="text-sm text-[#d9c6ac]">De afsluitende band onderaan de landingspagina. Hier mag je directer naar contact toe werken.</p>
           </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="text-sm md:col-span-2">
+              Titel in de afsluitende contactband
+              <input className={pageFieldClass()} value={value.ctaContextTitle ?? ""} onChange={(event) => update("ctaContextTitle", event.target.value)} />
+            </label>
 
-          <div className="grid gap-3">
-            {(value.faqItems ?? []).map((item, index) => (
-              <div key={`${page}-faq-${index}`} className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-[var(--color-text-primary)]">Vraag {index + 1}</p>
-                  <button
-                    type="button"
-                    onClick={() => removeFaq(index)}
-                    className="rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-xs font-semibold text-[#d9c6ac] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-                  >
-                    Verwijder
-                  </button>
-                </div>
-
-                <div className="mt-3 grid gap-3">
-                  <label className="text-sm">
-                    Vraag
-                    <input
-                      className={pageFieldClass()}
-                      value={item.question}
-                      onChange={(event) => updateFaq(index, "question", event.target.value)}
-                    />
-                  </label>
-
-                  <label className="text-sm">
-                    Antwoord
-                    <textarea
-                      className={pageFieldClass("min-h-24 resize-y")}
-                      value={item.answer}
-                      onChange={(event) => updateFaq(index, "answer", event.target.value)}
-                    />
-                  </label>
-                </div>
-              </div>
-            ))}
+            <label className="text-sm md:col-span-2">
+              Uitleg in de afsluitende contactband
+              <textarea className={pageFieldClass("min-h-24 resize-y")} value={value.ctaContextBody ?? ""} onChange={(event) => update("ctaContextBody", event.target.value)} />
+            </label>
           </div>
         </div>
 
-        <div className="grid gap-4">
+        <div className="grid gap-4 rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(18,30,46,0.14)] p-5">
+          <div>
+            <h3 className="font-display text-2xl">Geavanceerd</h3>
+            <p className="text-sm text-[#d9c6ac]">Alleen gebruiken als je echt een extra blok nodig hebt. Dit is niet de hoofdroute voor de pagina-opbouw.</p>
+          </div>
           <div className="flex items-center justify-between gap-3">
             <div>
               <h3 className="font-display text-2xl">Extra toelichting</h3>
@@ -696,17 +816,6 @@ function PageSection({
               </div>
             ))}
           </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-sm md:col-span-2">
-            Titel onder het bewijsblok
-            <input
-              className={pageFieldClass()}
-              value={value.proofTitle ?? ""}
-              onChange={(event) => update("proofTitle", event.target.value)}
-            />
-          </label>
         </div>
       </div>
     </details>

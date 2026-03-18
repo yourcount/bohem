@@ -28,6 +28,12 @@ export type LandingHighlightItem = {
   body: string;
 };
 
+export type LandingSocialProofItem = {
+  quote: string;
+  source?: string;
+  context?: string;
+};
+
 export type LandingExtraSection = {
   title: string;
   body: string;
@@ -35,6 +41,7 @@ export type LandingExtraSection = {
 
 export type LandingPageContent = {
   heroLabel?: string;
+  audienceLabel?: string;
   title: string;
   intro: string;
   seoTitle: string;
@@ -50,10 +57,14 @@ export type LandingPageContent = {
   positioningBody?: string;
   fitTitle?: string;
   fitItems?: string[];
+  practicalInfoItems?: string[];
   highlights?: LandingHighlightItem[];
+  socialProofItems?: LandingSocialProofItem[];
   extraSections?: LandingExtraSection[];
   faqTitle?: string;
   faqItems?: LandingFaqItem[];
+  ctaContextTitle?: string;
+  ctaContextBody?: string;
   localAreaTitle?: string;
   localAreaIntro?: string;
   priorityCities?: string[];

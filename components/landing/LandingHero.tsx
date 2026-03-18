@@ -8,6 +8,7 @@ import type { Cta, ImageAsset } from "@/lib/types";
 type LandingHeroProps = {
   id?: string;
   eyebrow?: string;
+  audienceLabel?: string;
   title: string;
   intro: string;
   note?: string;
@@ -23,7 +24,7 @@ function hasText(value: string | undefined | null) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-export function LandingHero({ id = "intro", eyebrow, title, intro, note, image, primaryCta, secondaryCta }: LandingHeroProps) {
+export function LandingHero({ id = "intro", eyebrow, audienceLabel, title, intro, note, image, primaryCta, secondaryCta }: LandingHeroProps) {
   const actions = [primaryCta, secondaryCta].filter(
     (cta): cta is Cta => Boolean(cta && hasText(cta.label) && hasText(cta.href))
   );
@@ -51,6 +52,11 @@ export function LandingHero({ id = "intro", eyebrow, title, intro, note, image, 
             <p className="mt-5 max-w-[60ch] text-[1.02rem] leading-8 text-[var(--color-text-primary)] sm:text-lg">
               {intro}
             </p>
+            {hasText(audienceLabel) ? (
+              <p className="mt-4 inline-flex max-w-[60ch] rounded-full border border-[rgba(242,139,14,0.28)] bg-[rgba(242,139,14,0.08)] px-4 py-2 text-sm text-[#f3d7b0]">
+                {audienceLabel}
+              </p>
+            ) : null}
             {hasText(note) ? <p className="mt-4 max-w-[55ch] text-sm text-[#d9c4a8]">{note}</p> : null}
             {actions.length > 0 ? (
               <div className="mt-7 flex flex-wrap gap-3">

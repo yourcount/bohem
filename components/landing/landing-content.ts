@@ -1,4 +1,4 @@
-import type { LandingExtraSection, LandingHighlightItem, NavItem, SiteContent } from "@/lib/types";
+import type { LandingExtraSection, LandingHighlightItem, LandingSocialProofItem, NavItem, SiteContent } from "@/lib/types";
 import { filterFutureShows } from "@/lib/content/shows";
 import { getLandingFaqItems, getLandingPageContent, type LandingPageKey } from "@/lib/content/landing-pages";
 
@@ -6,6 +6,7 @@ export type LandingRouteView = {
   navigation: NavItem[];
   intro: {
     eyebrow?: string;
+    audienceLabel?: string;
     title: string;
     intro: string;
     note?: string;
@@ -26,6 +27,16 @@ export type LandingRouteView = {
     proofTitle?: string;
     proofItems: string[];
     cta?: { label: string; href: string; variant?: "primary" | "secondary" };
+  };
+  socialProof?: {
+    eyebrow?: string;
+    title: string;
+    items: LandingSocialProofItem[];
+  };
+  practicalInfo?: {
+    eyebrow?: string;
+    title: string;
+    items: string[];
   };
   faq?: {
     eyebrow?: string;
@@ -152,6 +163,43 @@ function buildLocalArea(
   };
 }
 
+function buildSocialProof(
+  items: LandingSocialProofItem[] | undefined,
+  title: string,
+  eyebrow?: string
+): LandingRouteView["socialProof"] {
+  const visibleItems = (items ?? [])
+    .map((item) => ({
+      quote: item.quote?.trim() || "",
+      source: item.source?.trim() || "",
+      context: item.context?.trim() || ""
+    }))
+    .filter((item) => hasText(item.quote));
+
+  if (!hasText(title) || visibleItems.length === 0) return undefined;
+
+  return {
+    eyebrow,
+    title,
+    items: visibleItems
+  };
+}
+
+function buildPracticalInfo(
+  items: string[] | undefined,
+  title: string,
+  eyebrow?: string
+): LandingRouteView["practicalInfo"] {
+  const visibleItems = (items ?? []).map((item) => item.trim()).filter((item) => item.length > 0);
+  if (!hasText(title) || visibleItems.length === 0) return undefined;
+
+  return {
+    eyebrow,
+    title,
+    items: visibleItems
+  };
+}
+
 function toTelHref(phone: string | undefined | null) {
   if (!hasText(phone)) return undefined;
   const normalizedPhone = String(phone).trim().replace(/\s+/g, "");
@@ -176,19 +224,21 @@ export function buildMusicDuoLanding(siteContent: SiteContent): LandingRouteView
     ]),
     intro: {
       eyebrow: content.heroLabel || "Bohèm boeken",
+      audienceLabel: content.audienceLabel,
       title: content.title,
       intro: content.intro,
-      note: content.positioningBody || "Compact, muzikaal en zonder overbodige franje.",
+      note: content.positioningBody || "Een avond die dichtbij voelt, muzikaal blijft boeien en zonder afstand gespeeld wordt.",
       image: content.image || siteContent.hero.image,
-      primaryCta: content.cta ?? { label: "Vraag beschikbaarheid aan", href: "#contact" },
+      primaryCta: content.cta ?? { label: "Leg je idee aan ons voor", href: "#contact" },
       secondaryCta: visibleShows.length > 0 ? { label: "Bekijk de shows", href: "#shows", variant: "secondary" } : { label: "Lees de FAQ", href: "#faq", variant: "secondary" }
     },
     highlights: {
-      eyebrow: content.proofTitle || "Waar Bohèm past",
-      title: content.positioningTitle || "Waarom dit werkt als boeking",
+      eyebrow: content.proofTitle || "Wat je neerzet",
+      title: content.positioningTitle || "Waarom dit als avond blijft hangen",
       intro: content.positioningBody || content.intro,
       items: combineSections(content.highlights, content.fitItems, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6)
     },
+    socialProof: buildSocialProof(content.socialProofItems, "Wat organisatoren en bezoekers teruggeven", "Reacties"),
     localArea: buildLocalArea(
       content.localAreaTitle,
       content.localAreaIntro,
@@ -197,6 +247,7 @@ export function buildMusicDuoLanding(siteContent: SiteContent): LandingRouteView
       content.localProofItems,
       content.localLinkLabel && content.localLinkHref ? { label: content.localLinkLabel, href: content.localLinkHref, variant: "secondary" } : undefined
     ),
+    practicalInfo: buildPracticalInfo(content.practicalInfoItems, "Praktisch om te weten", "Praktisch"),
     faq,
     shows: visibleShows.length > 0 ? {
       eyebrow: siteContent.bookings.showsEyebrow ?? "Live agenda",
@@ -205,8 +256,8 @@ export function buildMusicDuoLanding(siteContent: SiteContent): LandingRouteView
     } : undefined,
     cta: {
       eyebrow: "Contact",
-      title: "Plan direct een boeking",
-      body: "Stuur een korte vraag, dan kijken we samen naar datum, setting en geschiktheid.",
+      title: content.ctaContextTitle || "Vertel wat voor avond je wilt neerzetten",
+      body: content.ctaContextBody || "Stuur een korte vraag, dan kijken we samen naar datum, setting en geschiktheid.",
       primaryCta: { label: "Mail direct", href: `mailto:${siteContent.bookings.press?.contactEmail || siteContent.contact.email}` },
       secondaryCta: toTelHref(siteContent.bookings.press?.contactPhone)
         ? { label: "Bel direct", href: toTelHref(siteContent.bookings.press?.contactPhone)!, variant: "secondary" }
@@ -233,19 +284,21 @@ export function buildTheaterConcertLanding(siteContent: SiteContent): LandingRou
     ]),
     intro: {
       eyebrow: content.heroLabel || "Theaterconcert boeken",
+      audienceLabel: content.audienceLabel,
       title: content.title,
       intro: content.intro,
-      note: content.positioningBody || "Voor zalen die een rustig, muzikaal en inhoudelijk sterk programma zoeken.",
+      note: content.positioningBody || "Voor zalen die een luistergericht programma zoeken dat muzikaal blijft verrassen en dramaturgisch klopt.",
       image: content.image || siteContent.about.photoMoments?.[0] || siteContent.hero.image,
-      primaryCta: content.cta ?? { label: "Plan een theaterconcert", href: "#contact" },
+      primaryCta: content.cta ?? { label: "Bespreek je programma", href: "#contact" },
       secondaryCta: visibleShows.length > 0 ? { label: "Bekijk de shows", href: "#shows", variant: "secondary" } : { label: "Bekijk de highlights", href: "#highlights", variant: "secondary" }
     },
     highlights: {
-      eyebrow: content.proofTitle || "Programmering",
-      title: content.positioningTitle || "Waar dit type avond sterk in is",
-      intro: content.positioningBody || "Klein genoeg om dichtbij te voelen, rijk genoeg om een avond te dragen.",
+      eyebrow: content.proofTitle || "Programmafit",
+      title: content.positioningTitle || "Waarom dit in een theatercontext werkt",
+      intro: content.positioningBody || "Een avond die dichtbij voelt, maar stevig genoeg is om een zaal te dragen.",
       items: combineSections(content.highlights, content.fitItems, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6)
     },
+    socialProof: buildSocialProof(content.socialProofItems, "Wat deze setting losmaakt", "Reacties uit de zaal"),
     localArea: buildLocalArea(
       content.localAreaTitle,
       content.localAreaIntro,
@@ -254,6 +307,7 @@ export function buildTheaterConcertLanding(siteContent: SiteContent): LandingRou
       content.localProofItems,
       content.localLinkLabel && content.localLinkHref ? { label: content.localLinkLabel, href: content.localLinkHref, variant: "secondary" } : undefined
     ),
+    practicalInfo: buildPracticalInfo(content.practicalInfoItems, "Praktisch voor programmeurs", "Afstemming"),
     faq,
     shows: visibleShows.length > 0 ? {
       eyebrow: siteContent.bookings.showsEyebrow ?? "Speeldata",
@@ -262,8 +316,8 @@ export function buildTheaterConcertLanding(siteContent: SiteContent): LandingRou
     } : undefined,
     cta: {
       eyebrow: "Contact",
-      title: "Vraag een theaterconcert aan",
-      body: "Vertel kort wat voor zaal, publiek of programma je voor ogen hebt. Dan denken we mee over een passende invulling.",
+      title: content.ctaContextTitle || "Bespreek publiek, zaal en speelvorm",
+      body: content.ctaContextBody || "Vertel kort wat voor zaal, publiek of programma je voor ogen hebt. Dan denken we mee over een passende invulling.",
       primaryCta: { label: "Mail direct", href: `mailto:${siteContent.bookings.press?.contactEmail || siteContent.contact.email}` },
       secondaryCta: toTelHref(siteContent.bookings.press?.contactPhone)
         ? { label: "Bel direct", href: toTelHref(siteContent.bookings.press?.contactPhone)!, variant: "secondary" }
@@ -283,30 +337,34 @@ export function buildKampvuurLanding(siteContent: SiteContent): LandingRouteView
   return {
     navigation: makeNav([
       ["Intro", "#intro"],
-      ["Beleving", "#kampvuur"],
+      ["Wat dit losmaakt", "#highlights"],
+      ["De beleving", "#kampvuurklanken"],
       ["FAQ", "#faq"],
       ["Contact", "#contact"]
     ]),
     intro: {
       eyebrow: content.heroLabel || "Kampvuurklanken",
+      audienceLabel: content.audienceLabel,
       title: content.title,
       intro: content.intro,
-      note: content.positioningBody || "Intiem, gedragen en geschikt voor groepen die echt samen willen luisteren.",
+      note: content.positioningBody || "Geen standaard teamactiviteit, maar een avond die rust, herkenning en gesprek oproept.",
       image: content.image || siteContent.kampvuur.image || siteContent.hero.image,
-      primaryCta: content.cta ?? { label: "Vraag Kampvuurklanken aan", href: "#contact" },
-      secondaryCta: { label: "Bekijk de beleving", href: "#kampvuur", variant: "secondary" }
+      primaryCta: content.cta ?? { label: "Bekijk de beleving", href: "#kampvuurklanken" },
+      secondaryCta: { label: "Lees wat dit losmaakt", href: "#highlights", variant: "secondary" }
     },
     highlights: {
       eyebrow: content.proofTitle || "Voor teams en organisaties",
-      title: content.positioningTitle || "Waarom dit werkt",
+      title: content.positioningTitle || "Wat dit in een groep losmaakt",
       intro: content.positioningBody || siteContent.kampvuur.body?.[0],
       items: combineSections(content.highlights, content.fitItems, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6)
     },
+    socialProof: buildSocialProof(content.socialProofItems, "Waarom groepen hierop reageren", "Terug uit teams"),
+    practicalInfo: buildPracticalInfo(content.practicalInfoItems, "Hoe we dit afstemmen", "Praktisch"),
     faq,
     cta: {
       eyebrow: "Contact",
-      title: "Plan een Kampvuurklanken-avond",
-      body: siteContent.kampvuur.contactPrompt || "Vertel kort voor welke groep en welke avond je zoekt, dan maken we samen een passende opzet.",
+      title: content.ctaContextTitle || "Verken of Kampvuurklanken bij jullie groep past",
+      body: content.ctaContextBody || siteContent.kampvuur.contactPrompt || "Vertel kort voor welke groep en welke avond je zoekt, dan maken we samen een passende opzet.",
       primaryCta: hasText(siteContent.kampvuur.contactEmail)
         ? { label: "Mail direct", href: `mailto:${siteContent.kampvuur.contactEmail}` }
         : undefined,
@@ -333,19 +391,21 @@ export function buildHuiskamerConcertLanding(siteContent: SiteContent): LandingR
     ]),
     intro: {
       eyebrow: content.heroLabel || "Huiskamerconcert boeken",
+      audienceLabel: content.audienceLabel,
       title: content.title,
       intro: content.intro,
-      note: content.positioningBody || "Compact van opzet, rijk in sfeer.",
+      note: content.positioningBody || "Een avond die klein mag voelen, maar groot binnenkomt.",
       image: content.image || siteContent.musicExperience.image,
-      primaryCta: content.cta ?? { label: "Boek een huiskamerconcert", href: "#contact" },
+      primaryCta: content.cta ?? { label: "Leg je avond aan ons voor", href: "#contact" },
       secondaryCta: { label: "Bekijk de mogelijkheden", href: "#highlights", variant: "secondary" }
     },
     highlights: {
-      eyebrow: content.proofTitle || "Intieme setting",
-      title: content.positioningTitle || "Waarom een huiskamerconcert werkt",
-      intro: content.positioningBody || "De ruimte is klein, de beleving juist groot.",
+      eyebrow: content.proofTitle || "Dicht op het publiek",
+      title: content.positioningTitle || "Waarom dit in een kleine setting zo sterk werkt",
+      intro: content.positioningBody || "De ruimte is klein, de aandacht juist groot.",
       items: combineSections(content.highlights, content.fitItems, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6)
     },
+    socialProof: buildSocialProof(content.socialProofItems, "Wat gasten na afloop onthouden", "Reacties"),
     localArea: buildLocalArea(
       content.localAreaTitle,
       content.localAreaIntro,
@@ -354,11 +414,12 @@ export function buildHuiskamerConcertLanding(siteContent: SiteContent): LandingR
       content.localProofItems,
       content.localLinkLabel && content.localLinkHref ? { label: content.localLinkLabel, href: content.localLinkHref, variant: "secondary" } : undefined
     ),
+    practicalInfo: buildPracticalInfo(content.practicalInfoItems, "Praktisch voor een huiskamerconcert", "Praktisch"),
     faq,
     cta: {
       eyebrow: "Contact",
-      title: "Vraag een huiskamerconcert aan",
-      body: "Stuur een korte beschrijving van de ruimte en het gezelschap; dan denken we mee over een passende opzet.",
+      title: content.ctaContextTitle || "Vertel iets over je ruimte en gezelschap",
+      body: content.ctaContextBody || "Stuur een korte beschrijving van de ruimte en het gezelschap; dan denken we mee over een passende opzet.",
       primaryCta: { label: "Mail direct", href: `mailto:${siteContent.bookings.press?.contactEmail || siteContent.contact.email}` },
       secondaryCta: toTelHref(siteContent.bookings.press?.contactPhone)
         ? { label: "Bel direct", href: toTelHref(siteContent.bookings.press?.contactPhone)!, variant: "secondary" }
@@ -380,30 +441,33 @@ export function buildPersLanding(siteContent: SiteContent): LandingRouteView {
   return {
     navigation: makeNav([
       ["Intro", "#intro"],
-      ["Feiten", "#facts"],
+      ["Kernfeiten", "#highlights"],
       ["FAQ", "#faq"],
       ["Contact", "#contact"]
     ]),
     intro: {
       eyebrow: content.heroLabel || "Pers en programmering",
+      audienceLabel: content.audienceLabel,
       title: content.title,
       intro: content.intro,
-      note: content.positioningBody || "Korte briefing, duidelijke feiten en directe contactopties.",
+      note: content.positioningBody || "Alles wat een programmeur, redacteur of venue snel nodig heeft.",
       image: content.image || siteContent.bookings.highlightImage || siteContent.about.photoMoments?.[0] || siteContent.hero.image,
-      primaryCta: content.cta ?? { label: "Bekijk de feiten", href: "#facts" },
+      primaryCta: content.cta ?? { label: "Bekijk de kernfeiten", href: "#highlights" },
       secondaryCta: { label: "Lees de FAQ", href: "#faq", variant: "secondary" }
     },
     highlights: {
       eyebrow: content.proofTitle || "Kernfeiten",
-      title: content.positioningTitle || press?.title || "Wat handig is om te weten",
-      intro: content.positioningBody || "Alles wat programmeurs, redacties en venues snel nodig hebben.",
+      title: content.positioningTitle || press?.title || "Wat handig is om meteen te weten",
+      intro: content.positioningBody || "Feiten, positionering en contactopties zonder omweg.",
       items: combineSections(content.highlights, content.fitItems || facts, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6)
     },
+    socialProof: buildSocialProof(content.socialProofItems, "Snelle context voor programmeurs en media", "Context"),
+    practicalInfo: buildPracticalInfo(content.practicalInfoItems, "Snel geregeld", "Praktisch"),
     faq,
     cta: {
       eyebrow: "Contact",
-      title: "Vraag persmateriaal aan",
-      body: "Stuur een bericht voor persinformatie, programmering of beeldmateriaal. We reageren snel en gericht.",
+      title: content.ctaContextTitle || "Vraag persmateriaal of programmeerinformatie aan",
+      body: content.ctaContextBody || "Stuur een bericht voor persinformatie, programmering of beeldmateriaal. We reageren snel en gericht.",
       primaryCta: press?.kitHref && press.kitLabel ? { label: press.kitLabel, href: press.kitHref } : undefined,
       secondaryCta: press?.contactEmail
         ? { label: "Mail direct", href: `mailto:${press.contactEmail}`, variant: "secondary" }

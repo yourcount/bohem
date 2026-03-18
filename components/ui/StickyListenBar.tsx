@@ -7,6 +7,7 @@ import { getExternalLinkProps } from "@/lib/ui/link-target";
 
 type StickyListenBarProps = {
   visibleSectionIds: string[];
+  hiddenSectionIds?: string[];
   eyebrow: string;
   trackTitle: string;
   trackHref: string;
@@ -19,6 +20,7 @@ type StickyListenBarProps = {
 
 export function StickyListenBar({
   visibleSectionIds,
+  hiddenSectionIds = [],
   eyebrow,
   trackTitle,
   trackHref,
@@ -29,18 +31,26 @@ export function StickyListenBar({
   artworkFocusY = 50
 }: StickyListenBarProps) {
   const [isEligible, setIsEligible] = useState(false);
+  const [isSuppressed, setIsSuppressed] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const [isManuallyOpen, setIsManuallyOpen] = useState(false);
 
   useEffect(() => {
     const updateVisibility = () => {
       const viewportOffset = window.innerHeight * 0.35;
+      const shouldSuppress = hiddenSectionIds.some((id) => {
+        const section = document.getElementById(id);
+        if (!section) return false;
+        const rect = section.getBoundingClientRect();
+        return rect.top <= viewportOffset && rect.bottom > viewportOffset;
+      });
       const shouldShow = visibleSectionIds.some((id) => {
         const section = document.getElementById(id);
         if (!section) return false;
         const rect = section.getBoundingClientRect();
         return rect.top <= viewportOffset && rect.bottom > viewportOffset;
       });
+      setIsSuppressed(shouldSuppress);
       setIsEligible(shouldShow);
     };
 
@@ -52,10 +62,10 @@ export function StickyListenBar({
       window.removeEventListener("scroll", updateVisibility);
       window.removeEventListener("resize", updateVisibility);
     };
-  }, [visibleSectionIds]);
+  }, [hiddenSectionIds, visibleSectionIds]);
 
-  const showBar = !isDismissed && (isEligible || isManuallyOpen);
-  const showLauncher = !showBar;
+  const showBar = !isDismissed && !isSuppressed && (isEligible || isManuallyOpen);
+  const showLauncher = !showBar && !isSuppressed;
 
   return (
     <>

@@ -92,14 +92,6 @@ type AttentionPoint = {
   severity: AttentionSeverity;
   impactText?: string;
 };
-type QuickTask = {
-  id: string;
-  label: string;
-  sectionTitle: string;
-  path?: string;
-  description: string;
-  impactText?: string;
-};
 type GuideTargetKey = "section-menu" | "save-bar" | "search-panel";
 type GuideStep = {
   id: string;
@@ -1514,51 +1506,6 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
     focusFieldPath(sectionTitle, path);
   };
 
-  const quickTasks = useMemo<QuickTask[]>(
-    () => [
-      {
-        id: "hero-photo",
-        label: "Hero-foto aanpassen",
-        sectionTitle: "Bovenaan de pagina",
-        path: "hero.image.src",
-        description: "Vervang direct de grote openingsfoto bovenaan de site.",
-        impactText: "Dit beeld bepaalt de eerste indruk op de homepage."
-      },
-      {
-        id: "new-show",
-        label: "Nieuwe show toevoegen",
-        sectionTitle: SHOWS_SECTION_TITLE,
-        description: "Ga meteen naar de shows om een datum, locatie en links in te vullen.",
-        impactText: "Shows verschijnen alleen live als datum en zichtbare inhoud zijn ingevuld."
-      },
-      {
-        id: "sticky-listen",
-        label: "Sticky luisterbalk aanpassen",
-        sectionTitle: "Discografie",
-        path: "discography.featuredSingle.href",
-        description: "Pas titel, link of cover van de luisterbalk aan.",
-        impactText: "Dit komt terug in de pop-up muziekbalk en op landingspagina's."
-      },
-      {
-        id: "footer-links",
-        label: "Footerlinks aanpassen",
-        sectionTitle: FOOTER_SECTION_TITLE,
-        path: "footer.links.0.label",
-        description: "Werk de belangrijke links onderaan de site bij.",
-        impactText: "Deze links staan onderaan de homepage en alle landingspagina's."
-      },
-      {
-        id: "press-kit",
-        label: "Perskit aanpassen",
-        sectionTitle: "Boekingen",
-        path: "bookings.press.kitHref",
-        description: "Ga direct naar de perskit-link en persgegevens.",
-        impactText: "Dit staat bovenaan de perspagina en in het persblok op de site."
-      }
-    ],
-    []
-  );
-
   const attentionPoints = useMemo<AttentionPoint[]>(() => {
     if (!content) return [];
 
@@ -1974,23 +1921,6 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
             <li>Klik onderaan op <strong>Opslaan</strong>.</li>
             <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
           </ol>
-          <div className="mt-4">
-            <p className="font-semibold text-[#f8f5f1]">Snelle taken</p>
-            <div className="mt-2 grid gap-2">
-              {quickTasks.map((task) => (
-                <button
-                  key={task.id}
-                  type="button"
-                  onClick={() => jumpToEditorTarget(task.sectionTitle, task.path)}
-                  className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3 text-left transition-colors hover:bg-[rgba(244,233,220,0.06)]"
-                >
-                  <span className="block text-sm font-semibold text-[#f8f5f1]">{task.label}</span>
-                  <span className="mt-1 block text-xs text-[#d9c6ac]">{task.description}</span>
-                  {task.impactText ? <span className="mt-2 block text-[11px] text-[#f3d7b0]">{task.impactText}</span> : null}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
         <div>
           <div className="flex flex-wrap items-center justify-between gap-2">

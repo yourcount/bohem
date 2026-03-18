@@ -101,6 +101,52 @@ function toHighlightItems(items: LandingHighlightItem[] | string[] | undefined):
     .filter((item) => hasText(item.body));
 }
 
+function toSentenceCase(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+}
+
+function deriveHighlightTitle(body: string, index: number) {
+  const normalized = body.trim().replace(/\s+/g, " ");
+  if (!normalized) return `Kernpunt ${String(index + 1).padStart(2, "0")}`;
+
+  const shortWords = normalized.split(" ");
+  if (shortWords.length <= 4) {
+    return toSentenceCase(normalized);
+  }
+
+  const separators = [" waar ", " die ", " met ", " voor ", " zonder ", " zodat ", " waarin "];
+  for (const separator of separators) {
+    const [candidate] = normalized.split(separator);
+    const trimmedCandidate = candidate?.trim() || "";
+    if (trimmedCandidate.split(" ").length >= 2 && trimmedCandidate.split(" ").length <= 5) {
+      return toSentenceCase(trimmedCandidate);
+    }
+  }
+
+  return toSentenceCase(shortWords.slice(0, 4).join(" "));
+}
+
+function toTitledFitItems(items: string[] | undefined): LandingHighlightItem[] {
+  if (!Array.isArray(items) || items.length === 0) return [];
+
+  return items
+    .map((item, index) => {
+      const body = item.trim();
+      if (!body) return null;
+
+      const title = deriveHighlightTitle(body, index);
+      const hasCompactBody = body.split(" ").length <= 4;
+
+      return {
+        title,
+        body: hasCompactBody && title === toSentenceCase(body) ? "" : toSentenceCase(body)
+      };
+    })
+    .filter((item): item is LandingHighlightItem => Boolean(item && (hasText(item.title) || hasText(item.body))));
+}
+
 function limitFaq(items: Array<{ question: string; answer: string }>, fallback: Array<{ question: string; answer: string }>) {
   const source = items.filter((item) => hasText(item.question) && hasText(item.answer));
   return source.length > 0 ? source : fallback;
@@ -120,7 +166,7 @@ function combineSections(
   }
 
   if (Array.isArray(fitItems)) {
-    items.push(...toHighlightItems(fitItems));
+    items.push(...toTitledFitItems(fitItems));
   }
 
   if (Array.isArray(extraSections)) {

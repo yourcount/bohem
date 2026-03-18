@@ -35,7 +35,7 @@ export function SiteFooter({ footer }: SiteFooterProps) {
 
   return (
     <footer aria-label="Footer" className="border-t border-[var(--color-line-muted)] bg-[#111d30] py-8 text-[#d6e3ec]">
-      <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-4 sm:px-6 lg:grid-cols-[180px_minmax(320px,1fr)_260px] lg:items-start">
+      <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-4 sm:px-6 lg:grid-cols-[180px_minmax(420px,1fr)_260px] lg:items-start">
         <div className="lg:pt-1">
           <Image
             src="/brand/logos/bohem-logo-white-moon-color.webp"
@@ -47,10 +47,10 @@ export function SiteFooter({ footer }: SiteFooterProps) {
         </div>
 
         {footerLinks.length > 0 ? (
-          <nav aria-label="Belangrijke links" className="w-full lg:px-6">
-            <div className="mx-auto max-w-[460px]">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0] lg:text-center">Belangrijke links</p>
-              <ul className="grid gap-x-8 gap-y-2 sm:grid-cols-2 lg:justify-items-center">
+          <nav aria-label="Belangrijke links" className="w-full lg:pl-6 xl:pl-10">
+            <div className="max-w-[560px]">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Belangrijke links</p>
+              <ul className="grid gap-x-10 gap-y-2 sm:grid-cols-2">
                 {footerLinks.map((link) => (
                   <li key={`${link.label}-${link.href}`} className="min-w-0">
                     <Link

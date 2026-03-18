@@ -91,7 +91,7 @@ export function LandingHero({ id = "intro", eyebrow, audienceLabel, title, intro
             {hasMetaDrawer ? (
               <details className="mt-5 max-w-[62ch] overflow-hidden rounded-2xl border border-[rgba(243,215,176,0.18)] bg-[rgba(248,241,229,0.05)] shadow-[0_10px_24px_rgba(0,0,0,0.16)]">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-sm font-medium text-[#f1dfc5] marker:content-none">
-                  <span>Meer context</span>
+                  <span>Lees meer of luister alvast</span>
                   <span aria-hidden="true" className="text-xs uppercase tracking-[0.12em] text-[#f3d7b0]">
                     Open
                   </span>

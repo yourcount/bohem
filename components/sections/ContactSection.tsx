@@ -106,6 +106,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? "";
   const turnstileEnabled = turnstileSiteKey.length > 0;
   const sectionRef = useRef<HTMLElement | null>(null);
+  const feedbackRef = useRef<HTMLDivElement | null>(null);
   const desktopTurnstileRef = useRef<HTMLDivElement | null>(null);
   const mobileTurnstileRef = useRef<HTMLDivElement | null>(null);
   const desktopTurnstileResolverRef = useRef<((token: string) => void) | null>(null);
@@ -156,19 +157,30 @@ export function ContactSection({ contact }: ContactSectionProps) {
   const FeedbackMessage = ({ className = "" }: { className?: string }) => {
     if (submitError) {
       return (
-        <p role="alert" className={`text-sm text-[#ffb4a8] ${className}`.trim()}>
+        <div
+          ref={feedbackRef}
+          role="alert"
+          tabIndex={-1}
+          className={`rounded-2xl border border-[rgba(255,180,168,0.24)] bg-[rgba(82,25,20,0.28)] px-4 py-3 text-sm leading-relaxed text-[#ffb4a8] ${className}`.trim()}
+        >
           {submitError}
-        </p>
+        </div>
       );
     }
     if (submitSuccess) {
       return (
-        <p aria-live="polite" className={`text-sm text-[#b6efb9] ${className}`.trim()}>
+        <div
+          ref={feedbackRef}
+          role="status"
+          aria-live="polite"
+          tabIndex={-1}
+          className={`rounded-2xl border border-[rgba(182,239,185,0.24)] bg-[rgba(18,53,33,0.28)] px-4 py-3 text-sm leading-relaxed text-[#b6efb9] ${className}`.trim()}
+        >
           <span aria-hidden="true" className="success-pop">
             ✓
           </span>
           {submitSuccess}
-        </p>
+        </div>
       );
     }
     return null;
@@ -186,6 +198,18 @@ export function ContactSection({ contact }: ContactSectionProps) {
       setSubmitSuccess("");
     }
   }, [mobileStep, submitError, submitSuccess]);
+
+  useEffect(() => {
+    if (!submitError && !submitSuccess) return;
+
+    const node = feedbackRef.current;
+    if (!node) return;
+
+    requestAnimationFrame(() => {
+      node.focus({ preventScroll: true });
+      node.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  }, [submitError, submitSuccess]);
 
   useEffect(() => {
     if (!turnstileEnabled) return;

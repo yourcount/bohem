@@ -18,7 +18,7 @@ export function LandingPageShell({ brandName, navigation, children, footer }: La
         Ga direct naar inhoud
       </a>
 
-      <SiteHeader brandName={brandName} navigation={navigation} />
+      <SiteHeader brandName={brandName} navigation={navigation} homeHref="/" />
 
       <main id="main-content" className="landing-page-shell">
         {children}

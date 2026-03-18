@@ -98,7 +98,7 @@ export function ShowsSection({ shows, eyebrow, title, badgeLabel }: ShowsSection
                           <span className="ticket-burst-label">Tickets</span>
                         </Link>
                       ) : null}
-                      {!show.freeEntry && hasText(show.infoHref) ? (
+                      {hasText(show.infoHref) ? (
                         <Link
                           href={show.infoHref!}
                           {...getExternalLinkProps(show.infoHref)}

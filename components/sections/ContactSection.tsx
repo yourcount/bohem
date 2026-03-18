@@ -187,12 +187,14 @@ export function ContactSection({ contact }: ContactSectionProps) {
   };
 
   useEffect(() => {
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
     if ((submitError || submitSuccess) && mobileStep !== 2) {
       setMobileStep(2);
     }
   }, [mobileStep, submitError, submitSuccess]);
 
   useEffect(() => {
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
     if (mobileStep === 1 && (submitError || submitSuccess)) {
       setSubmitError("");
       setSubmitSuccess("");

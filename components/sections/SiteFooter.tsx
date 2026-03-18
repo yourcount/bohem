@@ -55,7 +55,7 @@ export function SiteFooter({ footer }: SiteFooterProps) {
                   <li key={`${link.label}-${link.href}`} className="min-w-0">
                     <Link
                       href={link.href}
-                      className="inline-flex text-sm text-[#d6e3ec] transition-colors hover:text-white"
+                      className="quiet-link text-sm text-[#d6e3ec] underline decoration-transparent"
                     >
                       {link.label}
                     </Link>
@@ -78,7 +78,7 @@ export function SiteFooter({ footer }: SiteFooterProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={link.label}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-line-muted)] text-[#f3d7b0] transition-colors hover:border-[#c8873e] hover:text-white"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-line-muted)] text-[#f3d7b0] transition-[transform,border-color,color,box-shadow] duration-200 hover:-translate-y-[1px] hover:border-[#c8873e] hover:text-white hover:shadow-[0_8px_18px_rgba(0,0,0,0.18)]"
                 >
                   {link.icon}
                 </a>
@@ -93,7 +93,7 @@ export function SiteFooter({ footer }: SiteFooterProps) {
               href="https://www.instagram.com/yourcounter/"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline transition-colors hover:text-white"
+              className="quiet-link underline"
             >
               Tijmen de Graaf
             </a>

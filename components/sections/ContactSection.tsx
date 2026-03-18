@@ -38,6 +38,8 @@ function FormField({
 }) {
   const fieldId = `${idPrefix}-${field.id}`;
   const isRequired = field.id === "subject" ? false : field.required;
+  const fieldBaseClassName =
+    "soft-field w-full rounded-[10px] border border-[rgba(36,27,23,0.2)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text-dark)]";
   const onChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     onValueChange?.(event.target.value);
   };
@@ -56,7 +58,7 @@ function FormField({
           placeholder={field.placeholder}
           value={value}
           onChange={onChange}
-          className="w-full rounded-[10px] border border-[rgba(36,27,23,0.2)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text-dark)]"
+          className={fieldBaseClassName}
         />
       ) : field.type === "select" ? (
         <div className="relative">
@@ -64,7 +66,7 @@ function FormField({
             id={fieldId}
             name={field.id}
             required={isRequired}
-            className="w-full appearance-none rounded-[10px] border border-[rgba(36,27,23,0.2)] bg-[var(--color-surface)] px-4 py-3 pr-12 text-[var(--color-text-dark)] transition-colors focus:border-[var(--color-accent-amber)] focus:outline-none"
+            className={`${fieldBaseClassName} appearance-none pr-12`}
             {...(typeof value === "string" ? { value, onChange } : { defaultValue: "" })}
           >
             <option value="">
@@ -93,7 +95,7 @@ function FormField({
           required={isRequired}
           value={value}
           onChange={onChange}
-          className="w-full rounded-[10px] border border-[rgba(36,27,23,0.2)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text-dark)]"
+          className={fieldBaseClassName}
         />
       )}
     </div>
@@ -487,7 +489,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
                         setSubmitSuccess("");
                         setMobileStep(1);
                       }}
-                      className="inline-flex w-full items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-3 text-sm font-semibold transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                      className="soft-button-secondary inline-flex w-full items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-3 text-sm font-semibold"
                     >
                       Terug
                     </button>
@@ -575,7 +577,7 @@ export function ContactSection({ contact }: ContactSectionProps) {
         <Reveal delayMs={200}>
           <p className="mt-4 text-[#e8d5bd]">
             Of mail direct naar{" "}
-            <a className="underline" href={`mailto:${contact.email}`}>
+            <a className="quiet-link underline" href={`mailto:${contact.email}`}>
               {contact.email}
             </a>
           </p>

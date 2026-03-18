@@ -36,7 +36,7 @@ export function LandingPracticalInfo({ id = "praktisch", eyebrow, title, items, 
           <div className="grid gap-4 md:grid-cols-2">
             {visibleItems.map((item, index) => (
               <Reveal key={`${item}-${index}`} delayMs={index * 70}>
-                <article className="rounded-2xl border border-[rgba(67,135,133,0.32)] bg-[rgba(244,233,220,0.05)] p-5 text-sm leading-7 text-[#e7d7c1]">
+                <article className="subtle-lift-card rounded-2xl border border-[rgba(67,135,133,0.32)] bg-[rgba(244,233,220,0.05)] p-5 text-sm leading-7 text-[#e7d7c1]">
                   {item}
                 </article>
               </Reveal>
@@ -48,7 +48,7 @@ export function LandingPracticalInfo({ id = "praktisch", eyebrow, title, items, 
           <div className="grid gap-3 lg:grid-cols-3">
             {visibleItems.map((item, index) => (
               <Reveal key={`${item}-${index}`} delayMs={index * 60}>
-                <article className="rounded-2xl border border-[rgba(67,135,133,0.28)] bg-[rgba(18,30,46,0.34)] px-4 py-4 text-sm leading-7 text-[#e7d7c1]">
+                <article className="subtle-lift-card rounded-2xl border border-[rgba(67,135,133,0.28)] bg-[rgba(18,30,46,0.34)] px-4 py-4 text-sm leading-7 text-[#e7d7c1]">
                   {item}
                 </article>
               </Reveal>

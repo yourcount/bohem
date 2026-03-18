@@ -45,7 +45,7 @@ export function LandingHighlights({ id = "highlights", eyebrow, title, intro, it
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {visibleItems.map((item, index) => (
               <Reveal key={`${item.title}-${index}`} delayMs={index * 80}>
-                <article className="flex h-full flex-col rounded-2xl border border-[rgba(67,135,133,0.45)] bg-[rgba(18,30,46,0.55)] p-5 text-sm text-[#e7d7c1] shadow-[0_12px_30px_rgba(0,0,0,0.18)]">
+                <article className="subtle-lift-card flex h-full flex-col rounded-2xl border border-[rgba(67,135,133,0.45)] bg-[rgba(18,30,46,0.55)] p-5 text-sm text-[#e7d7c1] shadow-[0_12px_30px_rgba(0,0,0,0.18)]">
                   {hasText(item.title) ? <h3 className="font-display text-2xl text-[#f8f1e5]">{item.title}</h3> : null}
                   {hasText(item.body) ? <p className={hasText(item.title) ? "mt-3 leading-7" : "leading-7"}>{item.body}</p> : null}
                 </article>
@@ -58,7 +58,7 @@ export function LandingHighlights({ id = "highlights", eyebrow, title, intro, it
           <div className="grid gap-4 lg:grid-cols-3">
             {visibleItems.map((item, index) => (
               <Reveal key={`${item.title}-${index}`} delayMs={index * 80}>
-                <article className="flex h-full flex-col justify-between rounded-[1.75rem] border border-[rgba(242,139,14,0.28)] bg-[linear-gradient(145deg,rgba(38,24,20,0.82)_0%,rgba(24,20,28,0.88)_100%)] p-6 text-sm text-[#ead7bc] shadow-[0_16px_36px_rgba(0,0,0,0.2)]">
+                <article className="subtle-lift-card flex h-full flex-col justify-between rounded-[1.75rem] border border-[rgba(242,139,14,0.28)] bg-[linear-gradient(145deg,rgba(38,24,20,0.82)_0%,rgba(24,20,28,0.88)_100%)] p-6 text-sm text-[#ead7bc] shadow-[0_16px_36px_rgba(0,0,0,0.2)]">
                   <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#f3d7b0]">{String(index + 1).padStart(2, "0")}</div>
                   {hasText(item.title) ? <h3 className="mt-4 font-display text-3xl text-[#f8f1e5]">{item.title}</h3> : null}
                   {hasText(item.body) ? <p className="mt-4 leading-7">{item.body}</p> : null}
@@ -72,7 +72,7 @@ export function LandingHighlights({ id = "highlights", eyebrow, title, intro, it
           <div className="grid gap-4">
             {visibleItems.map((item, index) => (
               <Reveal key={`${item.title}-${index}`} delayMs={index * 80}>
-                <article className="grid gap-4 rounded-[1.75rem] border border-[rgba(67,135,133,0.35)] bg-[rgba(18,30,46,0.4)] p-5 md:grid-cols-[auto_1fr] md:items-start md:gap-6 md:p-6">
+                <article className="subtle-lift-card grid gap-4 rounded-[1.75rem] border border-[rgba(67,135,133,0.35)] bg-[rgba(18,30,46,0.4)] p-5 md:grid-cols-[auto_1fr] md:items-start md:gap-6 md:p-6">
                   <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#f3d7b0]">{String(index + 1).padStart(2, "0")}</div>
                   <div>
                     {hasText(item.title) ? <h3 className="font-display text-3xl text-[#f8f1e5]">{item.title}</h3> : null}
@@ -88,7 +88,7 @@ export function LandingHighlights({ id = "highlights", eyebrow, title, intro, it
           <div className="grid gap-4 md:grid-cols-3">
             {visibleItems.map((item, index) => (
               <Reveal key={`${item.title}-${index}`} delayMs={index * 80}>
-                <article className="relative rounded-[1.75rem] border border-[rgba(67,135,133,0.28)] bg-[rgba(244,233,220,0.05)] p-6 text-sm text-[#ead7bc]">
+                <article className="subtle-lift-card relative rounded-[1.75rem] border border-[rgba(67,135,133,0.28)] bg-[rgba(244,233,220,0.05)] p-6 text-sm text-[#ead7bc]">
                   <div className="mb-4 inline-flex h-9 min-w-9 items-center justify-center rounded-full border border-[rgba(242,139,14,0.24)] bg-[rgba(242,139,14,0.08)] px-3 text-xs font-semibold tracking-[0.14em] text-[#f3d7b0]">
                     {String(index + 1).padStart(2, "0")}
                   </div>
@@ -104,7 +104,7 @@ export function LandingHighlights({ id = "highlights", eyebrow, title, intro, it
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {visibleItems.map((item, index) => (
               <Reveal key={`${item.title}-${index}`} delayMs={index * 70}>
-                <article className="rounded-2xl border border-[rgba(243,215,176,0.18)] bg-[rgba(248,241,229,0.05)] px-4 py-4 text-sm text-[#ead7bc]">
+                <article className="subtle-lift-card rounded-2xl border border-[rgba(243,215,176,0.18)] bg-[rgba(248,241,229,0.05)] px-4 py-4 text-sm text-[#ead7bc]">
                   {hasText(item.title) ? <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#f3d7b0]">{item.title}</p> : null}
                   {hasText(item.body) ? <p className={`leading-7 ${hasText(item.title) ? "mt-2" : ""}`}>{item.body}</p> : null}
                 </article>

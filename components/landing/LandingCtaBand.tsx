@@ -49,7 +49,7 @@ export function LandingCtaBand({ id = "contact", eyebrow, title, body, proofIntr
                 {visibleProofItems.length > 0 ? (
                   <div className={`grid gap-3 md:grid-cols-3 ${hasText(proofIntro) ? "mt-3" : ""}`.trim()}>
                     {visibleProofItems.map((item) => (
-                      <div key={item} className="rounded-xl border border-[rgba(243,215,176,0.12)] bg-[rgba(9,14,24,0.18)] px-3 py-3 text-sm leading-6 text-[#ead7bc]">
+                      <div key={item} className="subtle-lift-card rounded-xl border border-[rgba(243,215,176,0.12)] bg-[rgba(9,14,24,0.18)] px-3 py-3 text-sm leading-6 text-[#ead7bc]">
                         {item}
                       </div>
                     ))}

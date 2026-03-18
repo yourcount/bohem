@@ -9,16 +9,22 @@ type LandingCtaBandProps = {
   body: string;
   primaryCta?: Cta;
   secondaryCta?: Cta;
+  homeLink?: {
+    label: string;
+    href: string;
+    intro?: string;
+  };
 };
 
 function hasText(value: string | undefined | null) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-export function LandingCtaBand({ id = "contact", eyebrow, title, body, primaryCta, secondaryCta }: LandingCtaBandProps) {
+export function LandingCtaBand({ id = "contact", eyebrow, title, body, primaryCta, secondaryCta, homeLink }: LandingCtaBandProps) {
   const actions = [primaryCta, secondaryCta].filter(
     (cta): cta is Cta => Boolean(cta && hasText(cta.label) && hasText(cta.href))
   );
+  const showHomeLink = Boolean(homeLink && hasText(homeLink.label) && hasText(homeLink.href));
 
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="section-ambient py-16">
@@ -41,6 +47,16 @@ export function LandingCtaBand({ id = "contact", eyebrow, title, body, primaryCt
                     {cta.label}
                   </ButtonLink>
                 ))}
+              </div>
+            ) : null}
+            {showHomeLink ? (
+              <div className="mt-6 border-t border-[rgba(242,139,14,0.2)] pt-5 text-sm text-[var(--color-text-primary)]">
+                {hasText(homeLink?.intro) ? <p>{homeLink?.intro}</p> : null}
+                <div className="mt-3">
+                  <ButtonLink href={homeLink!.href} variant="secondary" dataCta={`landing_${id}_home`}>
+                    {homeLink!.label}
+                  </ButtonLink>
+                </div>
               </div>
             ) : null}
           </div>

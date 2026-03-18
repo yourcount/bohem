@@ -122,6 +122,11 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
         body={view.cta.body}
         primaryCta={view.cta.primaryCta}
         secondaryCta={view.cta.secondaryCta}
+        homeLink={{
+          intro: "Wil je Bohèm eerst als geheel leren kennen, met muziek, achtergrond, shows en contact op één plek?",
+          label: "Bekijk de volledige homepagina",
+          href: "/"
+        }}
       />
     </LandingPageShell>
   );

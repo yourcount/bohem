@@ -35,8 +35,8 @@ export function SiteFooter({ footer }: SiteFooterProps) {
 
   return (
     <footer aria-label="Footer" className="border-t border-[var(--color-line-muted)] bg-[#111d30] py-8 text-[#d6e3ec]">
-      <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-4 sm:px-6 lg:grid-cols-[auto_1fr_auto] lg:items-start">
-        <div>
+      <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-4 sm:px-6 lg:grid-cols-[180px_minmax(320px,1fr)_260px] lg:items-start">
+        <div className="lg:pt-1">
           <Image
             src="/brand/logos/bohem-logo-white-moon-color.webp"
             alt={footerText || "Bohèm"}
@@ -47,26 +47,28 @@ export function SiteFooter({ footer }: SiteFooterProps) {
         </div>
 
         {footerLinks.length > 0 ? (
-          <nav aria-label="Belangrijke links" className="w-full">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0]">Belangrijke links</p>
-            <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-              {footerLinks.map((link) => (
-                <li key={`${link.label}-${link.href}`}>
-                  <Link
-                    href={link.href}
-                    className="inline-flex text-sm text-[#d6e3ec] transition-colors hover:text-white"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <nav aria-label="Belangrijke links" className="w-full lg:px-6">
+            <div className="mx-auto max-w-[460px]">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#f3d7b0] lg:text-center">Belangrijke links</p>
+              <ul className="grid gap-x-8 gap-y-2 sm:grid-cols-2 lg:justify-items-center">
+                {footerLinks.map((link) => (
+                  <li key={`${link.label}-${link.href}`} className="min-w-0">
+                    <Link
+                      href={link.href}
+                      className="inline-flex text-sm text-[#d6e3ec] transition-colors hover:text-white"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </nav>
         ) : (
           <div />
         )}
 
-        <div className="text-sm text-[#cfd9e2] lg:text-right">
+        <div className="text-sm text-[#cfd9e2] lg:ml-auto lg:max-w-[260px] lg:text-right">
           {socialLinks.length > 0 ? (
             <div className="mb-3 flex items-center gap-2 lg:justify-end">
               {socialLinks.map((link) => (

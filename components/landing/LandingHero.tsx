@@ -83,18 +83,20 @@ export function LandingHero({ id = "intro", eyebrow, audienceLabel, title, intro
               </div>
             ) : null}
             {listenCue && hasText(listenCue.intro) && hasText(listenCue.ctaLabel) && hasText(listenCue.href) ? (
-              <div className="mt-5 inline-flex max-w-[62ch] flex-wrap items-center gap-3 rounded-full border border-[rgba(67,135,133,0.32)] bg-[rgba(18,30,46,0.36)] px-4 py-3 text-sm text-[#e7d7c1]">
-                <span className="inline-flex items-center gap-2">
+              <div className="mt-5 flex max-w-[62ch] flex-col gap-4 rounded-3xl border border-[rgba(67,135,133,0.32)] bg-[rgba(18,30,46,0.36)] px-5 py-4 text-sm text-[#e7d7c1] sm:flex-row sm:items-center sm:justify-between">
+                <span className="inline-flex min-w-0 items-start gap-2 leading-7 sm:flex-1">
                   <span aria-hidden="true" className="equalizer-icon text-[#f3d7b0]">
                     <span />
                     <span />
                     <span />
                   </span>
-                  <span>{listenCue.intro}</span>
+                  <span className="min-w-0">{listenCue.intro}</span>
                 </span>
-                <ButtonLink href={listenCue.href} variant="secondary" dataCta={`landing_${id}_listen_context`}>
-                  {listenCue.ctaLabel}
-                </ButtonLink>
+                <div className="shrink-0 self-start sm:self-center">
+                  <ButtonLink href={listenCue.href} variant="secondary" dataCta={`landing_${id}_listen_context`}>
+                    {listenCue.ctaLabel}
+                  </ButtonLink>
+                </div>
               </div>
             ) : null}
             {quickPanel && hasText(quickPanel.title) ? (

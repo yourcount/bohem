@@ -118,6 +118,14 @@ export function KampvuurSection({ kampvuur }: KampvuurSectionProps) {
                     ))}
                   </ul>
                 ) : null}
+                <div className="mt-5 flex justify-center">
+                  <Link
+                    href="/kampvuurklanken"
+                    className="inline-flex items-center justify-center rounded-full border border-[rgba(243,215,176,0.24)] bg-[rgba(243,215,176,0.08)] px-5 py-2.5 text-sm font-semibold text-[#f3d7b0] transition-colors hover:border-[rgba(243,215,176,0.4)] hover:bg-[rgba(243,215,176,0.14)]"
+                  >
+                    Bekijk de Kampvuurklanken pagina
+                  </Link>
+                </div>
               </article>
             ) : null}
 
@@ -126,14 +134,6 @@ export function KampvuurSection({ kampvuur }: KampvuurSectionProps) {
             ) : null}
 
             {hasText(kampvuur.contactPrompt) ? <p className="mt-5 text-center text-[var(--color-text-primary)]">{kampvuur.contactPrompt}</p> : null}
-            <div className="mt-4 flex justify-center">
-              <Link
-                href="/kampvuurklanken"
-                className="inline-flex items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-              >
-                Bekijk de Kampvuurklanken pagina
-              </Link>
-            </div>
             {hasContactActions ? (
               <div className="mt-2 flex flex-wrap justify-center gap-3">
                 {hasEmailCta ? (

@@ -432,6 +432,7 @@ export function buildPersLanding(siteContent: SiteContent): LandingRouteView {
   const content = getLandingPageContent(siteContent, "press");
   const press = siteContent.bookings.press;
   const facts = press?.facts ?? [];
+  const pressKitCta = press?.kitHref && press.kitLabel ? { label: press.kitLabel, href: press.kitHref } : undefined;
   const faq = buildFaq(getLandingFaqItems(siteContent, "press"), [
     { question: "Waar vinden we persinformatie?", answer: press?.kitLabel ? `Via ${press.kitLabel}.` : "Via het persmateriaal en de contactgegevens op deze pagina." },
     { question: "Wie kunnen we benaderen voor pers of boekingen?", answer: "Gebruik het contactadres of telefoonnummer op deze pagina voor een snelle reactie." },
@@ -450,25 +451,25 @@ export function buildPersLanding(siteContent: SiteContent): LandingRouteView {
       audienceLabel: content.audienceLabel,
       title: content.title,
       intro: content.intro,
-      note: content.positioningBody || "Alles wat een programmeur, redacteur of venue snel nodig heeft.",
+      note: content.positioningBody || press?.boilerplate || "Alles wat een redacteur, programmeur of venue snel nodig heeft.",
       image: content.image || siteContent.bookings.highlightImage || siteContent.about.photoMoments?.[0] || siteContent.hero.image,
-      primaryCta: content.cta ?? { label: "Bekijk de kernfeiten", href: "#highlights" },
+      primaryCta: content.cta ?? pressKitCta ?? { label: "Bekijk de kernfeiten", href: "#highlights" },
       secondaryCta: { label: "Lees de FAQ", href: "#faq", variant: "secondary" }
     },
     highlights: {
       eyebrow: content.proofTitle || "Kernfeiten",
-      title: content.positioningTitle || press?.title || "Wat handig is om meteen te weten",
-      intro: content.positioningBody || "Feiten, positionering en contactopties zonder omweg.",
+      title: content.positioningTitle || press?.title || "Bohèm in het kort",
+      intro: content.positioningBody || press?.boilerplate || "Feiten, positionering en contactopties zonder omweg.",
       items: combineSections(content.highlights, content.fitItems || facts, content.extraSections, content.proofTitle, content.fitTitle).slice(0, 6)
     },
-    socialProof: buildSocialProof(content.socialProofItems, "Snelle context voor pers en boekers", "Context"),
-    practicalInfo: buildPracticalInfo(content.practicalInfoItems, "Snel geregeld", "Praktisch"),
+    socialProof: buildSocialProof(content.socialProofItems, "Kernfeiten voor pers en boekers", "Context"),
+    practicalInfo: buildPracticalInfo(content.practicalInfoItems, "Perskit en contact", "Praktisch"),
     faq,
     cta: {
       eyebrow: "Contact",
       title: content.ctaContextTitle || "Vraag persmateriaal of extra informatie aan",
       body: content.ctaContextBody || "Stuur een bericht voor persinformatie, boekingsvragen of beeldmateriaal. We reageren snel en helder.",
-      primaryCta: press?.kitHref && press.kitLabel ? { label: press.kitLabel, href: press.kitHref } : undefined,
+      primaryCta: pressKitCta,
       secondaryCta: press?.contactEmail
         ? { label: "Mail direct", href: `mailto:${press.contactEmail}`, variant: "secondary" }
         : undefined

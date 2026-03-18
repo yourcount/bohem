@@ -430,7 +430,7 @@
         }
       ],
       "localAreaTitle": "Ook te boeken in Utrecht, Amersfoort, Hilversum en Leiden",
-      "localAreaIntro": "Bohèm past goed bij culturele avonden, luisterconcerten en kleinschalige events in Midden-Nederland en de Randstad. Voor deze eerste lokale SEO-laag richten we ons op steden waar een theater- of huiskamerpubliek logisch aansluit op het karakter van het duo.",
+      "localAreaIntro": "Bohèm is te boeken in Midden-Nederland en de Randstad. Vooral in steden met kleine podia, culturele avonden en luisterpubliek komt deze vorm goed tot zijn recht.",
       "priorityCities": [
         "Utrecht",
         "Amersfoort",
@@ -440,8 +440,8 @@
       "localProofTitle": "Waarom dit regionaal logisch is",
       "localProofItems": [
         "In Utrecht en Amersfoort sluit Bohèm goed aan op culturele podia en avonden waar mensen echt willen luisteren.",
-        "Hilversum en Leiden combineren een cultureel profiel met relatief weinig scherpe muziekduo-landingspagina’s.",
-        "Deze steden zijn sterk genoeg om regionaal genoemd te worden zonder dat er meteen dunne aparte stadspagina’s nodig zijn."
+        "In Hilversum en Leiden past Bohèm goed bij culturele avonden, kleine podia en aandachtige settings.",
+        "Ook buiten deze steden denken we graag mee als de setting past bij een warme, luistergerichte avond."
       ],
       "localFaqTitle": "Lokale vragen over muziekduo boeken",
       "localFaqItems": [
@@ -539,17 +539,17 @@
         }
       ],
       "localAreaTitle": "Theaterconcerten in Utrecht, Hilversum en Leiden",
-      "localAreaIntro": "Voor lokale SEO op theatertermen kiezen we steden waar cultuurpubliek, kleine podia en een luistersetting logisch samenkomen. Utrecht, Hilversum en Leiden zijn in deze batch de eerste focusplaatsen.",
+      "localAreaIntro": "Utrecht, Hilversum en Leiden zijn logische plekken voor theateravonden met een luisterpubliek. In die steden sluit Bohèm goed aan op kleine podia en culturele programma's.",
       "priorityCities": [
         "Utrecht",
         "Hilversum",
         "Leiden"
       ],
-      "localProofTitle": "Waarom deze steden passen bij theaterintentie",
+      "localProofTitle": "Waarom deze steden goed passen bij deze vorm",
       "localProofItems": [
-        "Utrecht biedt de sterkste culturele vraag, maar vraagt ook om heldere positionering.",
-        "Hilversum en Leiden laten ruimte zien voor een warme theaterpagina zonder zware concurrentie van grote boekingssites.",
-        "Deze mix maakt het mogelijk om nu al regionaal relevant te zijn zonder losse stadspagina’s te bouwen."
+        "Utrecht past bij culturele avonden waar publiek echt wil luisteren.",
+        "Hilversum en Leiden sluiten goed aan op kleine podia, vlakkevloeren en warme zaalsettings.",
+        "Ook voor andere theaters of culturele avonden denken we graag mee als de sfeer en setting passen."
       ],
       "localFaqTitle": "Lokale vragen over theaterconcerten",
       "localFaqItems": [
@@ -729,7 +729,7 @@
         }
       ],
       "localAreaTitle": "Huiskamerconcerten in Amersfoort, Leiden en Utrecht",
-      "localAreaIntro": "Voor huiskamerconcert-intentie kiezen we steden waar een culturele of kleinschalige concertsetting logisch voelt. Deze pagina gebruikt Utrecht, Amersfoort en Leiden als eerste regionale signalen.",
+      "localAreaIntro": "Amersfoort, Leiden en Utrecht zijn plekken waar huiskamerconcerten en kleine luisteravonden goed passen. Daar sluit de directe, compacte vorm van Bohèm mooi op aan.",
       "priorityCities": [
         "Amersfoort",
         "Leiden",
@@ -737,9 +737,9 @@
       ],
       "localProofTitle": "Waarom deze steden logisch zijn voor een huiskamerconcert",
       "localProofItems": [
-        "Amersfoort en Leiden zijn kansrijk voor kleinschalige live-avonden waar publiek echt komt luisteren.",
-        "Utrecht is competitiever, maar inhoudelijk te belangrijk om niet regionaal mee te nemen.",
-        "Huiskamerconcerten vragen om geloofwaardige, persoonlijke copy; daarom beperken we ons in batch 1 tot een korte shortlist."
+        "In Amersfoort en Leiden past Bohèm goed bij kleinschalige live-avonden met een luisterend publiek.",
+        "Ook in en rond Utrecht werkt deze vorm sterk in persoonlijke settings en kleine zalen.",
+        "Twijfel je over jouw ruimte of stad, dan kijken we graag mee of de setting past."
       ],
       "localFaqTitle": "Lokale vragen over huiskamerconcerten",
       "localFaqItems": [
@@ -792,16 +792,16 @@
       "ctaContextBody": "Stuur een korte beschrijving van de plek, het aantal gasten en het soort avond dat je voor ogen hebt. Dan denken we mee over een passende opzet."
     },
     "press": {
-      "title": "Pers & media rond Bohèm",
-      "intro": "Zoek je in korte tijd de kern van Bohèm, een bruikbare omschrijving of direct persmateriaal? Op deze pagina staan de belangrijkste feiten, contactopties en downloads compact bij elkaar.",
+      "title": "Persinformatie over Bohèm",
+      "intro": "Bohèm is het live duo van Arthur Bont en Bettina Kraaieveld. Op deze pagina vind je de korte omschrijving, kernfeiten, perskit en contactgegevens die je nodig hebt voor publicatie of programmering.",
       "seoTitle": "Pers & media | Bohèm",
       "seoDescription": "Persinformatie, kernfeiten, boekingsinfo en perskit van Bohèm op één plek.",
       "ogTitle": "Pers & media | Bohèm",
       "ogDescription": "Alle kernfeiten, boekingsinfo en persmateriaal van Bohèm compact op één pagina.",
-      "heroLabel": "Persinformatie en boekingsinfo",
-      "positioningTitle": "Wat handig is om meteen te weten",
-      "positioningBody": "Bohèm is het live duo van Arthur Bont en Bettina Kraaieveld. Verhalende songs, sterke live-presentatie en een warm geluid staan daarbij centraal.",
-      "fitTitle": "Kernfeiten in het kort",
+      "heroLabel": "Persinformatie, perskit en contact",
+      "positioningTitle": "Bohèm in het kort",
+      "positioningBody": "BOHÈM maakt melodische, verhalende songs in het Nederlands en Engels over het leven in al zijn facetten. In hun live-concept Reizigers combineren Arthur Bont en Bettina Kraaieveld persoonlijke liedjes met een warme live-presentatie die raakt en verbindt.",
+      "fitTitle": "Snelle kernfeiten",
       "fitItems": [
         "Arthur Bont + Bettina Kraaieveld",
         "EP Wolkentranen (2026)",
@@ -810,23 +810,23 @@
       ],
       "highlights": [
         {
-          "title": "Snel te scannen",
-          "body": "Belangrijkste feiten, omschrijving en contactopties staan hier zonder omweg bij elkaar."
+          "title": "Direct bruikbaar",
+          "body": "De korte omschrijving, kernfeiten en contactopties staan hier direct bij elkaar voor pers, programmeurs en venues."
         },
         {
-          "title": "Bruikbaar voor pers en boekers",
-          "body": "De pagina helpt zowel redacties als programmeurs om Bohèm snel en helder te positioneren."
+          "title": "Snel door te zetten",
+          "body": "Gebruik deze pagina om een aankondiging, korte introductie of persaanvraag zonder extra zoekwerk rond te maken."
         },
         {
-          "title": "Materiaal direct beschikbaar",
-          "body": "Perskit en basisinformatie zijn direct beschikbaar voor gebruik of verdere afstemming."
+          "title": "Perskit meteen beschikbaar",
+          "body": "Beeldmateriaal en basisinformatie zijn direct te downloaden of op te vragen voor verdere afstemming."
         }
       ],
       "faqTitle": "Veelgestelde vragen voor pers en programmeurs",
       "faqItems": [
         {
           "question": "Hoe vat je Bohèm kort samen?",
-          "answer": "Bohèm is het live duo van Arthur Bont en Bettina Kraaieveld, met verhalende songs en een warme live-presentatie."
+          "answer": "Bohèm is het live duo van Arthur Bont en Bettina Kraaieveld, met melodische Nederlandstalige en Engelstalige songs en een warme live-presentatie."
         },
         {
           "question": "Waar vind ik direct het juiste materiaal?",
@@ -834,12 +834,12 @@
         },
         {
           "question": "Met wie neem ik contact op voor pers of boekingen?",
-          "answer": "Gebruik het contactadres op deze pagina voor een snelle reactie op pers- of programmeervragen."
+          "answer": "Gebruik het contactadres op deze pagina voor een snelle reactie op pers- of boekingsvragen."
         }
       ],
       "cta": {
-        "label": "Bekijk de kernfeiten",
-        "href": "#facts",
+        "label": "Download perskit",
+        "href": "/brand/docs/bohem-press-kit.pdf",
         "variant": "primary"
       },
       "extraSections": [
@@ -848,26 +848,26 @@
           "body": "De boilerplate en kernfeiten zijn bedoeld om snel en consistent te kunnen publiceren."
         }
       ],
-      "audienceLabel": "Voor programmeurs, pers en venues die snel de juiste feiten nodig hebben.",
+      "audienceLabel": "Voor redacties, programmeurs en venues die snel bruikbare informatie nodig hebben.",
       "practicalInfoItems": [
         "De perskit is direct te downloaden zonder extra aanvraag.",
-        "Voor programmeervragen en persverzoeken is er een direct contactadres.",
-        "Deze pagina is bedoeld om snel te scannen, niet om lang door te zoeken."
+        "Voor persvragen en boekingsvragen is er een direct contactadres.",
+        "Je vindt hier de korte omschrijving, kernfeiten en basislinks zonder verder te hoeven zoeken."
       ],
       "socialProofItems": [
         {
           "quote": "BOHÈM: Arthur Bont + Bettina Kraaieveld",
-          "source": "Pers in 30 seconden",
-          "context": "snelle basisregel voor programmeurs en redacties"
+          "source": "Kernfeit",
+          "context": "direct bruikbaar in korte introducties"
         },
         {
           "quote": "Genre: melodische NL/EN songs met verhalende inslag",
-          "source": "Pers in 30 seconden",
+          "source": "Kernfeit",
           "context": "muzikale positionering"
         },
         {
           "quote": "Live-concept: Reizigers",
-          "source": "Pers in 30 seconden",
+          "source": "Kernfeit",
           "context": "herkenbaar live-profiel"
         }
       ],

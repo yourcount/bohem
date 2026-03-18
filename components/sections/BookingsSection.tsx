@@ -121,7 +121,7 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                     </Link>
                     <Link
                       href="/huiskamerconcert-boeken"
-                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-center font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] sm:col-span-2 sm:justify-self-start"
+                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-center font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] sm:col-span-2 sm:justify-self-center"
                     >
                       Huiskamerconcert boeken
                     </Link>

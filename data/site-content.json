@@ -381,7 +381,30 @@
       "kitHref": "/brand/docs/bohem-press-kit.pdf",
       "contactEmail": "info@musicbybohem.nl",
       "contactPhone": "+31 6 36313948"
-    }
+    },
+    "routeTitle": "Waar wil je Bohèm voor ontdekken?",
+    "routeItems": [
+      {
+        "label": "Muziekduo boeken",
+        "description": "Voor een avond die dichtbij voelt en muzikaal genoeg blijft om echt bij te blijven.",
+        "href": "/muziekduo-boeken"
+      },
+      {
+        "label": "Theaterconcert boeken",
+        "description": "Voor zalen en culturele avonden waar aandacht, sfeer en tekst samen mogen werken.",
+        "href": "/theaterconcert-boeken"
+      },
+      {
+        "label": "Kampvuurklanken",
+        "description": "Voor teams en groepen die iets echts willen meemaken zonder standaard programma.",
+        "href": "/kampvuurklanken"
+      },
+      {
+        "label": "Huiskamerconcert boeken",
+        "description": "Voor kleine ruimtes, hosts en een intieme setting met directe nabijheid.",
+        "href": "/huiskamerconcert-boeken"
+      }
+    ]
   },
   "landingPages": {
     "musicDuo": {
@@ -491,7 +514,14 @@
         }
       ],
       "ctaContextTitle": "Vertel wat voor avond je wilt neerzetten",
-      "ctaContextBody": "Noem datum, setting en soort publiek. Dan laten we snel weten of Bohèm past en hoe we het muzikaal kunnen invullen."
+      "ctaContextBody": "Noem datum, setting en soort publiek. Dan laten we snel weten of Bohèm past en hoe we het muzikaal kunnen invullen.",
+      "highlightsVariant": "split-scenarios",
+      "ctaProofIntro": "Je hoeft nog niet alles vast te hebben liggen om contact op te nemen.",
+      "ctaProofItems": [
+        "We stemmen setting, lengte en sfeer vooraf samen af.",
+        "Bohèm werkt zowel intiem als op een groter podium overtuigend.",
+        "Je krijgt snel duidelijkheid over beschikbaarheid en opzet."
+      ]
     },
     "theaterConcert": {
       "title": "Theaterconcert boeken dat muzikaal én als avond blijft boeien",
@@ -599,7 +629,14 @@
         }
       ],
       "ctaContextTitle": "Bespreek publiek, zaal en speelvorm",
-      "ctaContextBody": "Vertel wat voor zaal, publiek of culturele avond je voor ogen hebt. Dan denken we gericht mee over een passende invulling."
+      "ctaContextBody": "Vertel wat voor zaal, publiek of culturele avond je voor ogen hebt. Dan denken we gericht mee over een passende invulling.",
+      "highlightsVariant": "editorial-list",
+      "ctaProofIntro": "Een eerste vraag is genoeg om te toetsen of dit programma bij je zaal past.",
+      "ctaProofItems": [
+        "We denken mee over zaal, speelduur en publieksritme.",
+        "Programmeurinformatie en persmateriaal zijn direct beschikbaar.",
+        "Ook binnen een bestaand avondprogramma kunnen we gericht afstemmen."
+      ]
     },
     "kampvuur": {
       "title": "Kampvuurklanken voor teams die iets echts willen beleven",
@@ -681,7 +718,14 @@
         }
       ],
       "ctaContextTitle": "Verken of Kampvuurklanken bij jullie groep past",
-      "ctaContextBody": "Vertel iets over de groep, het moment en wat je hoopt los te maken. Dan denken we mee over een passende vorm en duur."
+      "ctaContextBody": "Vertel iets over de groep, het moment en wat je hoopt los te maken. Dan denken we mee over een passende vorm en duur.",
+      "highlightsVariant": "host-flow",
+      "ctaProofIntro": "Je hoeft nog geen uitgewerkt programma te hebben om dit te verkennen.",
+      "ctaProofItems": [
+        "De avond wordt afgestemd op groep, doel en sfeer.",
+        "Geschikt voor teams die verbinding zoeken zonder geforceerd programma.",
+        "Praktisch en inhoudelijk vooraf helder afgestemd."
+      ]
     },
     "huiskamerconcert": {
       "title": "Huiskamerconcert boeken dat dichtbij mag komen",
@@ -789,7 +833,14 @@
         }
       ],
       "ctaContextTitle": "Vertel iets over je ruimte en gezelschap",
-      "ctaContextBody": "Stuur een korte beschrijving van de plek, het aantal gasten en het soort avond dat je voor ogen hebt. Dan denken we mee over een passende opzet."
+      "ctaContextBody": "Stuur een korte beschrijving van de plek, het aantal gasten en het soort avond dat je voor ogen hebt. Dan denken we mee over een passende opzet.",
+      "highlightsVariant": "host-flow",
+      "ctaProofIntro": "Ook met alleen een ruimte en een idee kunnen we al goed meedenken.",
+      "ctaProofItems": [
+        "We stemmen opstelling en duur af op je ruimte en gezelschap.",
+        "Geen technisch zware productie nodig om dit te laten werken.",
+        "Je krijgt snel terug of Bohèm bij je avond past."
+      ]
     },
     "press": {
       "title": "Persinformatie over Bohèm",
@@ -872,7 +923,10 @@
         }
       ],
       "ctaContextTitle": "Contact voor pers en boekingen",
-      "ctaContextBody": "Heb je aanvullend materiaal, een extra quote of afstemming nodig voor publicatie of programmering, neem dan direct contact op."
+      "ctaContextBody": "Heb je aanvullend materiaal, een extra quote of afstemming nodig voor publicatie of programmering, neem dan direct contact op.",
+      "highlightsVariant": "facts",
+      "ctaProofIntro": "",
+      "ctaProofItems": []
     }
   },
   "contact": {

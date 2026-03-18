@@ -82,12 +82,23 @@ type SearchTarget =
 
 type StatusTone = "neutral" | "success" | "error";
 type EditorMode = "form" | "visual";
+type AttentionSeverity = "critical" | "review" | "info";
 type AttentionPoint = {
   id: string;
   text: ReactNode;
   sectionTitle: string;
   path?: string;
   ctaLabel: string;
+  severity: AttentionSeverity;
+  impactText?: string;
+};
+type QuickTask = {
+  id: string;
+  label: string;
+  sectionTitle: string;
+  path?: string;
+  description: string;
+  impactText?: string;
 };
 type GuideTargetKey = "section-menu" | "save-bar" | "search-panel";
 type GuideStep = {
@@ -122,6 +133,30 @@ const HIDDEN_EDITOR_PATH_PREFIXES = [
 
 function hasText(value: string | null | undefined) {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function getAttentionTone(severity: AttentionSeverity) {
+  switch (severity) {
+    case "critical":
+      return {
+        label: "Direct oplossen",
+        card: "border-[rgba(255,180,168,0.24)] bg-[rgba(82,25,20,0.28)]",
+        badge: "border-[rgba(255,180,168,0.24)] bg-[rgba(255,180,168,0.12)] text-[#ffb4a8]"
+      };
+    case "info":
+      return {
+        label: "Alleen informatief",
+        card: "border-[rgba(135,197,255,0.24)] bg-[rgba(18,33,53,0.28)]",
+        badge: "border-[rgba(135,197,255,0.24)] bg-[rgba(135,197,255,0.12)] text-[#cfe8ff]"
+      };
+    case "review":
+    default:
+      return {
+        label: "Goed om na te kijken",
+        card: "border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)]",
+        badge: "border-[rgba(242,139,14,0.22)] bg-[rgba(242,139,14,0.1)] text-[#f3d7b0]"
+      };
+  }
 }
 
 const sectionLabels: Record<string, string> = {
@@ -1479,6 +1514,51 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
     focusFieldPath(sectionTitle, path);
   };
 
+  const quickTasks = useMemo<QuickTask[]>(
+    () => [
+      {
+        id: "hero-photo",
+        label: "Hero-foto aanpassen",
+        sectionTitle: "Bovenaan de pagina",
+        path: "hero.image.src",
+        description: "Vervang direct de grote openingsfoto bovenaan de site.",
+        impactText: "Dit beeld bepaalt de eerste indruk op de homepage."
+      },
+      {
+        id: "new-show",
+        label: "Nieuwe show toevoegen",
+        sectionTitle: SHOWS_SECTION_TITLE,
+        description: "Ga meteen naar de shows om een datum, locatie en links in te vullen.",
+        impactText: "Shows verschijnen alleen live als datum en zichtbare inhoud zijn ingevuld."
+      },
+      {
+        id: "sticky-listen",
+        label: "Sticky luisterbalk aanpassen",
+        sectionTitle: "Discografie",
+        path: "discography.featuredSingle.href",
+        description: "Pas titel, link of cover van de luisterbalk aan.",
+        impactText: "Dit komt terug in de pop-up muziekbalk en op landingspagina's."
+      },
+      {
+        id: "footer-links",
+        label: "Footerlinks aanpassen",
+        sectionTitle: FOOTER_SECTION_TITLE,
+        path: "footer.links.0.label",
+        description: "Werk de belangrijke links onderaan de site bij.",
+        impactText: "Deze links staan onderaan de homepage en alle landingspagina's."
+      },
+      {
+        id: "press-kit",
+        label: "Perskit aanpassen",
+        sectionTitle: "Boekingen",
+        path: "bookings.press.kitHref",
+        description: "Ga direct naar de perskit-link en persgegevens.",
+        impactText: "Dit staat bovenaan de perspagina en in het persblok op de site."
+      }
+    ],
+    []
+  );
+
   const attentionPoints = useMemo<AttentionPoint[]>(() => {
     if (!content) return [];
 
@@ -1507,7 +1587,9 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
         ),
         sectionTitle: SHOWS_SECTION_TITLE,
         path: `bookings.upcomingShows.${firstShowWithoutLinks}.ticketsHref`,
-        ctaLabel: "Ga naar deze show"
+        ctaLabel: "Ga naar deze show",
+        severity: "critical",
+        impactText: "Op de site verschijnen dan geen knoppen bij deze show."
       });
     }
 
@@ -1524,7 +1606,9 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
         ),
         sectionTitle: SHOWS_SECTION_TITLE,
         path: `bookings.upcomingShows.${firstPastShowIndex}.date`,
-        ctaLabel: "Ga naar deze show"
+        ctaLabel: "Ga naar deze show",
+        severity: "info",
+        impactText: "Deze show blijft in de editor staan, maar is niet meer live zichtbaar."
       });
     }
 
@@ -1544,7 +1628,9 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
         ),
         sectionTitle: SHOWS_SECTION_TITLE,
         path: `bookings.upcomingShows.${firstDateNeedingCleanup}.date`,
-        ctaLabel: "Ga naar datumveld"
+        ctaLabel: "Ga naar datumveld",
+        severity: "info",
+        impactText: "De datum wordt bij opslaan automatisch opgeschoond voor de live site."
       });
     }
 
@@ -1554,7 +1640,9 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
         text: <>In de footer staan nu geen social links. Daardoor worden er onderaan de site geen social iconen getoond.</>,
         sectionTitle: FOOTER_SECTION_TITLE,
         path: "footer.instagramHref",
-        ctaLabel: "Ga naar footer en socials"
+        ctaLabel: "Ga naar footer en socials",
+        severity: "review",
+        impactText: "Homepage en landingspagina's tonen dan geen social iconen."
       });
     }
 
@@ -1564,14 +1652,25 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
         text: <>De uitgelichte single heeft wel een titel, maar nog geen link. De luisterknop in de sticky balk werkt dan niet.</>,
         sectionTitle: "Discografie",
         path: "discography.featuredSingle.href",
-        ctaLabel: "Ga naar sticky luisterknop"
+        ctaLabel: "Ga naar sticky luisterknop",
+        severity: "critical",
+        impactText: "De luisterbalk en luisterknoppen kunnen dan niet doorklikken."
       });
     }
 
-    return points;
+    const severityOrder: Record<AttentionSeverity, number> = { critical: 0, review: 1, info: 2 };
+    return points.sort((left, right) => severityOrder[left.severity] - severityOrder[right.severity]);
   }, [content, shows]);
 
   const visibleAttentionPoints = attentionPoints.filter((item) => !dismissedAttentionPointIds.includes(item.id));
+  const groupedAttentionPoints = useMemo(
+    () => ({
+      critical: visibleAttentionPoints.filter((item) => item.severity === "critical"),
+      review: visibleAttentionPoints.filter((item) => item.severity === "review"),
+      info: visibleAttentionPoints.filter((item) => item.severity === "info")
+    }),
+    [visibleAttentionPoints]
+  );
 
   const guideSteps = useMemo<GuideStep[]>(
     () => [
@@ -1875,6 +1974,23 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
             <li>Klik onderaan op <strong>Opslaan</strong>.</li>
             <li>Gebruik <strong>Voorbeeld</strong> om de live weergave te controleren.</li>
           </ol>
+          <div className="mt-4">
+            <p className="font-semibold text-[#f8f5f1]">Snelle taken</p>
+            <div className="mt-2 grid gap-2">
+              {quickTasks.map((task) => (
+                <button
+                  key={task.id}
+                  type="button"
+                  onClick={() => jumpToEditorTarget(task.sectionTitle, task.path)}
+                  className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3 text-left transition-colors hover:bg-[rgba(244,233,220,0.06)]"
+                >
+                  <span className="block text-sm font-semibold text-[#f8f5f1]">{task.label}</span>
+                  <span className="mt-1 block text-xs text-[#d9c6ac]">{task.description}</span>
+                  {task.impactText ? <span className="mt-2 block text-[11px] text-[#f3d7b0]">{task.impactText}</span> : null}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         <div>
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -1890,29 +2006,47 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
             ) : null}
           </div>
           {visibleAttentionPoints.length > 0 ? (
-            <ul className="mt-2 space-y-3 text-xs sm:text-sm">
-              {visibleAttentionPoints.map((item) => (
-                <li key={item.id} className="rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3">
-                  <p>{item.text}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => jumpToEditorTarget(item.sectionTitle, item.path)}
-                      className="inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-                    >
-                      {item.ctaLabel}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDismissedAttentionPointIds((prev) => (prev.includes(item.id) ? prev : [...prev, item.id]))}
-                      className="inline-flex rounded-full border border-[rgba(244,233,220,0.16)] px-3 py-1.5 text-[11px] font-semibold text-[#d9c6ac] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-                    >
-                      Negeren
-                    </button>
+            <div className="mt-2 space-y-4 text-xs sm:text-sm">
+              {(["critical", "review", "info"] as AttentionSeverity[]).map((severity) => {
+                const items = groupedAttentionPoints[severity];
+                if (items.length === 0) return null;
+                const tone = getAttentionTone(severity);
+
+                return (
+                  <div key={severity}>
+                    <div className="mb-2 flex items-center gap-2">
+                      <span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${tone.badge}`}>
+                        {tone.label}
+                      </span>
+                    </div>
+                    <ul className="space-y-3">
+                      {items.map((item) => (
+                        <li key={item.id} className={`rounded-lg border p-3 ${tone.card}`}>
+                          <p>{item.text}</p>
+                          {item.impactText ? <p className="mt-2 text-[11px] text-[#f3d7b0]">{item.impactText}</p> : null}
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => jumpToEditorTarget(item.sectionTitle, item.path)}
+                              className="inline-flex rounded-full border border-[var(--color-line-muted)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                            >
+                              {item.ctaLabel}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDismissedAttentionPointIds((prev) => (prev.includes(item.id) ? prev : [...prev, item.id]))}
+                              className="inline-flex rounded-full border border-[rgba(244,233,220,0.16)] px-3 py-1.5 text-[11px] font-semibold text-[#d9c6ac] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                            >
+                              Negeren
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </li>
-              ))}
-            </ul>
+                );
+              })}
+            </div>
           ) : attentionPoints.length === 0 ? (
             <div className="mt-2 rounded-lg border border-[rgba(67,135,133,0.28)] bg-[rgba(13,22,34,0.35)] p-3 text-xs sm:text-sm">
               <p>Er zijn op dit moment geen aandachtspunten op basis van de huidige inhoud.</p>

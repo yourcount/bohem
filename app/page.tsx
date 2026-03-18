@@ -7,6 +7,7 @@ import { DiscographySection } from "@/components/sections/DiscographySection";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { KampvuurSection } from "@/components/sections/KampvuurSection";
 import { MusicExperienceSection } from "@/components/sections/MusicExperienceSection";
+import { RouteChooserSection } from "@/components/sections/RouteChooserSection";
 import { ShowsSection } from "@/components/sections/ShowsSection";
 import { SiteFooter } from "@/components/sections/SiteFooter";
 import { SiteHeader } from "@/components/sections/SiteHeader";
@@ -150,6 +151,7 @@ export default async function HomePage() {
 
       <main id="main-content">
         <HeroSection hero={siteContent.hero} />
+        <RouteChooserSection title={siteContent.bookings.routeTitle} items={siteContent.bookings.routeItems} />
         <SectionMotifDivider />
         {hasAboutSection ? (
           <>

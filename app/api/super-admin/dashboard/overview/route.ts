@@ -8,6 +8,15 @@ import { readFullSiteContent } from "@/lib/db/full-site-content-db";
 import { listFeatureFlags, readTechnicalSettings } from "@/lib/db/system-controls-db";
 import { getSiteUrl } from "@/lib/seo";
 
+type WarningSeverity = "critical" | "review" | "info";
+
+type DashboardWarning = {
+  severity: WarningSeverity;
+  text: string;
+  ctaLabel: string;
+  href: string;
+};
+
 const NON_CONTENT_KEYS = new Set(["href", "variant", "id", "type", "autoComplete", "required", "width", "height", "focusX", "focusY"]);
 
 function hasText(value: string | undefined | null) {
@@ -181,21 +190,75 @@ export async function GET() {
       }
     ];
 
-    const warnings: string[] = [];
-    if (!mailgun.configured) warnings.push("Mailgun is niet volledig geconfigureerd. Het contactformulier kan dan geen mails versturen.");
-    if (!turnstile.enabled) warnings.push("Turnstile staat uit. Het contactformulier heeft dan geen actieve botcheck.");
-    if (!blobConfigured && process.env.VERCEL) warnings.push("Vercel Blob is niet geconfigureerd. Content-opslag is dan niet persistent.");
-    if (!hasShows) warnings.push("Er zijn nu geen volgende shows ingevuld. De shows-sectie blijft verborgen.");
+    const warnings: DashboardWarning[] = [];
+    if (!mailgun.configured) {
+      warnings.push({
+        severity: "critical",
+        text: "Mailgun is niet volledig geconfigureerd. Het contactformulier kan dan geen mails versturen.",
+        ctaLabel: "Open systeem",
+        href: "/admin/backend/system"
+      });
+    }
+    if (!turnstile.enabled) {
+      warnings.push({
+        severity: "critical",
+        text: "Turnstile staat uit. Het contactformulier heeft dan geen actieve botcheck.",
+        ctaLabel: "Open systeem",
+        href: "/admin/backend/system"
+      });
+    }
+    if (!blobConfigured && process.env.VERCEL) {
+      warnings.push({
+        severity: "critical",
+        text: "Vercel Blob is niet geconfigureerd. Content-opslag is dan niet persistent.",
+        ctaLabel: "Open systeem",
+        href: "/admin/backend/system"
+      });
+    }
+    if (!hasShows) {
+      warnings.push({
+        severity: "review",
+        text: "Er zijn nu geen volgende shows ingevuld. De shows-sectie blijft verborgen.",
+        ctaLabel: "Open content",
+        href: "/admin"
+      });
+    }
 
     const showsWithoutCta = visibleUpcomingShows.filter(
       (show) => !hasText(show.ticketsHref) && !hasText(show.infoHref)
     ).length;
-    if (showsWithoutCta > 0) warnings.push(`${showsWithoutCta} show(s) missen zowel een kaartjeslink als extra infolink.`);
-    if (!hasText(siteContent.discography.featuredSingle.href)) warnings.push("De uitgelichte single mist een geldige luisterlink.");
-    if (!hasText(siteContent.footer.instagramHref) && !hasText(siteContent.footer.youtubeHref)) {
-      warnings.push("Footer-socials zijn leeg. YouTube en Instagram worden dan niet getoond.");
+    if (showsWithoutCta > 0) {
+      warnings.push({
+        severity: "review",
+        text: `${showsWithoutCta} show(s) missen zowel een kaartjeslink als extra infolink.`,
+        ctaLabel: "Open content",
+        href: "/admin"
+      });
     }
-    if (hasPressSection && !hasText(siteContent.bookings.press?.kitHref)) warnings.push("Het persblok bevat geen technische rider of perskit-link.");
+    if (!hasText(siteContent.discography.featuredSingle.href)) {
+      warnings.push({
+        severity: "critical",
+        text: "De uitgelichte single mist een geldige luisterlink.",
+        ctaLabel: "Open content",
+        href: "/admin"
+      });
+    }
+    if (!hasText(siteContent.footer.instagramHref) && !hasText(siteContent.footer.youtubeHref)) {
+      warnings.push({
+        severity: "review",
+        text: "Footer-socials zijn leeg. YouTube en Instagram worden dan niet getoond.",
+        ctaLabel: "Open content",
+        href: "/admin"
+      });
+    }
+    if (hasPressSection && !hasText(siteContent.bookings.press?.kitHref)) {
+      warnings.push({
+        severity: "review",
+        text: "Het persblok bevat geen technische rider of perskit-link.",
+        ctaLabel: "Open landings",
+        href: "/admin/backend/landings"
+      });
+    }
 
     return NextResponse.json(
       {

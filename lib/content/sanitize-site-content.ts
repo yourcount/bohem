@@ -335,6 +335,7 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
         cta: sanitizeLandingCta(content.landingPages?.musicDuo?.cta, siteContent.landingPages.musicDuo.cta),
         faqItems: sanitizeLandingFaqItems(content.landingPages?.musicDuo?.faqItems, siteContent.landingPages.musicDuo.faqItems),
         practicalInfoItems: sanitizeTextList(content.landingPages?.musicDuo?.practicalInfoItems, siteContent.landingPages.musicDuo.practicalInfoItems),
+        ctaProofItems: sanitizeTextList(content.landingPages?.musicDuo?.ctaProofItems, siteContent.landingPages.musicDuo.ctaProofItems),
         socialProofItems: sanitizeLandingSocialProofItems(content.landingPages?.musicDuo?.socialProofItems, siteContent.landingPages.musicDuo.socialProofItems),
         priorityCities: sanitizeTextList(content.landingPages?.musicDuo?.priorityCities, siteContent.landingPages.musicDuo.priorityCities),
         localProofItems: sanitizeTextList(content.landingPages?.musicDuo?.localProofItems, siteContent.landingPages.musicDuo.localProofItems),
@@ -347,6 +348,7 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
         cta: sanitizeLandingCta(content.landingPages?.theaterConcert?.cta, siteContent.landingPages.theaterConcert.cta),
         faqItems: sanitizeLandingFaqItems(content.landingPages?.theaterConcert?.faqItems, siteContent.landingPages.theaterConcert.faqItems),
         practicalInfoItems: sanitizeTextList(content.landingPages?.theaterConcert?.practicalInfoItems, siteContent.landingPages.theaterConcert.practicalInfoItems),
+        ctaProofItems: sanitizeTextList(content.landingPages?.theaterConcert?.ctaProofItems, siteContent.landingPages.theaterConcert.ctaProofItems),
         socialProofItems: sanitizeLandingSocialProofItems(content.landingPages?.theaterConcert?.socialProofItems, siteContent.landingPages.theaterConcert.socialProofItems),
         priorityCities: sanitizeTextList(content.landingPages?.theaterConcert?.priorityCities, siteContent.landingPages.theaterConcert.priorityCities),
         localProofItems: sanitizeTextList(content.landingPages?.theaterConcert?.localProofItems, siteContent.landingPages.theaterConcert.localProofItems),
@@ -359,6 +361,7 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
         cta: sanitizeLandingCta(content.landingPages?.kampvuur?.cta, siteContent.landingPages.kampvuur.cta),
         faqItems: sanitizeLandingFaqItems(content.landingPages?.kampvuur?.faqItems, siteContent.landingPages.kampvuur.faqItems),
         practicalInfoItems: sanitizeTextList(content.landingPages?.kampvuur?.practicalInfoItems, siteContent.landingPages.kampvuur.practicalInfoItems),
+        ctaProofItems: sanitizeTextList(content.landingPages?.kampvuur?.ctaProofItems, siteContent.landingPages.kampvuur.ctaProofItems),
         socialProofItems: sanitizeLandingSocialProofItems(content.landingPages?.kampvuur?.socialProofItems, siteContent.landingPages.kampvuur.socialProofItems)
       },
       huiskamerconcert: {
@@ -367,6 +370,7 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
         cta: sanitizeLandingCta(content.landingPages?.huiskamerconcert?.cta, siteContent.landingPages.huiskamerconcert.cta),
         faqItems: sanitizeLandingFaqItems(content.landingPages?.huiskamerconcert?.faqItems, siteContent.landingPages.huiskamerconcert.faqItems),
         practicalInfoItems: sanitizeTextList(content.landingPages?.huiskamerconcert?.practicalInfoItems, siteContent.landingPages.huiskamerconcert.practicalInfoItems),
+        ctaProofItems: sanitizeTextList(content.landingPages?.huiskamerconcert?.ctaProofItems, siteContent.landingPages.huiskamerconcert.ctaProofItems),
         socialProofItems: sanitizeLandingSocialProofItems(content.landingPages?.huiskamerconcert?.socialProofItems, siteContent.landingPages.huiskamerconcert.socialProofItems),
         priorityCities: sanitizeTextList(content.landingPages?.huiskamerconcert?.priorityCities, siteContent.landingPages.huiskamerconcert.priorityCities),
         localProofItems: sanitizeTextList(content.landingPages?.huiskamerconcert?.localProofItems, siteContent.landingPages.huiskamerconcert.localProofItems),
@@ -379,6 +383,7 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
         cta: sanitizeLandingCta(content.landingPages?.press?.cta, siteContent.landingPages.press.cta),
         faqItems: sanitizeLandingFaqItems(content.landingPages?.press?.faqItems, siteContent.landingPages.press.faqItems),
         practicalInfoItems: sanitizeTextList(content.landingPages?.press?.practicalInfoItems, siteContent.landingPages.press.practicalInfoItems),
+        ctaProofItems: sanitizeTextList(content.landingPages?.press?.ctaProofItems, siteContent.landingPages.press.ctaProofItems),
         socialProofItems: sanitizeLandingSocialProofItems(content.landingPages?.press?.socialProofItems, siteContent.landingPages.press.socialProofItems)
       }
     },

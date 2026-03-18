@@ -63,7 +63,12 @@ type OverviewResponse = {
       created_at: string;
     }>;
   };
-  warnings: string[];
+  warnings: Array<{
+    severity: "critical" | "review" | "info";
+    text: string;
+    ctaLabel: string;
+    href: string;
+  }>;
 };
 
 type AuditResponse = {
@@ -198,6 +203,27 @@ function getAuditDomain(event: AuditResponse["events"][number]) {
   return event.targetType;
 }
 
+function warningSeverityClasses(severity: OverviewResponse["warnings"][number]["severity"]) {
+  switch (severity) {
+    case "critical":
+      return {
+        badge: "bg-[rgba(255,180,168,0.16)] text-[#ffb4a8] border-[rgba(255,180,168,0.25)]",
+        card: "border-[rgba(255,180,168,0.24)] bg-[rgba(82,25,20,0.28)]"
+      };
+    case "info":
+      return {
+        badge: "bg-[rgba(135,197,255,0.14)] text-[#cfe8ff] border-[rgba(135,197,255,0.25)]",
+        card: "border-[rgba(135,197,255,0.2)] bg-[rgba(18,33,53,0.28)]"
+      };
+    case "review":
+    default:
+      return {
+        badge: "bg-[rgba(242,139,14,0.12)] text-[#f3d7b0] border-[rgba(242,139,14,0.24)]",
+        card: "border-[rgba(242,139,14,0.24)] bg-[rgba(242,139,14,0.08)]"
+      };
+  }
+}
+
 export function SuperAdminShell() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [overview, setOverview] = useState<OverviewResponse | null>(null);
@@ -316,11 +342,32 @@ export function SuperAdminShell() {
             <p className="mt-1 text-sm text-[#d9c6ac]">Signaleringen die nu direct effect kunnen hebben op live content of bereikbaarheid.</p>
             {overview.warnings.length > 0 ? (
               <ul className="mt-4 space-y-2">
-                {overview.warnings.map((warning) => (
-                  <li key={warning} className="rounded-xl border border-[rgba(242,139,14,0.28)] bg-[rgba(242,139,14,0.1)] p-3 text-sm text-[#f8e5c8]">
-                    {warning}
-                  </li>
-                ))}
+                {[...overview.warnings]
+                  .sort((left, right) => {
+                    const priority = { critical: 0, review: 1, info: 2 } as const;
+                    return priority[left.severity] - priority[right.severity];
+                  })
+                  .map((warning) => {
+                    const classes = warningSeverityClasses(warning.severity);
+                    return (
+                      <li key={`${warning.severity}-${warning.text}-${warning.href}`} className={`rounded-xl border p-4 ${classes.card}`}>
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div className="space-y-2">
+                            <span className={`inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] ${classes.badge}`}>
+                              {warning.severity === "critical" ? "Direct oplossen" : warning.severity === "review" ? "Goed om na te kijken" : "Informatief"}
+                            </span>
+                            <p className="text-sm text-[#f8e5c8]">{warning.text}</p>
+                          </div>
+                          <Link
+                            href={warning.href}
+                            className="inline-flex shrink-0 items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-xs font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                          >
+                            {warning.ctaLabel}
+                          </Link>
+                        </div>
+                      </li>
+                    );
+                  })}
               </ul>
             ) : (
               <p className="mt-4 rounded-xl border border-[var(--color-line-muted)] bg-[rgba(24,41,63,0.28)] p-4 text-sm text-[#d9c6ac]">

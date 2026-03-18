@@ -12,6 +12,11 @@ type LandingHeroProps = {
   title: string;
   intro: string;
   note?: string;
+  listenCue?: {
+    intro: string;
+    ctaLabel: string;
+    href: string;
+  };
   quickPanel?: {
     title: string;
     items?: string[];
@@ -30,7 +35,7 @@ function hasText(value: string | undefined | null) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-export function LandingHero({ id = "intro", eyebrow, audienceLabel, title, intro, note, quickPanel, image, primaryCta, secondaryCta }: LandingHeroProps) {
+export function LandingHero({ id = "intro", eyebrow, audienceLabel, title, intro, note, listenCue, quickPanel, image, primaryCta, secondaryCta }: LandingHeroProps) {
   const actions = [primaryCta, secondaryCta].filter(
     (cta): cta is Cta => Boolean(cta && hasText(cta.label) && hasText(cta.href))
   );
@@ -75,6 +80,21 @@ export function LandingHero({ id = "intro", eyebrow, audienceLabel, title, intro
                     {cta.label}
                   </ButtonLink>
                 ))}
+              </div>
+            ) : null}
+            {listenCue && hasText(listenCue.intro) && hasText(listenCue.ctaLabel) && hasText(listenCue.href) ? (
+              <div className="mt-5 inline-flex max-w-[62ch] flex-wrap items-center gap-3 rounded-full border border-[rgba(67,135,133,0.32)] bg-[rgba(18,30,46,0.36)] px-4 py-3 text-sm text-[#e7d7c1]">
+                <span className="inline-flex items-center gap-2">
+                  <span aria-hidden="true" className="equalizer-icon text-[#f3d7b0]">
+                    <span />
+                    <span />
+                    <span />
+                  </span>
+                  <span>{listenCue.intro}</span>
+                </span>
+                <ButtonLink href={listenCue.href} variant="secondary" dataCta={`landing_${id}_listen_context`}>
+                  {listenCue.ctaLabel}
+                </ButtonLink>
               </div>
             ) : null}
             {quickPanel && hasText(quickPanel.title) ? (

@@ -57,6 +57,7 @@ export type LandingPageContent = {
   positioningBody?: string;
   fitTitle?: string;
   fitItems?: string[];
+  highlightsVariant?: "cards" | "split-scenarios" | "editorial-list" | "host-flow" | "facts";
   practicalInfoItems?: string[];
   highlights?: LandingHighlightItem[];
   socialProofItems?: LandingSocialProofItem[];
@@ -65,6 +66,8 @@ export type LandingPageContent = {
   faqItems?: LandingFaqItem[];
   ctaContextTitle?: string;
   ctaContextBody?: string;
+  ctaProofIntro?: string;
+  ctaProofItems?: string[];
   localAreaTitle?: string;
   localAreaIntro?: string;
   priorityCities?: string[];

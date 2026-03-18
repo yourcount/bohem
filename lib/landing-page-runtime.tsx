@@ -111,6 +111,7 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
         title={view.highlights.title}
         intro={view.highlights.intro}
         items={view.highlights.items}
+        variant={view.highlights.variant}
       />
     </>
   ) : null;
@@ -164,6 +165,7 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
         eyebrow={view.practicalInfo.eyebrow}
         title={view.practicalInfo.title}
         items={view.practicalInfo.items}
+        variant={view.practicalInfo.variant}
       />
     </>
   ) : null;
@@ -185,6 +187,7 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
         title={view.intro.title}
         intro={view.intro.intro}
         note={view.intro.note}
+        listenCue={view.intro.listenCue}
         quickPanel={view.intro.quickPanel}
         image={view.intro.image}
         primaryCta={view.intro.primaryCta}
@@ -249,6 +252,8 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
         eyebrow={view.cta.eyebrow}
         title={view.cta.title}
         body={view.cta.body}
+        proofIntro={view.cta.proofIntro}
+        proofItems={view.cta.proofItems}
         primaryCta={view.cta.primaryCta}
         secondaryCta={view.cta.secondaryCta}
         homeLink={landingKey === "press" ? undefined : {

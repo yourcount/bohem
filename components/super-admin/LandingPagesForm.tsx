@@ -193,6 +193,14 @@ function normalizeLandingPage(value: unknown): LandingPageDraft {
     positioningTitle: typeof current.positioningTitle === "string" ? current.positioningTitle : "",
     positioningBody: typeof current.positioningBody === "string" ? current.positioningBody : "",
     fitTitle: typeof current.fitTitle === "string" ? current.fitTitle : "",
+    highlightsVariant:
+      current.highlightsVariant === "cards" ||
+      current.highlightsVariant === "split-scenarios" ||
+      current.highlightsVariant === "editorial-list" ||
+      current.highlightsVariant === "host-flow" ||
+      current.highlightsVariant === "facts"
+        ? current.highlightsVariant
+        : "cards",
     fitItems: normalizeTextList(current.fitItems, [""]),
     practicalInfoItems: normalizeTextList(current.practicalInfoItems, [""]),
     highlights: normalizeHighlightItems(current.highlights),
@@ -202,6 +210,8 @@ function normalizeLandingPage(value: unknown): LandingPageDraft {
     faqItems: normalizeFaqItems(current.faqItems),
     ctaContextTitle: typeof current.ctaContextTitle === "string" ? current.ctaContextTitle : "",
     ctaContextBody: typeof current.ctaContextBody === "string" ? current.ctaContextBody : "",
+    ctaProofIntro: typeof current.ctaProofIntro === "string" ? current.ctaProofIntro : "",
+    ctaProofItems: normalizeTextList(current.ctaProofItems, [""]),
     localAreaTitle: typeof current.localAreaTitle === "string" ? current.localAreaTitle : "",
     localAreaIntro: typeof current.localAreaIntro === "string" ? current.localAreaIntro : "",
     priorityCities: normalizeTextList(current.priorityCities, [""]),
@@ -266,7 +276,7 @@ function PageSection({
     });
   };
 
-  const updateList = (key: "fitItems" | "practicalInfoItems" | "priorityCities" | "localProofItems", nextValue: string) => {
+  const updateList = (key: "fitItems" | "practicalInfoItems" | "ctaProofItems" | "priorityCities" | "localProofItems", nextValue: string) => {
     update(key, splitLines(nextValue));
   };
 
@@ -459,6 +469,17 @@ function PageSection({
             <label className="text-sm md:col-span-2">
               Uitleg bij waarom dit past
               <textarea className={pageFieldClass("min-h-24 resize-y")} value={value.positioningBody ?? ""} onChange={(event) => update("positioningBody", event.target.value)} />
+            </label>
+
+            <label className="text-sm md:col-span-2">
+              Vorm van het kernblok
+              <select className={pageFieldClass()} value={value.highlightsVariant ?? "cards"} onChange={(event) => update("highlightsVariant", event.target.value as LandingPageDraft["highlightsVariant"])}>
+                <option value="cards">Losse kaarten</option>
+                <option value="split-scenarios">Scenario's naast elkaar</option>
+                <option value="editorial-list">Redactionele lijst</option>
+                <option value="host-flow">Verloop of host-flow</option>
+                <option value="facts">Kernfeiten</option>
+              </select>
             </label>
 
             <label className="text-sm md:col-span-2">
@@ -757,6 +778,16 @@ function PageSection({
             <label className="text-sm md:col-span-2">
               Uitleg in de afsluitende contactband
               <textarea className={pageFieldClass("min-h-24 resize-y")} value={value.ctaContextBody ?? ""} onChange={(event) => update("ctaContextBody", event.target.value)} />
+            </label>
+
+            <label className="text-sm md:col-span-2">
+              Korte geruststelling boven de knoppen
+              <input className={pageFieldClass()} value={value.ctaProofIntro ?? ""} onChange={(event) => update("ctaProofIntro", event.target.value)} />
+            </label>
+
+            <label className="text-sm md:col-span-2">
+              Korte bewijsregels bij de knoppen, één per regel
+              <textarea className={pageFieldClass("min-h-24 resize-y")} value={joinLines(value.ctaProofItems)} onChange={(event) => updateList("ctaProofItems", event.target.value)} />
             </label>
           </div>
         </div>

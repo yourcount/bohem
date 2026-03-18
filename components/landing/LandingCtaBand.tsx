@@ -7,6 +7,8 @@ type LandingCtaBandProps = {
   eyebrow?: string;
   title: string;
   body: string;
+  proofIntro?: string;
+  proofItems?: string[];
   primaryCta?: Cta;
   secondaryCta?: Cta;
   homeLink?: {
@@ -20,10 +22,11 @@ function hasText(value: string | undefined | null) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-export function LandingCtaBand({ id = "contact", eyebrow, title, body, primaryCta, secondaryCta, homeLink }: LandingCtaBandProps) {
+export function LandingCtaBand({ id = "contact", eyebrow, title, body, proofIntro, proofItems, primaryCta, secondaryCta, homeLink }: LandingCtaBandProps) {
   const actions = [primaryCta, secondaryCta].filter(
     (cta): cta is Cta => Boolean(cta && hasText(cta.label) && hasText(cta.href))
   );
+  const visibleProofItems = (proofItems ?? []).map((item) => item.trim()).filter((item) => item.length > 0).slice(0, 3);
   const showHomeLink = Boolean(homeLink && hasText(homeLink.label) && hasText(homeLink.href));
 
   return (
@@ -40,6 +43,20 @@ export function LandingCtaBand({ id = "contact", eyebrow, title, body, primaryCt
               {title}
             </h2>
             <p className="mt-4 max-w-[64ch] text-[var(--color-text-primary)]">{body}</p>
+            {hasText(proofIntro) || visibleProofItems.length > 0 ? (
+              <div className="mt-5 rounded-2xl border border-[rgba(243,215,176,0.16)] bg-[rgba(248,241,229,0.05)] p-4">
+                {hasText(proofIntro) ? <p className="text-sm text-[#f3d7b0]">{proofIntro}</p> : null}
+                {visibleProofItems.length > 0 ? (
+                  <div className={`grid gap-3 md:grid-cols-3 ${hasText(proofIntro) ? "mt-3" : ""}`.trim()}>
+                    {visibleProofItems.map((item) => (
+                      <div key={item} className="rounded-xl border border-[rgba(243,215,176,0.12)] bg-[rgba(9,14,24,0.18)] px-3 py-3 text-sm leading-6 text-[#ead7bc]">
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
             {actions.length > 0 ? (
               <div className="mt-6 flex flex-wrap gap-3">
                 {actions.map((cta) => (

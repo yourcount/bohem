@@ -224,8 +224,10 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
         : {})
     },
     bookings: {
+      ...siteContent.bookings,
       ...content.bookings,
       cta: {
+        ...siteContent.bookings.cta,
         ...content.bookings.cta,
         href: sanitizeHref(content.bookings.cta.href, siteContent.bookings.cta.href)
       },
@@ -234,6 +236,14 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
             routeItems: content.bookings.routeItems.map((item, index) => ({
               ...item,
               href: sanitizeHref(item.href, siteContent.bookings.routeItems?.[index]?.href ?? "#contact")
+            }))
+          }
+        : {}),
+      ...(Array.isArray(content.bookings.faqItems) && content.bookings.faqItems.length > 0
+        ? {
+            faqItems: content.bookings.faqItems.map((item, index) => ({
+              question: item.question?.trim() || siteContent.bookings.faqItems?.[index]?.question || "",
+              answer: item.answer?.trim() || siteContent.bookings.faqItems?.[index]?.answer || ""
             }))
           }
         : {}),
@@ -252,6 +262,7 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
       ...(content.bookings.press
         ? {
             press: {
+              ...siteContent.bookings.press,
               ...content.bookings.press,
               kitHref: sanitizeHref(content.bookings.press.kitHref, siteContent.bookings.press?.kitHref ?? "/")
             }

@@ -15,6 +15,9 @@ export function absoluteUrl(path: string): string {
 export function buildHomeJsonLd(content: SiteContent) {
   const url = getSiteUrl();
   const heroImage = absoluteUrl(content.hero.image.src);
+  const faqItems = (content.bookings.faqItems ?? []).filter(
+    (item) => typeof item.question === "string" && item.question.trim().length > 0 && typeof item.answer === "string" && item.answer.trim().length > 0
+  );
   const personNameMap: Record<string, string> = {
     Arthur: "Arthur Bont",
     Bettina: "Bettina Kraaieveld"
@@ -120,6 +123,24 @@ export function buildHomeJsonLd(content: SiteContent) {
         datePublished: "2026",
         url: content.discography.artist.href
       },
+      ...(faqItems.length > 0
+        ? [
+            {
+              "@type": "FAQPage",
+              "@id": `${url}/#booking-faq`,
+              url: `${url}/#boekingen`,
+              inLanguage: "nl-NL",
+              mainEntity: faqItems.map((item) => ({
+                "@type": "Question",
+                name: item.question.trim(),
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: item.answer.trim()
+                }
+              }))
+            }
+          ]
+        : []),
       ...content.about.bios.map((bio) => ({
         "@type": "Person",
         name: personNameMap[bio.name] ?? bio.name,

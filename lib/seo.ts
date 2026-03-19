@@ -14,6 +14,69 @@ export function absoluteUrl(path: string): string {
   return `${getSiteUrl()}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+function buildEventDescription(content: SiteContent, show: NonNullable<SiteContent["bookings"]["upcomingShows"]>[number]) {
+  return `Live optreden van ${content.brand.name} in ${show.venue}, ${show.city}.`;
+}
+
+function getEventImage(content: SiteContent, landingImageSrc?: string) {
+  return absoluteUrl(landingImageSrc || content.bookings.highlightImage?.src || content.hero.image.src);
+}
+
+function buildEventOffer(
+  show: NonNullable<SiteContent["bookings"]["upcomingShows"]>[number],
+  startDate: string
+) {
+  const primaryShowUrl = show.ticketsHref?.trim() || show.infoHref?.trim() || "";
+  if (!primaryShowUrl) return undefined;
+
+  return {
+    "@type": "Offer",
+    url: absoluteUrl(primaryShowUrl),
+    availability: "https://schema.org/InStock",
+    validFrom: startDate,
+    priceCurrency: "EUR",
+    ...(show.freeEntry ? { price: 0 } : {})
+  };
+}
+
+function buildMusicEventNode(
+  content: SiteContent,
+  show: NonNullable<SiteContent["bookings"]["upcomingShows"]>[number],
+  options?: { imageSrc?: string }
+) {
+  const startDate = parseDutchShowDate(show.date);
+  if (!startDate) return null;
+
+  return {
+    "@type": "MusicEvent",
+    name: `Bohèm live — ${show.venue}`,
+    description: buildEventDescription(content, show),
+    startDate,
+    endDate: startDate,
+    image: getEventImage(content, options?.imageSrc),
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    eventStatus: "https://schema.org/EventScheduled",
+    location: {
+      "@type": "Place",
+      name: show.venue,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: show.city,
+        addressCountry: "NL"
+      }
+    },
+    organizer: {
+      "@id": `${getSiteUrl()}/#musicgroup`
+    },
+    performer: {
+      "@type": "MusicGroup",
+      name: content.brand.name,
+      url: getSiteUrl()
+    },
+    ...(buildEventOffer(show, startDate) ? { offers: buildEventOffer(show, startDate) } : {})
+  };
+}
+
 export function buildHomeJsonLd(content: SiteContent) {
   const url = getSiteUrl();
   const heroImage = absoluteUrl(content.hero.image.src);
@@ -35,41 +98,7 @@ export function buildHomeJsonLd(content: SiteContent) {
 
   const events =
     filterFutureShows(content.bookings.upcomingShows)
-      ?.map((show) => {
-        const startDate = parseDutchShowDate(show.date);
-        if (!startDate) return null;
-        const primaryShowUrl = show.ticketsHref?.trim() || show.infoHref?.trim() || "";
-        return {
-          "@type": "MusicEvent",
-          name: `Bohèm live — ${show.venue}`,
-          startDate,
-          eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-          eventStatus: "https://schema.org/EventScheduled",
-          location: {
-            "@type": "Place",
-            name: show.venue,
-            address: {
-              "@type": "PostalAddress",
-              addressLocality: show.city,
-              addressCountry: "NL"
-            }
-          },
-          performer: {
-            "@type": "MusicGroup",
-            name: content.brand.name,
-            url
-          },
-          ...(primaryShowUrl
-            ? {
-                offers: {
-                  "@type": "Offer",
-                  url: absoluteUrl(primaryShowUrl),
-                  availability: "https://schema.org/InStock"
-                }
-              }
-            : {})
-        };
-      })
+      ?.map((show) => buildMusicEventNode(content, show))
       .filter(Boolean) ?? [];
 
   return {
@@ -223,27 +252,7 @@ export function buildLandingPageJsonLd(landingKey: LandingPageKey, content: Site
   const events =
     ["musicDuo", "theaterConcert", "huiskamerconcert"].includes(landingKey)
       ? filterFutureShows(content.bookings.upcomingShows)
-          ?.map((show) => {
-            const startDate = parseDutchShowDate(show.date);
-            if (!startDate) return null;
-            return {
-              "@type": "MusicEvent",
-              name: `Bohèm live — ${show.venue}`,
-              startDate,
-              location: {
-                "@type": "Place",
-                name: show.venue,
-                address: {
-                  "@type": "PostalAddress",
-                  addressLocality: show.city,
-                  addressCountry: "NL"
-                }
-              },
-              performer: {
-                "@id": `${url}/#musicgroup`
-              }
-            };
-          })
+          ?.map((show) => buildMusicEventNode(content, show, { imageSrc: landing.image?.src }))
           .filter(Boolean) ?? []
       : [];
 
@@ -314,41 +323,7 @@ function getGroupProfileUrls(content: SiteContent) {
 function getUpcomingEventSchema(content: SiteContent) {
   return (
     filterFutureShows(content.bookings.upcomingShows)
-      ?.map((show) => {
-        const startDate = parseDutchShowDate(show.date);
-        if (!startDate) return null;
-        const primaryShowUrl = show.ticketsHref?.trim() || show.infoHref?.trim() || "";
-        return {
-          "@type": "MusicEvent",
-          name: `Bohèm live — ${show.venue}`,
-          startDate,
-          eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-          eventStatus: "https://schema.org/EventScheduled",
-          location: {
-            "@type": "Place",
-            name: show.venue,
-            address: {
-              "@type": "PostalAddress",
-              addressLocality: show.city,
-              addressCountry: "NL"
-            }
-          },
-          performer: {
-            "@type": "MusicGroup",
-            name: content.brand.name,
-            url: getSiteUrl()
-          },
-          ...(primaryShowUrl
-            ? {
-                offers: {
-                  "@type": "Offer",
-                  url: absoluteUrl(primaryShowUrl),
-                  availability: "https://schema.org/InStock"
-                }
-              }
-            : {})
-        };
-      })
+      ?.map((show) => buildMusicEventNode(content, show))
       .filter(Boolean) ?? []
   );
 }

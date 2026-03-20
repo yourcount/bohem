@@ -39,6 +39,7 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
   const siteContent = await getLiveSiteContent();
   const jsonLd = buildNewsArticleJsonLd(item);
   const navigation = [
+    { label: "Home", href: "/" },
     { label: "Nieuws", href: "/nieuws" },
     { label: "Pers", href: "/pers" },
     { label: "Contact", href: "/#contact" }
@@ -64,6 +65,12 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
             </h1>
             <p className="mt-5 max-w-[62ch] text-base leading-8 text-[#e7d7c1] sm:text-lg">{item.excerpt}</p>
             <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                href="/"
+                className="inline-flex items-center rounded-full border border-[rgba(243,215,176,0.22)] px-5 py-2.5 text-sm font-semibold text-[#f3d7b0] transition-colors hover:border-[#c8873e] hover:text-white"
+              >
+                Naar homepage
+              </Link>
               <Link
                 href="/nieuws"
                 className="inline-flex items-center rounded-full border border-[rgba(243,215,176,0.22)] px-5 py-2.5 text-sm font-semibold text-[#f3d7b0] transition-colors hover:border-[#c8873e] hover:text-white"
@@ -108,6 +115,18 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
           </article>
 
           <aside className="grid h-fit gap-5">
+            <section className="rounded-[1.8rem] border border-[rgba(243,215,176,0.16)] bg-[rgba(244,233,220,0.04)] p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#f3d7b0]">Verder kijken</p>
+              <div className="mt-4 grid gap-3">
+                <Link
+                  href="/"
+                  className="rounded-2xl border border-[var(--color-line-muted)] bg-[rgba(18,30,46,0.4)] px-4 py-3 text-sm text-[#e7d7c1] transition-colors hover:border-[#c8873e] hover:text-white"
+                >
+                  Ga naar de homepage van Bohèm
+                </Link>
+              </div>
+            </section>
+
             <section className="rounded-[1.8rem] border border-[rgba(243,215,176,0.16)] bg-[rgba(244,233,220,0.04)] p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#f3d7b0]">Op de site</p>
               <div className="mt-4 grid gap-3">

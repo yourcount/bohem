@@ -24,6 +24,7 @@ export default async function NewsIndexPage() {
   const items = getAllNewsItems();
   const jsonLd = buildNewsIndexJsonLd(items);
   const navigation = [
+    { label: "Home", href: "/" },
     { label: "Nieuws", href: "/nieuws" },
     { label: "Pers", href: "/pers" },
     { label: "Contact", href: "/#contact" }
@@ -38,20 +39,27 @@ export default async function NewsIndexPage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#f3d7b0]">Nieuws</p>
             <h1 className="mt-3 max-w-[11ch] font-display text-4xl leading-tight text-[var(--color-text-primary)] sm:text-5xl lg:text-6xl">
-              Releases, shows en context rond Bohèm
+              Nieuwe muziek, shows en verhalen van Bohèm
             </h1>
             <p className="mt-5 max-w-[64ch] text-base leading-8 text-[#e7d7c1] sm:text-lg">
-              Op deze pagina staan alleen updates die iets toevoegen: nieuwe muziek, publieke shows en context voor redacties,
-              programmeurs en luisteraars die Bohèm via het eigen domein willen volgen.
+              Hier delen we alleen berichten die echt iets toevoegen: nieuwe muziek, openbare speeldata en verhalen die iets laten zien van waar Bohèm live en muzikaal mee bezig is.
             </p>
+            <div className="mt-6">
+              <Link
+                href="/"
+                className="inline-flex items-center rounded-full border border-[rgba(243,215,176,0.22)] px-5 py-2.5 text-sm font-semibold text-[#f3d7b0] transition-colors hover:border-[#c8873e] hover:text-white"
+              >
+                Eerst naar de homepage
+              </Link>
+            </div>
           </div>
 
           <div className="rounded-[2rem] border border-[rgba(243,215,176,0.18)] bg-[rgba(244,233,220,0.05)] p-6 shadow-[0_24px_54px_rgba(0,0,0,0.24)]">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#f3d7b0]">Wat je hier vindt</p>
             <div className="mt-4 grid gap-3 text-sm leading-7 text-[#ead7bc]">
-              <p>Nieuwe releases met luisterlinks en duiding.</p>
-              <p>Show-updates die meer doen dan alleen datum en locatie noemen.</p>
-              <p>Media- en programmeercontext die doorlinkt naar de juiste vaste pagina&apos;s.</p>
+              <p>Nieuwe releases met luisterlinks en wat achtergrond.</p>
+              <p>Openbare shows met iets meer context dan alleen datum en locatie.</p>
+              <p>Berichten voor luisteraars, redacties en programmeurs die Bohèm beter willen leren kennen.</p>
             </div>
           </div>
         </div>
@@ -64,10 +72,10 @@ export default async function NewsIndexPage() {
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#f3d7b0]">Overzicht</p>
-              <h2 className="mt-2 font-display text-3xl text-[var(--color-text-primary)] sm:text-4xl">Actuele berichten op het eigen domein</h2>
+              <h2 className="mt-2 font-display text-3xl text-[var(--color-text-primary)] sm:text-4xl">Recente berichten</h2>
             </div>
             <p className="max-w-[44ch] text-sm leading-7 text-[#d9c6ac]">
-              Hier vind je compacte updates met extra context, luisterlinks en praktische vervolgstappen als je Bohèm verder wilt volgen of boeken.
+              Korte updates voor wie wil luisteren, komen kijken of Bohèm beter wil leren kennen.
             </p>
           </div>
 

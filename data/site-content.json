@@ -154,6 +154,17 @@
       }
     ]
   },
+  "video": {
+    "eyebrow": "Live in beeld",
+    "title": "Zie hoe Bohèm live binnenkomt",
+    "intro": "Liever eerst kijken hoe Bohèm klinkt op het podium of in een intieme setting? Hier vind je de meest recente live-fragmenten en sessies van het YouTube-kanaal.",
+    "cta": {
+      "label": "Bekijk het YouTube-kanaal",
+      "href": "https://www.youtube.com/@VideoBoh%C3%A8m"
+    },
+    "emptyStateLabel": "Open het YouTube-kanaal",
+    "emptyStateHref": "https://www.youtube.com/@VideoBoh%C3%A8m"
+  },
   "musicExperience": {
     "title": "Muziekbeleving",
     "body": "Live, onder de noemer Reizigers, neemt Bohèm het publiek mee op een muzikale mini-trip: verrassende arrangementen, diepgang, flair, humor en interactie. Liedjes om bij stil te staan en energie om in mee te bewegen.",

@@ -10,6 +10,7 @@ import { MusicExperienceSection } from "@/components/sections/MusicExperienceSec
 import { ShowsSection } from "@/components/sections/ShowsSection";
 import { SiteFooter } from "@/components/sections/SiteFooter";
 import { SiteHeader } from "@/components/sections/SiteHeader";
+import { VideoSection } from "@/components/sections/VideoSection";
 import { MobileStickyCta } from "@/components/ui/MobileStickyCta";
 import { ScrollExperience } from "@/components/ui/ScrollExperience";
 import { SectionMotifDivider } from "@/components/ui/SectionMotifDivider";
@@ -17,6 +18,7 @@ import { StickyListenBar } from "@/components/ui/StickyListenBar";
 import { ensureShowsNavigationItem } from "@/lib/content/navigation";
 import { getLiveSiteContent } from "@/lib/content/live-content";
 import { filterFutureShows } from "@/lib/content/shows";
+import { getYoutubeVideos } from "@/lib/content/youtube";
 import { getSeoSettingsSafe, resolveHomeJsonLd, resolveHomeSeo } from "@/lib/seo-settings";
 import { getFeatureFlagsSafe } from "@/lib/system/feature-flags";
 
@@ -110,12 +112,14 @@ function hasSectionContent(value: unknown): boolean {
 export default async function HomePage() {
   const siteContent = await getLiveSiteContent();
   const visibleUpcomingShows = filterFutureShows(siteContent.bookings.upcomingShows);
+  const youtubeVideos = await getYoutubeVideos(3);
   const flags = await getFeatureFlagsSafe();
   const seoSettings = await getSeoSettingsSafe();
-  const jsonLd = resolveHomeJsonLd(siteContent, seoSettings);
+  const jsonLd = resolveHomeJsonLd(siteContent, seoSettings, youtubeVideos);
   const hasAboutSection = hasSectionContent(siteContent.about);
   const hasDiscographySection = flags.enable_discography_section && hasSectionContent(siteContent.discography);
-  const hasMusicExperienceSection = hasSectionContent(siteContent.musicExperience);
+  const hasVideoSection = hasSectionContent(siteContent.video) && youtubeVideos.length > 0;
+  const hasMusicExperienceSection = false;
   const hasShows = visibleUpcomingShows.length > 0;
   const hasKampvuurSection = flags.enable_kampvuur_section && hasSectionContent(siteContent.kampvuur);
   const hasBookingsSection = hasSectionContent(siteContent.bookings);
@@ -126,6 +130,7 @@ export default async function HomePage() {
     if (!hasText(item.label) || !hasText(item.href)) return false;
     if (item.href === "#bio") return hasAboutSection;
     if (item.href === "#discografie") return hasDiscographySection;
+    if (item.href === "#video") return false;
     if (item.href === "#muziek") return hasMusicExperienceSection;
     if (item.href === "#shows") return hasShows;
     if (item.href === "#kampvuurklanken") return hasKampvuurSection;
@@ -159,6 +164,12 @@ export default async function HomePage() {
         {hasDiscographySection ? (
           <>
             <DiscographySection discography={siteContent.discography} />
+            <SectionMotifDivider />
+          </>
+        ) : null}
+        {hasVideoSection ? (
+          <>
+            <VideoSection videoContent={siteContent.video} videos={youtubeVideos} />
             <SectionMotifDivider />
           </>
         ) : null}

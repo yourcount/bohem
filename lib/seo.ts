@@ -1,5 +1,5 @@
 import { getLandingFaqItems, getLandingRouteByKey } from "@/lib/content/landing-pages";
-import type { SiteContent } from "@/lib/types";
+import type { SiteContent, YoutubeVideoItem } from "@/lib/types";
 import { filterFutureShows, parseDutchShowDate } from "@/lib/content/shows";
 import { getLandingPagePath, type LandingPageKey } from "@/lib/landing-pages";
 
@@ -77,7 +77,7 @@ function buildMusicEventNode(
   };
 }
 
-export function buildHomeJsonLd(content: SiteContent) {
+export function buildHomeJsonLd(content: SiteContent, videos: YoutubeVideoItem[] = []) {
   const url = getSiteUrl();
   const heroImage = absoluteUrl(content.hero.image.src);
   const faqItems = (content.bookings.faqItems ?? []).filter(
@@ -100,6 +100,7 @@ export function buildHomeJsonLd(content: SiteContent) {
     filterFutureShows(content.bookings.upcomingShows)
       ?.map((show) => buildMusicEventNode(content, show))
       .filter(Boolean) ?? [];
+  const featuredVideo = videos[0];
 
   return {
     "@context": "https://schema.org",
@@ -154,6 +155,21 @@ export function buildHomeJsonLd(content: SiteContent) {
         datePublished: "2026",
         url: content.discography.artist.href
       },
+      ...(featuredVideo
+        ? [
+            {
+              "@type": "VideoObject",
+              "@id": `${url}/#video-${featuredVideo.id}`,
+              name: featuredVideo.title,
+              description: featuredVideo.description || content.video.intro,
+              thumbnailUrl: [absoluteUrl(featuredVideo.thumbnailUrl)],
+              uploadDate: featuredVideo.publishedAt,
+              embedUrl: `https://www.youtube.com/embed/${featuredVideo.id}`,
+              contentUrl: featuredVideo.url,
+              publisher: { "@id": `${url}/#musicgroup` }
+            }
+          ]
+        : []),
       ...(faqItems.length > 0
         ? [
             {

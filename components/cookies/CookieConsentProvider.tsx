@@ -232,7 +232,7 @@ export function CookieConsentProvider({
           <div className="cookie-banner-inner">
             <h2 className="cookie-title">Cookies op deze website</h2>
             <p className="cookie-copy">
-              We gebruiken alleen noodzakelijke cookies zonder toestemming. Voor externe media (zoals Spotify), statistieken en marketing vragen we
+              We gebruiken alleen noodzakelijke cookies zonder toestemming. Voor externe media (zoals Spotify en YouTube), statistieken en marketing vragen we
               eerst je toestemming. Je keuze geldt 6 maanden en je kunt deze altijd aanpassen.
             </p>
 

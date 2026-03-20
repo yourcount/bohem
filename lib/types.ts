@@ -18,6 +18,18 @@ export type ImageAsset = {
   focusY?: number;
 };
 
+export type YoutubeVideoItem = {
+  id: string;
+  title: string;
+  url: string;
+  thumbnailUrl: string;
+  publishedAt: string;
+  description?: string;
+  channelTitle?: string;
+  kind: "standard" | "short";
+  source: "api" | "feed";
+};
+
 export type LandingFaqItem = {
   question: string;
   answer: string;
@@ -163,6 +175,14 @@ export type SiteContent = {
         href: string;
       }>;
     }>;
+  };
+  video: {
+    eyebrow?: string;
+    title: string;
+    intro: string;
+    cta: Cta;
+    emptyStateLabel?: string;
+    emptyStateHref?: string;
   };
   musicExperience: {
     title: string;

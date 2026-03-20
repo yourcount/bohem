@@ -1,4 +1,4 @@
-type CacheKey = "site_content" | "seo_settings" | "feature_flags";
+type CacheKey = "site_content" | "seo_settings" | "feature_flags" | "youtube_videos";
 
 type Entry = {
   value: unknown;
@@ -45,7 +45,7 @@ export function writeRuntimeCache<T>(key: CacheKey, value: T, ttlSeconds: number
 export function invalidateSiteRuntimeCache() {
   const size = runtimeCache.size;
   runtimeCache.clear();
-  return { invalidatedEntries: size, invalidatedKeys: ["site_content", "seo_settings", "feature_flags"] as CacheKey[] };
+  return { invalidatedEntries: size, invalidatedKeys: ["site_content", "seo_settings", "feature_flags", "youtube_videos"] as CacheKey[] };
 }
 
 export function invalidateRuntimeCacheByRoute(routePath: string) {

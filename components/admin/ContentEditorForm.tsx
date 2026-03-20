@@ -8,7 +8,7 @@ import type { SiteContent } from "@/lib/types";
 
 type EditorManagedContent = Pick<
   SiteContent,
-  "brand" | "navigation" | "hero" | "about" | "discography" | "musicExperience" | "kampvuur" | "bookings" | "contact" | "footer"
+  "brand" | "navigation" | "hero" | "about" | "discography" | "kampvuur" | "bookings" | "contact" | "footer"
 >;
 type UpcomingShow = NonNullable<SiteContent["bookings"]["upcomingShows"]>[number];
 
@@ -157,7 +157,6 @@ const sectionLabels: Record<string, string> = {
   hero: "Bovenaan de pagina",
   about: "Over Bohèm",
   discography: "Discografie",
-  musicExperience: "Muziekbeleving",
   kampvuur: "Kampvuurklanken",
   bookings: "Boekingen",
   contact: "Contact",
@@ -233,8 +232,6 @@ const PATH_LABELS: Record<string, string> = {
   "discography.featuredSingle.image.alt": "Omschrijving van de cover in de pop-up muziekbalk",
   "hero.image.src": "Hero-foto",
   "hero.image.alt": "Omschrijving van de hero-foto",
-  "musicExperience.image.src": "Foto bij muziekbeleving",
-  "musicExperience.image.alt": "Omschrijving van de foto bij muziekbeleving",
   "bookings.coverKoffer.image.src": "Foto bij coverkoffer",
   "bookings.coverKoffer.image.alt": "Omschrijving van de coverkoffer-foto",
   "bookings.faqTitle": "Titel boven veelgestelde vragen",
@@ -264,8 +261,6 @@ const PATH_VISIBILITY_HINTS: Record<string, string> = {
   "discography.featuredSingle.href": "Leeg = de knop in de pop-up muziekbalk verdwijnt.",
   "discography.featuredSingle.ctaLabel": "Leeg = de knop in de pop-up muziekbalk verdwijnt.",
   "discography.featuredSingle.image.src": "Leeg = de cover in de pop-up muziekbalk valt terug op de standaardafbeelding.",
-  "musicExperience.cta.href": "Leeg = de knop in Muziekbeleving verdwijnt.",
-  "musicExperience.cta.label": "Leeg = de knop in Muziekbeleving verdwijnt.",
   "bookings.cta.href": "Leeg = de hoofdknop in Boekingen verdwijnt.",
   "bookings.cta.label": "Leeg = de hoofdknop in Boekingen verdwijnt.",
   "bookings.faqTitle": "Leeg + geen vragen = het blok met veelgestelde vragen wordt niet getoond.",
@@ -284,7 +279,6 @@ const SECTION_SEARCH_TERMS: Record<string, string[]> = {
   "Bovenaan de pagina": ["hero", "bovenaan", "bovenkant", "eerste scherm", "hoofdfoto", "openingsscherm", "introblok"],
   "Over Bohèm": ["bio", "over", "over bohem", "bandinfo", "leden", "bettina", "arthur"],
   Discografie: ["muziek", "liedjes", "single", "releases", "spotify", "pop-up", "muziekbalk", "luisterbalk", "cover"],
-  Muziekbeleving: ["muziekbeleving", "muzikale beleving", "boom foto", "verhaal", "beleving"],
   Kampvuurklanken: ["kampvuur", "kampvuurklanken", "teams", "management", "team sessie", "vuur"],
   Boekingen: ["boekingen", "live", "optredens", "agenda", "aanvragen", "beschikbaarheid", "pers", "coverkoffer"],
   Contact: ["contact", "formulier", "stuur bericht", "mail", "telefoon"],
@@ -305,7 +299,6 @@ const FIELD_SEARCH_TERMS: Record<string, string[]> = {
   "bookings.faqTitle": ["faq", "veelgestelde vragen", "vragen", "boekingsvragen"],
   "bookings.faqItems.0.question": ["faq vraag", "veelgestelde vraag", "vraag"],
   "bookings.faqItems.0.answer": ["faq antwoord", "antwoord op vraag", "antwoord"],
-  "musicExperience.image.src": ["boom foto", "foto bij muziekbeleving"],
   "bookings.coverKoffer.image.src": ["coverkoffer foto", "koffer foto"],
   "bookings.press.kitHref": ["perskit", "technische rider", "media download"],
   "bookings.press.contactPhone": ["telefoon pers", "pers telefoon"],

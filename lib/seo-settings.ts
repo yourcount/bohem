@@ -1,4 +1,4 @@
-import type { SiteContent } from "@/lib/types";
+import type { SiteContent, YoutubeVideoItem } from "@/lib/types";
 import { getCachePolicySafe } from "@/lib/cache/policy";
 import { CACHE_REVALIDATE_SECONDS, CACHE_TAGS } from "@/lib/cache/tags";
 import { hasRuntimeCacheKey, readRuntimeCache, writeRuntimeCache } from "@/lib/cache/runtime-cache";
@@ -286,14 +286,14 @@ export function resolveHomeSeo(content: SiteContent, settings: SeoSettings | nul
   );
 }
 
-export function resolveHomeJsonLd(content: SiteContent, settings: SeoSettings | null) {
+export function resolveHomeJsonLd(content: SiteContent, settings: SeoSettings | null, videos: YoutubeVideoItem[] = []) {
   if (!settings || settings.home_json_ld_mode !== "custom") {
-    return buildHomeJsonLd(content);
+    return buildHomeJsonLd(content, videos);
   }
 
   const parsed = parseJsonLdString(settings.home_json_ld_custom);
   if (!parsed.ok) {
-    return buildHomeJsonLd(content);
+    return buildHomeJsonLd(content, videos);
   }
 
   return parsed.parsed;

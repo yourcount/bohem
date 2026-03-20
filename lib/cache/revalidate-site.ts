@@ -8,5 +8,6 @@ export function revalidatePublicSiteCaches(path = "/") {
   revalidateTag(CACHE_TAGS.siteContent, "max");
   revalidateTag(CACHE_TAGS.seoSettings, "max");
   revalidateTag(CACHE_TAGS.featureFlags, "max");
+  revalidateTag(CACHE_TAGS.youtubeVideos, "max");
   revalidatePath(path);
 }

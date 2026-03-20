@@ -1,11 +1,13 @@
 export const CACHE_TAGS = {
   siteContent: "site-content",
   seoSettings: "seo-settings",
-  featureFlags: "feature-flags"
+  featureFlags: "feature-flags",
+  youtubeVideos: "youtube-videos"
 } as const;
 
 export const CACHE_REVALIDATE_SECONDS = {
   siteContent: 90,
   seoSettings: 120,
-  featureFlags: 90
+  featureFlags: 90,
+  youtubeVideos: 21600
 } as const;

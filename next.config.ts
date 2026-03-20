@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "*.public.blob.vercel-storage.com"
+      },
+      {
+        protocol: "https",
+        hostname: "*.ytimg.com"
+      },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com"
       }
     ]
   },
@@ -34,7 +42,7 @@ const nextConfig: NextConfig = {
       `connect-src ${connectSrc}`,
       "worker-src 'self' blob:",
       "manifest-src 'self'",
-      "frame-src https://open.spotify.com https://*.spotify.com https://vercel.live https://challenges.cloudflare.com",
+      "frame-src https://open.spotify.com https://*.spotify.com https://www.youtube-nocookie.com https://www.youtube.com https://vercel.live https://challenges.cloudflare.com",
       "upgrade-insecure-requests"
     ].join("; ");
 

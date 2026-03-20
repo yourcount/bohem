@@ -44,6 +44,8 @@ const INTERNAL_ANCHOR_ALIASES: Record<string, string> = {
   bio: "#bio",
   over: "#bio",
   discografie: "#discografie",
+  video: "#video",
+  videos: "#video",
   muziek: "#muziek",
   shows: "#shows",
   show: "#shows",
@@ -263,6 +265,16 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
           }))
         };
       })
+    },
+    video: {
+      ...siteContent.video,
+      ...content.video,
+      cta: {
+        ...siteContent.video.cta,
+        ...content.video?.cta,
+        href: sanitizeHref(content.video?.cta?.href ?? siteContent.video.cta.href, siteContent.video.cta.href)
+      },
+      emptyStateHref: sanitizeOptionalHref(content.video?.emptyStateHref, siteContent.video.emptyStateHref ?? "")
     },
     musicExperience: {
       ...content.musicExperience,

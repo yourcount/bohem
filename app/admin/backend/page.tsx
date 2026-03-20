@@ -15,7 +15,7 @@ export default async function SuperAdminPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-[1240px] px-4 py-12 sm:px-6">
+    <main className="mx-auto min-h-svh w-full max-w-[1240px] px-4 py-12 sm:px-6">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-4xl">Admin Backend</h1>
@@ -36,7 +36,9 @@ export default async function SuperAdminPage() {
         </div>
       </div>
 
-      <SuperAdminShell />
+      <div className="rounded-[1.75rem] border border-[rgba(67,135,133,0.22)] bg-[rgba(10,15,24,0.72)] p-3 shadow-[0_18px_42px_rgba(0,0,0,0.18)] sm:p-4">
+        <SuperAdminShell />
+      </div>
     </main>
   );
 }

@@ -15,7 +15,7 @@ export default async function AdminHomePage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-[1120px] px-4 py-12 sm:px-6">
+    <main className="mx-auto min-h-svh w-full max-w-[1120px] px-4 py-12 sm:px-6">
       <h1 className="mb-2 font-display text-4xl">Website inhoud bewerken</h1>
       <p className="mb-6 text-[#d9c6ac]">
         Ingelogd als {session.email}. Pas hier alle zichtbare website-inhoud aan, inclusief foto&apos;s en discografie.
@@ -40,7 +40,9 @@ export default async function AdminHomePage() {
         </Link>
       </div>
 
-      <ContentEditorForm currentUserEmail={session.email} />
+      <div className="rounded-[1.75rem] border border-[rgba(67,135,133,0.22)] bg-[rgba(10,15,24,0.72)] p-3 shadow-[0_18px_42px_rgba(0,0,0,0.18)] sm:p-4">
+        <ContentEditorForm currentUserEmail={session.email} />
+      </div>
     </main>
   );
 }

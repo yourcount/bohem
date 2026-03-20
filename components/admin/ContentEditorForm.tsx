@@ -537,7 +537,35 @@ function isImageSourcePath(path: string) {
 }
 
 function isManagedLibraryImage(src: string) {
-  return src.startsWith("/uploads/library/");
+  if (src.startsWith("/uploads/library/")) {
+    return true;
+  }
+
+  try {
+    const url = new URL(src);
+    return url.pathname.replace(/^\/+/, "").startsWith("uploads/library/");
+  } catch {
+    return false;
+  }
+}
+
+function getMediaDisplayName(src: string, fallback?: string) {
+  if (typeof fallback === "string" && fallback.trim().length > 0) {
+    return fallback.trim();
+  }
+
+  if (src.startsWith("/")) {
+    const parts = src.split("/").filter(Boolean);
+    return parts[parts.length - 1] ?? src;
+  }
+
+  try {
+    const url = new URL(src);
+    const parts = url.pathname.split("/").filter(Boolean);
+    return parts[parts.length - 1] ?? src;
+  } catch {
+    return src;
+  }
 }
 
 function toFocusPath(srcPath: string, key: "focusX" | "focusY") {
@@ -2274,6 +2302,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
                                     alt={imageAlt}
                                     width={420}
                                     height={240}
+                                    unoptimized
                                     className="h-24 w-full rounded-md object-cover"
                                     style={{ objectPosition: `${focusPoint.x}% ${focusPoint.y}%` }}
                                   />
@@ -3113,7 +3142,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
                     onChange={(event) => setMediaKind(event.target.value === "all" ? "all" : "photo")}
                     className="mt-1 w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-sm text-[var(--color-text-primary)]"
                   >
-                    <option value="photo">Alleen foto's</option>
+                    <option value="photo">Alleen foto&apos;s</option>
                     <option value="all">Alle assets</option>
                   </select>
                 </label>
@@ -3148,9 +3177,13 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
                         alt={file.name}
                         width={480}
                         height={280}
+                        unoptimized
                         className="h-28 w-full object-cover"
                       />
-                      <p className="truncate px-2 py-2 text-[11px] text-[#d9c6ac]" title={file.src}>
+                      <p className="truncate px-2 pb-0.5 pt-2 text-[11px] font-semibold text-[#f8f5f1]" title={getMediaDisplayName(file.src, file.name)}>
+                        {getMediaDisplayName(file.src, file.name)}
+                      </p>
+                      <p className="truncate px-2 pb-2 text-[10px] text-[#d9c6ac]" title={file.src}>
                         {file.src}
                       </p>
                     </button>

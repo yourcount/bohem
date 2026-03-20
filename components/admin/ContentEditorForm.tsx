@@ -536,6 +536,26 @@ function isImageSourcePath(path: string) {
   return path.endsWith(".src");
 }
 
+function looksLikeImageValue(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  if (trimmed.startsWith("/images/") || trimmed.startsWith("/uploads/") || trimmed.startsWith("/brand/")) {
+    return true;
+  }
+
+  try {
+    const url = new URL(trimmed);
+    const pathname = url.pathname.toLowerCase();
+    return [".jpg", ".jpeg", ".png", ".webp", ".avif", ".gif"].some((ext) => pathname.endsWith(ext));
+  } catch {
+    return false;
+  }
+}
+
+function isPreviewableImageField(path: string, value: string) {
+  return isImageSourcePath(path) || looksLikeImageValue(value);
+}
+
 function isManagedLibraryImage(src: string) {
   if (src.startsWith("/uploads/library/")) {
     return true;
@@ -566,6 +586,10 @@ function getMediaDisplayName(src: string, fallback?: string) {
   } catch {
     return src;
   }
+}
+
+function getImageAltPath(path: string) {
+  return isImageSourcePath(path) ? path.replace(/\.src$/, ".alt") : "";
 }
 
 function toFocusPath(srcPath: string, key: "focusX" | "focusY") {
@@ -2278,11 +2302,11 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
                         <div className="grid gap-2 md:grid-cols-2">
                           {sectionFields.slice(0, 12).map((field) => {
                             const isActiveField = visualSelectedPath === field.path;
-                            const isImageField = isImageSourcePath(field.path);
-                            const imageAltPath = isImageField ? field.path.replace(/\.src$/, ".alt") : "";
+                            const isImageField = isPreviewableImageField(field.path, field.value);
+                            const imageAltPath = getImageAltPath(field.path);
                             const imageAltRaw = imageAltPath ? readValueAtPath(content, imageAltPath) : "";
                             const imageAlt = typeof imageAltRaw === "string" && imageAltRaw.trim().length > 0 ? imageAltRaw : "Afbeelding preview";
-                            const focusPoint = isImageField ? getFocusForPath(field.path) : { x: 50, y: 50 };
+                            const focusPoint = isImageSourcePath(field.path) ? getFocusForPath(field.path) : { x: 50, y: 50 };
 
                             return (
                               <button
@@ -2381,8 +2405,34 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
             ) : visualSelectedField ? (
               <div className="space-y-3">
                 <label className="block text-xs font-semibold text-[#d9c6ac]">{visualSelectedField.label}</label>
-                {isImageSourcePath(visualSelectedField.path) ? (
+                {isPreviewableImageField(
+                  visualSelectedField.path,
+                  String(readValueAtPath(content, visualSelectedField.path) ?? "")
+                ) ? (
                   <div className="space-y-2">
+                    {hasText(String(readValueAtPath(content, visualSelectedField.path) ?? "")) ? (
+                      <div className="overflow-hidden rounded-xl border border-[var(--color-line-muted)] bg-[rgba(15,24,37,0.45)]">
+                        <Image
+                          src={String(readValueAtPath(content, visualSelectedField.path) ?? "")}
+                          alt={
+                            String(
+                              readValueAtPath(content, getImageAltPath(visualSelectedField.path)) ?? "Afbeelding preview"
+                            ) || "Afbeelding preview"
+                          }
+                          width={960}
+                          height={640}
+                          unoptimized
+                          className="h-44 w-full object-cover"
+                          style={
+                            isImageSourcePath(visualSelectedField.path)
+                              ? {
+                                  objectPosition: `${getFocusForPath(visualSelectedField.path).x}% ${getFocusForPath(visualSelectedField.path).y}%`
+                                }
+                              : undefined
+                          }
+                        />
+                      </div>
+                    ) : null}
                     <button
                       type="button"
                       onClick={() => openMediaModal(visualSelectedField.path)}
@@ -2809,12 +2859,13 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
                 const error = fieldErrors[field.path]?.[0];
                 const visibilityHint = visibilityHintForPath(field.path);
                 const describedBy = [field.helper ? helperId : "", visibilityHint ? visibilityHintId : "", error ? errorId : ""].filter(Boolean).join(" ") || undefined;
-                const showImageTools = isImageSourcePath(field.path);
-                const imageAltPath = showImageTools ? field.path.replace(/\.src$/, ".alt") : "";
+                const showImageTools = isPreviewableImageField(field.path, field.value);
+                const imageAltPath = getImageAltPath(field.path);
                 const imageAltRaw = imageAltPath ? readValueAtPath(content, imageAltPath) : "";
                 const imageAlt = typeof imageAltRaw === "string" && imageAltRaw.trim().length > 0 ? imageAltRaw : "Afbeelding preview";
-                const focusPoint = showImageTools ? getFocusForPath(field.path) : { x: 50, y: 50 };
-                const isEditingFocus = activeFocusPath === field.path;
+                const supportsFocusPoint = isImageSourcePath(field.path);
+                const focusPoint = supportsFocusPoint ? getFocusForPath(field.path) : { x: 50, y: 50 };
+                const isEditingFocus = supportsFocusPoint && activeFocusPath === field.path;
 
                 return (
                   <div
@@ -2893,7 +2944,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
                           >
                             Kies uit fotobibliotheek
                           </button>
-                          {field.value ? (
+                          {field.value && supportsFocusPoint ? (
                             <button
                               type="button"
                               onClick={() => setActiveFocusPath((prev) => (prev === field.path ? null : field.path))}

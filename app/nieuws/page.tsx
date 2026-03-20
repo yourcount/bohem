@@ -67,7 +67,7 @@ export default async function NewsIndexPage() {
               <h2 className="mt-2 font-display text-3xl text-[var(--color-text-primary)] sm:text-4xl">Actuele berichten op het eigen domein</h2>
             </div>
             <p className="max-w-[44ch] text-sm leading-7 text-[#d9c6ac]">
-              Elk bericht vormt een eigen indexeerbare pagina met context, relevante links en een duidelijke aansluiting op pers en boeking.
+              Hier vind je compacte updates met extra context, luisterlinks en praktische vervolgstappen als je Bohèm verder wilt volgen of boeken.
             </p>
           </div>
 

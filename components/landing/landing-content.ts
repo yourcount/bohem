@@ -856,9 +856,7 @@ export function buildPersLanding(siteContent: SiteContent): LandingRouteView {
       proofIntro: content.ctaProofIntro,
       proofItems: content.ctaProofItems,
       primaryCta: pressKitCta,
-      secondaryCta: press?.contactEmail
-        ? { label: "Mail direct", href: `mailto:${press.contactEmail}`, variant: "secondary" }
-        : undefined
+      secondaryCta: { label: "Bekijk nieuws", href: "/nieuws", variant: "secondary" }
     }
   };
 }

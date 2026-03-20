@@ -17,6 +17,27 @@ function nonEmptyItems(items: string[] | undefined) {
   return (items ?? []).map((item) => item.trim()).filter((item) => item.length > 0);
 }
 
+const bookingRouteCtas = [
+  {
+    href: "/muziekduo-boeken",
+    eyebrow: "Duo",
+    title: "Muziekduo",
+    suffix: "boeken"
+  },
+  {
+    href: "/theaterconcert-boeken",
+    eyebrow: "Podium",
+    title: "Theaterconcert",
+    suffix: "boeken"
+  },
+  {
+    href: "/huiskamerconcert-boeken",
+    eyebrow: "Intiem",
+    title: "Huiskamerconcert",
+    suffix: "boeken"
+  }
+] as const;
+
 export function BookingsSection({ bookings }: BookingsSectionProps) {
   const pressQuotes = nonEmptyItems(bookings.pressQuotes);
   const socialProof = (bookings.socialProof ?? []).filter((item) => hasText(item.quote) || hasText(item.source));
@@ -106,25 +127,24 @@ export function BookingsSection({ bookings }: BookingsSectionProps) {
                     </h2>
                   ) : null}
                   {hasText(bookings.body) ? <p>{bookings.body}</p> : null}
-                  <div className="mt-5 grid max-w-[42rem] gap-2 text-sm sm:grid-cols-2">
-                    <Link
-                      href="/muziekduo-boeken"
-                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-center font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-                    >
-                      Muziekduo boeken
-                    </Link>
-                    <Link
-                      href="/theaterconcert-boeken"
-                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-center font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
-                    >
-                      Theaterconcert boeken
-                    </Link>
-                    <Link
-                      href="/huiskamerconcert-boeken"
-                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--color-line-muted)] px-4 py-2 text-center font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)] sm:col-span-2 sm:justify-self-center"
-                    >
-                      Huiskamerconcert boeken
-                    </Link>
+                  <div className="mt-6 grid max-w-[52rem] gap-3 md:grid-cols-3">
+                    {bookingRouteCtas.map((cta) => (
+                      <Link
+                        key={cta.href}
+                        href={cta.href}
+                        className="subtle-lift-card group flex min-h-[5.75rem] flex-col justify-center rounded-[1.6rem] border border-[rgba(67,135,133,0.58)] bg-[linear-gradient(180deg,rgba(20,28,39,0.42)_0%,rgba(17,23,34,0.62)_100%)] px-5 py-4 text-center text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(244,233,220,0.08)]"
+                      >
+                        <span className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#d8bc95]">
+                          {cta.eyebrow}
+                        </span>
+                        <span className="font-display text-[1.55rem] leading-[1.02] text-[#f8f1e5] md:text-[1.7rem]">
+                          {cta.title}
+                        </span>
+                        <span className="mt-1 text-sm font-semibold tracking-[0.02em] text-[#efe2d0]">
+                          {cta.suffix}
+                        </span>
+                      </Link>
+                    ))}
                   </div>
                 </div>
               ) : null}

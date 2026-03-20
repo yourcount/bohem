@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 
 import { CookieConsentProvider } from "@/components/cookies/CookieConsentProvider";
-import { DeferredBackground } from "@/components/ui/DeferredBackground";
 import { DeferredConsentClients } from "@/components/ui/DeferredConsentClients";
+import { ConditionalLiquidBackground } from "@/components/ui/ConditionalLiquidBackground";
 import { getSiteUrl } from "@/lib/seo";
 
 import "./globals.css";
@@ -35,7 +35,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="nl" className={backslashFont.variable}>
       <body>
-        <DeferredBackground />
+        <ConditionalLiquidBackground />
         <div className="site-layer">
           <CookieConsentProvider>
             <DeferredConsentClients />

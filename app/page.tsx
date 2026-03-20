@@ -12,6 +12,7 @@ import { SiteFooter } from "@/components/sections/SiteFooter";
 import { SiteHeader } from "@/components/sections/SiteHeader";
 import { VideoSection } from "@/components/sections/VideoSection";
 import { DeferredHomeChrome } from "@/components/ui/DeferredHomeChrome";
+import { ScrollExperience } from "@/components/ui/ScrollExperience";
 import { SectionMotifDivider } from "@/components/ui/SectionMotifDivider";
 import { ensureShowsNavigationItem } from "@/lib/content/navigation";
 import { getLiveSiteContent } from "@/lib/content/live-content";
@@ -143,6 +144,7 @@ export default async function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <ScrollExperience />
 
       <a href="#main-content" className="skip-link">
         Ga direct naar inhoud

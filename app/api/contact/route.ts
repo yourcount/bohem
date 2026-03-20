@@ -39,6 +39,24 @@ function getMailgunConfig() {
   return { apiKey, domain, fromEmail, fromName, toEmail, region };
 }
 
+function resolveAdminRecipients(primaryRecipient: string) {
+  const requiredRecipient = "info@musicbybohem.nl";
+  const recipients = primaryRecipient
+    .split(",")
+    .map((value) => value.trim().toLowerCase())
+    .filter((value, index, values) => value.length > 0 && values.indexOf(value) === index);
+
+  if (!recipients.includes(requiredRecipient)) {
+    recipients.push(requiredRecipient);
+  }
+
+  return recipients;
+}
+
+function getReplyToRecipient() {
+  return "info@musicbybohem.nl";
+}
+
 function getTurnstileConfig() {
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? "";
   const secretKey = process.env.TURNSTILE_SECRET_KEY?.trim() ?? "";
@@ -323,6 +341,8 @@ async function sendContactMail(payload: {
   if (!config.apiKey || !config.domain || !config.fromEmail || !config.toEmail) {
     throw new Error("MAILGUN_NOT_CONFIGURED");
   }
+  const adminRecipients = resolveAdminRecipients(config.toEmail);
+  const replyToRecipient = getReplyToRecipient();
 
   const mailgun = new Mailgun(FormData);
   const client = mailgun.client({
@@ -436,7 +456,7 @@ async function sendContactMail(payload: {
 
   await client.messages.create(config.domain, {
     from: `${config.fromName} <${config.fromEmail}>`,
-    to: [config.toEmail],
+    to: adminRecipients,
     subject: adminSubject,
     text: adminText,
     html: adminHtml,
@@ -450,7 +470,7 @@ async function sendContactMail(payload: {
       subject: senderSubject,
       text: senderText,
       html: senderHtml,
-      "h:Reply-To": config.toEmail
+      "h:Reply-To": replyToRecipient
     });
   } catch (error) {
     console.error("Sender confirmation mail failed:", error);

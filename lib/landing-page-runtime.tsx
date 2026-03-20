@@ -20,6 +20,7 @@ import {
   type LandingRouteView
 } from "@/components/landing/landing-content";
 import { LandingPageShell } from "@/components/landing/LandingPageShell";
+import { ContactSection } from "@/components/sections/ContactSection";
 import { KampvuurSection } from "@/components/sections/KampvuurSection";
 import { ShowsSection } from "@/components/sections/ShowsSection";
 import { SectionMotifDivider } from "@/components/ui/SectionMotifDivider";
@@ -60,6 +61,20 @@ function getLandingRouteView(siteContent: SiteContent, landingKey: LandingPageKe
 
 function hasText(value: string | undefined | null) {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function isInlineContactHref(value: string | undefined | null) {
+  return typeof value === "string" && value.trim() === "#contact";
+}
+
+function hasLandingContactCta(view: LandingRouteView) {
+  return [
+    view.intro.primaryCta?.href,
+    view.intro.secondaryCta?.href,
+    view.localArea?.cta?.href,
+    view.cta.primaryCta?.href,
+    view.cta.secondaryCta?.href
+  ].some(isInlineContactHref);
 }
 
 function getStickyLandingSectionIds(landingKey: LandingPageKey, options: { hasHighlights: boolean; hasShows: boolean; hasLocalArea: boolean }) {
@@ -118,6 +133,7 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
         })
       : [];
   const showStickyListenBar = stickyVisibleSectionIds.length > 0;
+  const showLandingContactSection = landingKey !== "press" && hasLandingContactCta(view);
   const highlightSection = view.highlights ? (
     <>
       <SectionMotifDivider />
@@ -301,7 +317,7 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
       <SectionMotifDivider />
 
       <LandingCtaBand
-        id="contact"
+        id="cta"
         eyebrow={view.cta.eyebrow}
         title={view.cta.title}
         body={view.cta.body}
@@ -315,6 +331,13 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
           href: "/"
         }}
       />
+
+      {showLandingContactSection ? (
+        <>
+          <SectionMotifDivider />
+          <ContactSection contact={siteContent.contact} />
+        </>
+      ) : null}
 
       {showStickyListenBar ? (
         <StickyListenBar

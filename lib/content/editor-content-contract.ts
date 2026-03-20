@@ -11,6 +11,7 @@ export const EDITOR_CONTENT_KEYS = [
   "hero",
   "about",
   "discography",
+  "video",
   "kampvuur",
   "bookings",
   "contact",
@@ -338,6 +339,7 @@ function stripDisallowedReleaseLinksFromDiscography(content: EditorContent): Edi
         };
       })
     },
+    video: normalized.video,
     kampvuur: stripKampvuurFormatChoiceFields(normalized.kampvuur),
     bookings: stripBookingsRouteChoiceFields(normalized.bookings),
     contact: normalizeContactTemplates(normalized.contact),
@@ -352,6 +354,7 @@ export function pickEditorContent(full: SiteContent): EditorContent {
     hero: full.hero,
     about: full.about,
     discography: full.discography,
+    video: full.video,
     kampvuur: stripKampvuurFormatChoiceFields(full.kampvuur),
     bookings: stripBookingsRouteChoiceFields(full.bookings),
     contact: normalizeContactTemplates(full.contact),

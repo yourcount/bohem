@@ -86,6 +86,7 @@ export async function GET() {
     const siteContent = contentRecord.content;
     const hasAboutSection = hasSectionContent(siteContent.about);
     const hasDiscographySection = flags.enable_discography_section && hasSectionContent(siteContent.discography);
+    const hasVideoSection = hasSectionContent(siteContent.video);
     const visibleUpcomingShows = filterFutureShows(siteContent.bookings.upcomingShows);
     const hasShows = visibleUpcomingShows.length > 0;
     const hasKampvuurSection = flags.enable_kampvuur_section && hasSectionContent(siteContent.kampvuur);
@@ -126,6 +127,12 @@ export async function GET() {
           : flags.enable_discography_section
             ? "Sectie is leeg."
             : "Feature flag staat uit."
+      },
+      {
+        key: "video",
+        label: "Video",
+        state: hasVideoSection ? "visible" : "hidden",
+        reason: hasVideoSection ? "Sectie bevat inhoud." : "Sectie is leeg."
       },
       {
         key: "shows",

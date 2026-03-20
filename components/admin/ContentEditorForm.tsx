@@ -8,7 +8,7 @@ import type { SiteContent } from "@/lib/types";
 
 type EditorManagedContent = Pick<
   SiteContent,
-  "brand" | "navigation" | "hero" | "about" | "discography" | "kampvuur" | "bookings" | "contact" | "footer"
+  "brand" | "navigation" | "hero" | "about" | "discography" | "video" | "kampvuur" | "bookings" | "contact" | "footer"
 >;
 type UpcomingShow = NonNullable<SiteContent["bookings"]["upcomingShows"]>[number];
 
@@ -157,6 +157,7 @@ const sectionLabels: Record<string, string> = {
   hero: "Bovenaan de pagina",
   about: "Over Bohèm",
   discography: "Discografie",
+  video: "Video",
   kampvuur: "Kampvuurklanken",
   bookings: "Boekingen",
   contact: "Contact",
@@ -230,6 +231,8 @@ const PATH_LABELS: Record<string, string> = {
   "discography.featuredSingle.ctaLabel": "Knoptekst van de pop-up muziekknop",
   "discography.featuredSingle.image.src": "Cover van de pop-up muziekbalk",
   "discography.featuredSingle.image.alt": "Omschrijving van de cover in de pop-up muziekbalk",
+  "video.cta.href": "Link van de YouTube-kanaalknop",
+  "video.cta.label": "Tekst van de YouTube-kanaalknop",
   "hero.image.src": "Hero-foto",
   "hero.image.alt": "Omschrijving van de hero-foto",
   "bookings.coverKoffer.image.src": "Foto bij coverkoffer",
@@ -261,6 +264,8 @@ const PATH_VISIBILITY_HINTS: Record<string, string> = {
   "discography.featuredSingle.href": "Leeg = de knop in de pop-up muziekbalk verdwijnt.",
   "discography.featuredSingle.ctaLabel": "Leeg = de knop in de pop-up muziekbalk verdwijnt.",
   "discography.featuredSingle.image.src": "Leeg = de cover in de pop-up muziekbalk valt terug op de standaardafbeelding.",
+  "video.cta.href": "Leeg = de knop naar het YouTube-kanaal verdwijnt.",
+  "video.cta.label": "Leeg = de knop naar het YouTube-kanaal verdwijnt.",
   "bookings.cta.href": "Leeg = de hoofdknop in Boekingen verdwijnt.",
   "bookings.cta.label": "Leeg = de hoofdknop in Boekingen verdwijnt.",
   "bookings.faqTitle": "Leeg + geen vragen = het blok met veelgestelde vragen wordt niet getoond.",
@@ -279,6 +284,7 @@ const SECTION_SEARCH_TERMS: Record<string, string[]> = {
   "Bovenaan de pagina": ["hero", "bovenaan", "bovenkant", "eerste scherm", "hoofdfoto", "openingsscherm", "introblok"],
   "Over Bohèm": ["bio", "over", "over bohem", "bandinfo", "leden", "bettina", "arthur"],
   Discografie: ["muziek", "liedjes", "single", "releases", "spotify", "pop-up", "muziekbalk", "luisterbalk", "cover"],
+  Video: ["video", "youtube", "kanaal", "live video", "video sectie", "thumbnails"],
   Kampvuurklanken: ["kampvuur", "kampvuurklanken", "teams", "management", "team sessie", "vuur"],
   Boekingen: ["boekingen", "live", "optredens", "agenda", "aanvragen", "beschikbaarheid", "pers", "coverkoffer"],
   Contact: ["contact", "formulier", "stuur bericht", "mail", "telefoon"],
@@ -293,6 +299,10 @@ const FIELD_SEARCH_TERMS: Record<string, string[]> = {
   "discography.featuredSingle.ctaLabel": ["pop-up knop", "spotify knop", "knoptekst", "tekst op knop"],
   "discography.featuredSingle.image.src": ["cover", "single cover", "spotify cover", "muziekbalk foto", "luisterbalk foto", "albumhoes"],
   "discography.featuredSingle.image.alt": ["cover omschrijving", "beschrijving cover"],
+  "video.title": ["video titel", "youtube sectie titel", "titel video blok"],
+  "video.intro": ["video intro", "youtube intro", "tekst boven videos"],
+  "video.cta.label": ["youtube knop", "kanaalknop", "knoptekst video"],
+  "video.cta.href": ["youtube kanaal link", "kanaal url", "link video knop"],
   "hero.image.src": ["hero foto", "hoofdfoto", "bovenste foto", "grote foto"],
   "hero.headline": ["titel bovenaan", "hoofdtitel", "grote titel"],
   "hero.subhead": ["ondertitel bovenaan", "subtitel"],

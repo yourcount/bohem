@@ -273,7 +273,7 @@ async function fetchYoutubeVideosInternal(limit = MAX_ITEMS): Promise<YoutubeVid
 
 const getYoutubeVideosCached = unstable_cache(
   async () => fetchYoutubeVideosInternal(MAX_ITEMS),
-  ["youtube-videos-v1"],
+  ["youtube-videos-v2"],
   {
     tags: [CACHE_TAGS.youtubeVideos],
     revalidate: CACHE_REVALIDATE_SECONDS.youtubeVideos

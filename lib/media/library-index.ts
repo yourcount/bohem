@@ -18,10 +18,6 @@ type MediaIndexData = {
 const mediaIndexPath = join(process.cwd(), "data", "media-library.json");
 const mediaIndexBlobPath = "cms/media-library-v1.json";
 
-function shouldUseBlobMediaIndex() {
-  return Boolean(process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN);
-}
-
 function normalizeTag(tag: string) {
   return tag
     .toLowerCase()
@@ -88,14 +84,14 @@ function writeLocalIndex(data: MediaIndexData) {
 }
 
 export async function readMediaIndex(): Promise<MediaIndexData> {
-  if (shouldUseBlobMediaIndex()) {
+  if (Boolean(process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN)) {
     return readBlobIndex();
   }
   return readLocalIndex();
 }
 
 export async function writeMediaIndex(data: MediaIndexData) {
-  if (shouldUseBlobMediaIndex()) {
+  if (Boolean(process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN)) {
     await writeBlobIndex(data);
     return;
   }

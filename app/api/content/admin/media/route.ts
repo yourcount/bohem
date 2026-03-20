@@ -8,6 +8,7 @@ import { NextResponse } from "next/server";
 
 import { getAdminSession } from "@/lib/auth/admin-session";
 import { logAuditEvent } from "@/lib/db/admin-auth-db";
+import { getMediaBlobToken, isVercelWithoutMediaBlobStorage, shouldUseBlobMediaStorage } from "@/lib/media/blob-storage";
 import { parseTagInput, readMediaIndex, removeMediaIndexEntry, upsertMediaIndexEntry } from "@/lib/media/library-index";
 import { consumeRateLimit } from "@/lib/security/rate-limit";
 import { assertSameOrigin, getRequestMeta } from "@/lib/security/request";
@@ -18,6 +19,7 @@ const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const MAX_INPUT_PIXELS = 40_000_000;
 const MANAGED_UPLOAD_PREFIX = "/uploads/library/";
 const BLOB_UPLOAD_PREFIX = "uploads/library";
+const MEDIA_STORAGE_ENV_LABEL = "MEDIA_BLOB_READ_WRITE_TOKEN (of fallback: BLOB_READ_WRITE_TOKEN)";
 
 type ListedMediaFile = {
   src: string;
@@ -25,14 +27,6 @@ type ListedMediaFile = {
   tags: string[];
   kind: "photo" | "asset";
 };
-
-function shouldUseBlobMediaStorage() {
-  return Boolean(process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN);
-}
-
-function isVercelWithoutBlobStorage() {
-  return Boolean(process.env.VERCEL) && !process.env.BLOB_READ_WRITE_TOKEN;
-}
 
 function inferTagsFromPath(src: string) {
   const tags = new Set<string>();
@@ -117,7 +111,7 @@ async function listMediaFiles(filter: { query?: string; tag?: string; kind?: "al
     try {
       let cursor: string | undefined;
       do {
-        const page = await list({ prefix: `${BLOB_UPLOAD_PREFIX}/`, limit: 1000, cursor });
+        const page = await list({ token: getMediaBlobToken(), prefix: `${BLOB_UPLOAD_PREFIX}/`, limit: 1000, cursor });
         for (const blob of page.blobs) {
           if (!deduped.has(blob.url)) {
             deduped.set(blob.url, {
@@ -310,9 +304,9 @@ export async function POST(request: Request) {
   if (!limiter.allowed) {
     return NextResponse.json({ error: "Te veel uploads. Probeer later opnieuw.", code: "RATE_LIMITED" }, { status: 429 });
   }
-  if (isVercelWithoutBlobStorage()) {
+  if (isVercelWithoutMediaBlobStorage()) {
     return NextResponse.json(
-      { error: "Media-opslag is niet geconfigureerd. Voeg BLOB_READ_WRITE_TOKEN toe in Vercel.", code: "MEDIA_STORAGE_NOT_CONFIGURED" },
+      { error: `Media-opslag is niet geconfigureerd. Voeg ${MEDIA_STORAGE_ENV_LABEL} toe in Vercel.`, code: "MEDIA_STORAGE_NOT_CONFIGURED" },
       { status: 503 }
     );
   }
@@ -356,6 +350,7 @@ export async function POST(request: Request) {
     const { buffer, metadata } = await convertToOptimizedWebp(file);
     if (shouldUseBlobMediaStorage()) {
       const uploaded = await put(`${BLOB_UPLOAD_PREFIX}/${filename}`, buffer, {
+        token: getMediaBlobToken(),
         access: "public",
         addRandomSuffix: false,
         allowOverwrite: false,
@@ -426,9 +421,9 @@ export async function DELETE(request: Request) {
   if (!limiter.allowed) {
     return NextResponse.json({ error: "Te veel verwijderacties. Probeer later opnieuw.", code: "RATE_LIMITED" }, { status: 429 });
   }
-  if (isVercelWithoutBlobStorage()) {
+  if (isVercelWithoutMediaBlobStorage()) {
     return NextResponse.json(
-      { error: "Media-opslag is niet geconfigureerd. Voeg BLOB_READ_WRITE_TOKEN toe in Vercel.", code: "MEDIA_STORAGE_NOT_CONFIGURED" },
+      { error: `Media-opslag is niet geconfigureerd. Voeg ${MEDIA_STORAGE_ENV_LABEL} toe in Vercel.`, code: "MEDIA_STORAGE_NOT_CONFIGURED" },
       { status: 503 }
     );
   }
@@ -462,7 +457,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Ongeldig afbeeldingpad.", code: "INVALID_SRC" }, { status: 400 });
     }
     try {
-      await del(pathname);
+      await del(pathname, { token: getMediaBlobToken() });
     } catch {
       return NextResponse.json({ error: "Afbeelding kon niet verwijderd worden.", code: "FILE_DELETE_FAILED" }, { status: 404 });
     }

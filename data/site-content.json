@@ -1352,6 +1352,10 @@
         "href": "/pers"
       },
       {
+        "label": "Nieuws",
+        "href": "/nieuws"
+      },
+      {
         "label": "Contact",
         "href": "/#contact"
       }

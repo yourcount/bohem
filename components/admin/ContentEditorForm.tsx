@@ -439,6 +439,7 @@ function flattenEditableFields(value: unknown, path = "", section = ""): Editabl
   if (typeof value === "string") {
     const parts = pathParts(path);
     const leaf = parts[parts.length - 1] ?? "";
+    const isImageField = isPreviewableImageField(path, value);
     return [
       {
         path,
@@ -446,8 +447,9 @@ function flattenEditableFields(value: unknown, path = "", section = ""): Editabl
         label: labelForPath(path),
         helper: helperForPath(path),
         multiline:
-          value.length > 80 ||
-          ["description", "text", "body", "intro", "boilerplate", "note", "quote", "subhead"].includes(leaf),
+          !isImageField &&
+          (value.length > 80 ||
+            ["description", "text", "body", "intro", "boilerplate", "note", "quote", "subhead"].includes(leaf)),
         value
       }
     ];
@@ -2878,20 +2880,7 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
                     <label htmlFor={inputId} className="mb-1 block text-sm font-semibold text-[#f8f5f1]">
                       {field.label}
                     </label>
-                    {field.multiline ? (
-                      <textarea
-                        id={inputId}
-                        ref={(node) => {
-                          fieldRefs.current[field.path] = node;
-                        }}
-                        rows={4}
-                        value={field.value}
-                        onChange={(event) => onChangeField(field.path, event.target.value)}
-                        aria-invalid={Boolean(error)}
-                        aria-describedby={describedBy}
-                        className="w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-[var(--color-text-primary)]"
-                      />
-                    ) : showImageTools ? (
+                    {showImageTools ? (
                       <div className="rounded-xl border border-[var(--color-line-muted)] bg-[rgba(15,24,37,0.45)] p-3">
                         <input
                           id={inputId}
@@ -3038,6 +3027,19 @@ export function ContentEditorForm({ currentUserEmail }: { currentUserEmail: stri
                           </div>
                         ) : null}
                       </div>
+                    ) : field.multiline ? (
+                      <textarea
+                        id={inputId}
+                        ref={(node) => {
+                          fieldRefs.current[field.path] = node;
+                        }}
+                        rows={4}
+                        value={field.value}
+                        onChange={(event) => onChangeField(field.path, event.target.value)}
+                        aria-invalid={Boolean(error)}
+                        aria-describedby={describedBy}
+                        className="w-full rounded-lg border border-[var(--color-line-muted)] bg-[rgba(16,22,33,0.65)] px-3 py-2 text-[var(--color-text-primary)]"
+                      />
                     ) : (
                       <input
                         id={inputId}

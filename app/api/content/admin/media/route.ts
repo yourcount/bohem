@@ -2,7 +2,7 @@ import { mkdirSync, readdirSync, statSync, unlinkSync, writeFileSync } from "nod
 import { extname, join } from "node:path";
 import { randomBytes } from "node:crypto";
 
-import { del, list, put } from "@vercel/blob";
+import { BlobAccessError, BlobError, BlobFileTooLargeError, BlobServiceNotAvailable, BlobServiceRateLimited, BlobStoreNotFoundError, BlobStoreSuspendedError, del, list, put } from "@vercel/blob";
 import sharp from "sharp";
 import { NextResponse } from "next/server";
 
@@ -199,6 +199,82 @@ async function convertToOptimizedWebp(file: File) {
   return { buffer: output, metadata };
 }
 
+function getMediaUploadFailure(error: unknown) {
+  const details = error instanceof Error ? error.message : "Unknown upload error";
+
+  if (details === "UNSUPPORTED_IMAGE_FORMAT") {
+    return {
+      status: 415,
+      body: { error: "Afbeeldingsformaat niet toegestaan.", code: "UNSUPPORTED_FILE_TYPE", details }
+    };
+  }
+
+  if (details === "IMAGE_DIMENSIONS_INVALID") {
+    return {
+      status: 422,
+      body: {
+        error: "Afbeelding is te klein of beschadigd. Minimaal 120x120 pixels.",
+        code: "INVALID_IMAGE_DIMENSIONS",
+        details
+      }
+    };
+  }
+
+  if (error instanceof BlobStoreNotFoundError) {
+    return {
+      status: 503,
+      body: { error: "Blob-opslag kon niet gevonden worden.", code: "BLOB_STORE_NOT_FOUND", details }
+    };
+  }
+
+  if (error instanceof BlobStoreSuspendedError) {
+    return {
+      status: 503,
+      body: { error: "Blob-opslag is tijdelijk niet beschikbaar.", code: "BLOB_STORE_SUSPENDED", details }
+    };
+  }
+
+  if (error instanceof BlobServiceNotAvailable) {
+    return {
+      status: 503,
+      body: { error: "Blob-service is tijdelijk niet bereikbaar.", code: "BLOB_SERVICE_UNAVAILABLE", details }
+    };
+  }
+
+  if (error instanceof BlobServiceRateLimited) {
+    return {
+      status: 429,
+      body: { error: "Blob-service rate-limiteert deze upload. Probeer het later opnieuw.", code: "BLOB_RATE_LIMITED", details }
+    };
+  }
+
+  if (error instanceof BlobFileTooLargeError) {
+    return {
+      status: 413,
+      body: { error: "Blob-service weigert dit bestand vanwege de grootte.", code: "BLOB_FILE_TOO_LARGE", details }
+    };
+  }
+
+  if (error instanceof BlobAccessError) {
+    return {
+      status: 500,
+      body: { error: "Blob-opslag weigert de upload.", code: "BLOB_ACCESS_ERROR", details }
+    };
+  }
+
+  if (error instanceof BlobError) {
+    return {
+      status: 500,
+      body: { error: "Blob-upload mislukt.", code: "BLOB_UPLOAD_FAILED", details }
+    };
+  }
+
+  return {
+    status: 500,
+    body: { error: "Afbeelding opslaan mislukt.", code: "FILE_SAVE_FAILED", details }
+  };
+}
+
 export async function GET(request: Request) {
   const session = await getAdminSession();
   if (!session) {
@@ -331,17 +407,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, file: { src: publicUrl, name: filename, tags: savedTags } }, { status: 201 });
   } catch (error) {
     console.error("Media upload failed", error);
-    const message = error instanceof Error ? error.message : "FILE_SAVE_FAILED";
-    if (message === "UNSUPPORTED_IMAGE_FORMAT") {
-      return NextResponse.json({ error: "Afbeeldingsformaat niet toegestaan.", code: "UNSUPPORTED_FILE_TYPE" }, { status: 415 });
-    }
-    if (message === "IMAGE_DIMENSIONS_INVALID") {
-      return NextResponse.json(
-        { error: "Afbeelding is te klein of beschadigd. Minimaal 120x120 pixels.", code: "INVALID_IMAGE_DIMENSIONS" },
-        { status: 422 }
-      );
-    }
-    return NextResponse.json({ error: "Afbeelding opslaan mislukt.", code: "FILE_SAVE_FAILED" }, { status: 500 });
+    const failure = getMediaUploadFailure(error);
+    return NextResponse.json(failure.body, { status: failure.status });
   }
 }
 

@@ -27,13 +27,13 @@ const bookingRouteCtas = [
   {
     href: "/theaterconcert-boeken",
     eyebrow: "Podium",
-    title: "Theaterconcert",
+    title: "Theater",
     suffix: "boeken"
   },
   {
     href: "/huiskamerconcert-boeken",
     eyebrow: "Intiem",
-    title: "Huiskamerconcert",
+    title: "Huiskamer",
     suffix: "boeken"
   }
 ] as const;

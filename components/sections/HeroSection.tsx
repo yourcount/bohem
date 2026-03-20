@@ -98,7 +98,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
           preload
           fetchPriority="high"
           loading="eager"
-          quality={74}
+          quality={86}
           sizes="100vw"
         />
       </div>

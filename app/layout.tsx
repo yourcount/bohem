@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { AnalyticsScripts } from "@/components/analytics/AnalyticsScripts";
 import { CookieConsentProvider } from "@/components/cookies/CookieConsentProvider";
+import { ConditionalLiquidBackground } from "@/components/ui/ConditionalLiquidBackground";
 import { getSiteUrl } from "@/lib/seo";
 
 import "./globals.css";
@@ -28,12 +29,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="nl">
       <body>
-        <div aria-hidden="true" className="liquid-gradient-bg">
-          <span className="liquid-blob liquid-blob-a" />
-          <span className="liquid-blob liquid-blob-b" />
-          <span className="liquid-blob liquid-blob-c" />
-          <span className="liquid-mesh" />
-        </div>
+        <ConditionalLiquidBackground />
         <div className="site-layer">
           <CookieConsentProvider>
             <AnalyticsScripts />

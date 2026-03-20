@@ -2,7 +2,7 @@ import { mkdirSync, readdirSync, statSync, unlinkSync, writeFileSync } from "nod
 import { extname, join } from "node:path";
 import { randomBytes } from "node:crypto";
 
-import { del, put } from "@vercel/blob";
+import { del, list, put } from "@vercel/blob";
 import sharp from "sharp";
 import { NextResponse } from "next/server";
 
@@ -106,7 +106,33 @@ async function listMediaFiles(filter: { query?: string; tag?: string; kind?: "al
     deduped.set(file.src, file);
   }
 
-  const index = await readMediaIndex();
+  let index = { files: {} as Record<string, { src: string; tags: string[]; originalName?: string }> };
+  try {
+    index = await readMediaIndex();
+  } catch {
+    // Fall back to file/blob discovery if the media index is unavailable.
+  }
+
+  if (shouldUseBlobMediaStorage()) {
+    try {
+      let cursor: string | undefined;
+      do {
+        const page = await list({ prefix: `${BLOB_UPLOAD_PREFIX}/`, limit: 1000, cursor });
+        for (const blob of page.blobs) {
+          if (!deduped.has(blob.url)) {
+            deduped.set(blob.url, {
+              src: blob.url,
+              name: blob.pathname.split("/").pop() ?? blob.pathname
+            });
+          }
+        }
+        cursor = page.hasMore ? page.cursor : undefined;
+      } while (cursor);
+    } catch {
+      // Keep serving local/indexed files even when blob listing is unavailable.
+    }
+  }
+
   const query = (filter.query ?? "").trim().toLowerCase();
   const tag = (filter.tag ?? "").trim().toLowerCase();
   const kind = filter.kind ?? "all";
@@ -120,7 +146,7 @@ async function listMediaFiles(filter: { query?: string; tag?: string; kind?: "al
     }
   }
 
-  const list = Array.from(deduped.values()).map((file) => {
+  const mediaList = Array.from(deduped.values()).map((file) => {
     const indexed = index.files[file.src];
     const inferred = inferTagsFromPath(file.src);
     const tags = Array.from(new Set([...(indexed?.tags ?? []), ...inferred]));
@@ -134,7 +160,7 @@ async function listMediaFiles(filter: { query?: string; tag?: string; kind?: "al
     };
   });
 
-  return list
+  return mediaList
     .filter((file) => {
       if (kind === "photo" && file.kind !== "photo") {
         return false;
@@ -266,32 +292,43 @@ export async function POST(request: Request) {
       writeFileSync(absolutePath, buffer, { flag: "wx" });
     }
 
-    const indexEntry = await upsertMediaIndexEntry(publicUrl, {
-      tags: requestedTags,
-      originalName: file.name,
-      blobPath
-    });
+    let savedTags = requestedTags;
 
-    await logAuditEvent({
-      actorUserId: session.uid,
-      actorEmail: session.email,
-      action: "CONTENT_MEDIA_UPLOADED",
-      targetType: "media",
-      targetId: publicUrl,
-      metadata: {
-        mime: file.type,
-        size: file.size,
-        tags: indexEntry.tags,
-        optimizedTo: "webp",
-        sourceFormat: metadata.format ?? "unknown",
-        sourceWidth: metadata.width ?? null,
-        sourceHeight: metadata.height ?? null
-      },
-      ipAddress: ip,
-      userAgent
-    });
+    try {
+      const indexEntry = await upsertMediaIndexEntry(publicUrl, {
+        tags: requestedTags,
+        originalName: file.name,
+        blobPath
+      });
+      savedTags = indexEntry.tags;
+    } catch (indexError) {
+      console.error("Media index update failed", indexError);
+    }
 
-    return NextResponse.json({ ok: true, file: { src: publicUrl, name: filename, tags: indexEntry.tags } }, { status: 201 });
+    try {
+      await logAuditEvent({
+        actorUserId: session.uid,
+        actorEmail: session.email,
+        action: "CONTENT_MEDIA_UPLOADED",
+        targetType: "media",
+        targetId: publicUrl,
+        metadata: {
+          mime: file.type,
+          size: file.size,
+          tags: savedTags,
+          optimizedTo: "webp",
+          sourceFormat: metadata.format ?? "unknown",
+          sourceWidth: metadata.width ?? null,
+          sourceHeight: metadata.height ?? null
+        },
+        ipAddress: ip,
+        userAgent
+      });
+    } catch (auditError) {
+      console.error("Media upload audit log failed", auditError);
+    }
+
+    return NextResponse.json({ ok: true, file: { src: publicUrl, name: filename, tags: savedTags } }, { status: 201 });
   } catch (error) {
     console.error("Media upload failed", error);
     const message = error instanceof Error ? error.message : "FILE_SAVE_FAILED";
@@ -383,18 +420,26 @@ export async function DELETE(request: Request) {
     }
   }
 
-  await removeMediaIndexEntry(src);
+  try {
+    await removeMediaIndexEntry(src);
+  } catch (indexError) {
+    console.error("Media index delete failed", indexError);
+  }
 
-  await logAuditEvent({
-    actorUserId: session.uid,
-    actorEmail: session.email,
-    action: "CONTENT_MEDIA_DELETED",
-    targetType: "media",
-    targetId: src,
-    metadata: { src },
-    ipAddress: ip,
-    userAgent
-  });
+  try {
+    await logAuditEvent({
+      actorUserId: session.uid,
+      actorEmail: session.email,
+      action: "CONTENT_MEDIA_DELETED",
+      targetType: "media",
+      targetId: src,
+      metadata: { src },
+      ipAddress: ip,
+      userAgent
+    });
+  } catch (auditError) {
+    console.error("Media delete audit log failed", auditError);
+  }
 
   return NextResponse.json({ ok: true, removed: src }, { status: 200 });
 }

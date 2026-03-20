@@ -21,6 +21,12 @@
   --color-accent-amber: #f28b0e;
   --color-accent-copper: #b52f1d;
   --color-line-muted: #438785;
+  --ambient-teal-rgb: 40 167 193;
+  --ambient-amber-rgb: 242 139 14;
+  --ambient-copper-rgb: 181 47 29;
+  --ambient-violet-rgb: 77 65 110;
+  --ambient-sand-rgb: 243 215 176;
+  --ambient-deep-rgb: 16 26 42;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -61,8 +67,9 @@ body {
   line-height: 1.6;
   color: var(--color-text-primary);
   background:
-    radial-gradient(circle at 12% 8%, rgba(40, 167, 193, 0.24) 0%, transparent 38%),
-    radial-gradient(circle at 86% 10%, rgba(242, 139, 14, 0.3) 0%, transparent 36%),
+    radial-gradient(circle at 14% 10%, rgb(var(--ambient-teal-rgb) / 0.2) 0%, transparent 40%),
+    radial-gradient(circle at 84% 12%, rgb(var(--ambient-amber-rgb) / 0.24) 0%, transparent 38%),
+    radial-gradient(circle at 54% 100%, rgb(var(--ambient-violet-rgb) / 0.14) 0%, transparent 42%),
     linear-gradient(165deg, #101a2a 0%, #1b2d47 45%, #4d416e 100%);
 }
 
@@ -77,8 +84,8 @@ body {
   inset: -12%;
   z-index: 0;
   overflow: hidden;
-  opacity: 0.96;
-  filter: saturate(1.18) contrast(1.08);
+  opacity: 0.34;
+  filter: saturate(1.02) contrast(1.02);
 }
 
 .liquid-blob,
@@ -90,7 +97,7 @@ body {
 
 .liquid-blob {
   filter: blur(28px);
-  mix-blend-mode: screen;
+  mix-blend-mode: soft-light;
 }
 
 .liquid-blob-a {
@@ -101,9 +108,9 @@ body {
   min-width: 300px;
   min-height: 260px;
   background:
-    radial-gradient(circle at 26% 22%, rgba(142, 234, 255, 0.34) 0%, transparent 18%),
-    radial-gradient(circle at 36% 30%, rgba(40, 167, 193, 0.66) 0%, rgba(40, 167, 193, 0.28) 38%, transparent 72%),
-    radial-gradient(circle at 72% 62%, rgba(67, 135, 133, 0.34) 0%, transparent 62%);
+    radial-gradient(circle at 26% 22%, rgb(var(--ambient-sand-rgb) / 0.1) 0%, transparent 16%),
+    radial-gradient(circle at 36% 30%, rgb(var(--ambient-teal-rgb) / 0.54) 0%, rgb(var(--ambient-teal-rgb) / 0.2) 38%, transparent 72%),
+    radial-gradient(circle at 72% 62%, rgb(67 135 133 / 0.24) 0%, transparent 62%);
   animation: liquidFloatA 18s ease-in-out infinite alternate;
 }
 
@@ -115,9 +122,9 @@ body {
   min-width: 260px;
   min-height: 240px;
   background:
-    radial-gradient(circle at 42% 30%, rgba(255, 222, 168, 0.28) 0%, transparent 18%),
-    radial-gradient(circle at 48% 36%, rgba(242, 139, 14, 0.58) 0%, rgba(242, 139, 14, 0.22) 42%, transparent 72%),
-    radial-gradient(circle at 68% 62%, rgba(181, 47, 29, 0.3) 0%, transparent 62%);
+    radial-gradient(circle at 42% 30%, rgb(var(--ambient-sand-rgb) / 0.18) 0%, transparent 18%),
+    radial-gradient(circle at 48% 36%, rgb(var(--ambient-amber-rgb) / 0.48) 0%, rgb(var(--ambient-amber-rgb) / 0.2) 42%, transparent 72%),
+    radial-gradient(circle at 68% 62%, rgb(var(--ambient-copper-rgb) / 0.22) 0%, transparent 62%);
   animation: liquidFloatB 21s ease-in-out infinite alternate;
 }
 
@@ -129,9 +136,9 @@ body {
   min-width: 340px;
   min-height: 240px;
   background:
-    radial-gradient(circle at 28% 34%, rgba(214, 180, 255, 0.18) 0%, transparent 18%),
-    radial-gradient(circle at 30% 38%, rgba(77, 65, 110, 0.48) 0%, rgba(77, 65, 110, 0.2) 46%, transparent 74%),
-    radial-gradient(circle at 64% 52%, rgba(40, 167, 193, 0.28) 0%, transparent 68%);
+    radial-gradient(circle at 28% 34%, rgb(var(--ambient-sand-rgb) / 0.08) 0%, transparent 16%),
+    radial-gradient(circle at 30% 38%, rgb(var(--ambient-violet-rgb) / 0.42) 0%, rgb(var(--ambient-violet-rgb) / 0.16) 46%, transparent 74%),
+    radial-gradient(circle at 64% 52%, rgb(var(--ambient-teal-rgb) / 0.2) 0%, transparent 68%);
   animation: liquidFloatC 23s ease-in-out infinite alternate;
 }
 
@@ -139,13 +146,13 @@ body {
   inset: 0;
   border-radius: 0;
   background:
-    radial-gradient(circle at 12% 16%, rgba(255, 255, 255, 0.12) 0%, transparent 12%),
-    radial-gradient(circle at 82% 18%, rgba(243, 215, 176, 0.16) 0%, transparent 15%),
-    radial-gradient(circle at 36% 78%, rgba(40, 167, 193, 0.15) 0%, transparent 18%),
-    radial-gradient(circle at 74% 74%, rgba(242, 139, 14, 0.14) 0%, transparent 16%),
-    radial-gradient(circle at 52% 42%, rgba(181, 47, 29, 0.08) 0%, transparent 22%);
-  filter: blur(10px);
-  opacity: 0.94;
+    radial-gradient(circle at 12% 16%, rgb(var(--ambient-sand-rgb) / 0.08) 0%, transparent 12%),
+    radial-gradient(circle at 82% 18%, rgb(var(--ambient-sand-rgb) / 0.12) 0%, transparent 15%),
+    radial-gradient(circle at 36% 78%, rgb(var(--ambient-teal-rgb) / 0.12) 0%, transparent 18%),
+    radial-gradient(circle at 74% 74%, rgb(var(--ambient-amber-rgb) / 0.12) 0%, transparent 16%),
+    radial-gradient(circle at 52% 42%, rgb(var(--ambient-copper-rgb) / 0.08) 0%, transparent 22%);
+  filter: blur(12px);
+  opacity: 0.76;
   animation: liquidMeshShift 18s linear infinite alternate;
 }
 
@@ -293,23 +300,16 @@ body {
     radial-gradient(circle at 50% 112%, rgba(0, 0, 0, 0.26) 0%, transparent 36%);
 }
 
-.section-contrast-open::after,
-.section-contrast-deep::after {
-  content: "";
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-}
-
-.section-contrast-open::after {
-  background:
+.section-contrast-open {
+  --section-liquid-wash:
     radial-gradient(circle at 18% 14%, rgba(243, 215, 176, 0.06) 0%, transparent 28%),
+    radial-gradient(circle at 74% 34%, rgba(40, 167, 193, 0.08) 0%, transparent 24%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 28%, rgba(0, 0, 0, 0.04) 100%);
 }
 
-.section-contrast-deep::after {
-  background:
+.section-contrast-deep {
+  --section-liquid-wash:
+    radial-gradient(circle at 18% 72%, rgba(181, 47, 29, 0.08) 0%, transparent 26%),
     radial-gradient(circle at 82% 14%, rgba(242, 139, 14, 0.08) 0%, transparent 24%),
     linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, transparent 24%, rgba(0, 0, 0, 0.1) 100%);
 }
@@ -375,6 +375,8 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .liquid-blob,
   .liquid-mesh,
+  .section-ambient::before,
+  .section-ambient::after,
   .video-accordion-card,
   .video-side-stack .video-accordion-card {
     transition: none;
@@ -981,6 +983,15 @@ p {
   box-shadow:
     inset 0 90px 90px -90px rgba(255, 192, 125, 0.14),
     inset 0 -120px 110px -96px rgba(8, 12, 20, 0.56);
+  --section-liquid-opacity: 0.68;
+  --section-liquid-blend:
+    radial-gradient(circle at 14% 18%, rgb(var(--ambient-amber-rgb) / 0.16) 0%, transparent 30%),
+    radial-gradient(circle at 84% 22%, rgb(var(--ambient-teal-rgb) / 0.14) 0%, transparent 32%),
+    radial-gradient(circle at 64% 78%, rgb(var(--ambient-copper-rgb) / 0.12) 0%, transparent 38%);
+  --section-liquid-wash:
+    radial-gradient(circle at 22% 56%, rgb(var(--ambient-sand-rgb) / 0.07) 0%, transparent 24%),
+    radial-gradient(circle at 76% 36%, rgb(var(--ambient-teal-rgb) / 0.07) 0%, transparent 26%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.015) 0%, transparent 24%, rgb(var(--ambient-deep-rgb) / 0.04) 100%);
 }
 
 section.section-ambient + section.section-ambient {
@@ -992,34 +1003,56 @@ section.section-ambient + section.section-ambient {
   pointer-events: none;
   position: absolute;
   inset: 0;
+  z-index: -1;
+  background-image: var(--section-liquid-blend);
   background-repeat: no-repeat;
-  opacity: 0.44;
+  background-size: 132% 132%;
+  background-position: 0% 0%, 100% 0%, 40% 100%;
+  opacity: var(--section-liquid-opacity);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
+  animation: sectionLiquidDrift 24s ease-in-out infinite alternate;
 }
 
-.section-ambient-bio::before {
-  background-image:
-    radial-gradient(circle at 14% 18%, rgba(255, 172, 92, 0.2) 0%, transparent 34%),
-    radial-gradient(circle at 86% 22%, rgba(76, 160, 174, 0.16) 0%, transparent 36%),
-    radial-gradient(circle at 74% 82%, rgba(181, 47, 29, 0.14) 0%, transparent 40%);
-}
-
-.section-ambient-bio::after {
+.section-ambient::after {
   content: "";
   pointer-events: none;
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at 24% 62%, rgba(255, 207, 147, 0.14) 0%, transparent 30%),
-    radial-gradient(circle at 64% 10%, rgba(105, 181, 196, 0.12) 0%, transparent 34%);
-  opacity: 0.9;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 86%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 86%, transparent 100%);
+  z-index: -1;
+  background-image: var(--section-liquid-wash);
+  background-repeat: no-repeat;
+  background-size: 124% 124%;
+  background-position: 20% 12%, 82% 38%, center;
+  opacity: calc(var(--section-liquid-opacity) * 0.62);
+  mix-blend-mode: soft-light;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  animation: sectionLiquidDriftReverse 28s ease-in-out infinite alternate;
+}
+
+.section-ambient-bio::before {
+  --section-liquid-opacity: 0.78;
+  --section-liquid-blend:
+    radial-gradient(circle at 14% 18%, rgb(var(--ambient-amber-rgb) / 0.2) 0%, transparent 34%),
+    radial-gradient(circle at 86% 22%, rgb(var(--ambient-teal-rgb) / 0.16) 0%, transparent 36%),
+    radial-gradient(circle at 74% 82%, rgb(var(--ambient-copper-rgb) / 0.14) 0%, transparent 40%);
+  --section-liquid-wash:
+    radial-gradient(circle at 24% 62%, rgb(var(--ambient-sand-rgb) / 0.12) 0%, transparent 30%),
+    radial-gradient(circle at 64% 10%, rgb(var(--ambient-teal-rgb) / 0.12) 0%, transparent 34%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.02) 0%, transparent 24%, rgb(var(--ambient-deep-rgb) / 0.05) 100%);
 }
 
 .section-ambient-discography::before {
-  background-image: radial-gradient(circle at 88% 16%, rgba(242, 139, 14, 0.2) 0%, transparent 40%);
+  --section-liquid-opacity: 0.82;
+  --section-liquid-blend:
+    radial-gradient(circle at 12% 24%, rgb(var(--ambient-teal-rgb) / 0.18) 0%, transparent 36%),
+    radial-gradient(circle at 88% 16%, rgb(var(--ambient-amber-rgb) / 0.22) 0%, transparent 40%),
+    radial-gradient(circle at 62% 76%, rgb(var(--ambient-copper-rgb) / 0.14) 0%, transparent 36%);
+  --section-liquid-wash:
+    radial-gradient(circle at 18% 78%, rgb(var(--ambient-teal-rgb) / 0.09) 0%, transparent 26%),
+    radial-gradient(circle at 84% 56%, rgb(var(--ambient-sand-rgb) / 0.09) 0%, transparent 22%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.02) 0%, transparent 22%, rgb(var(--ambient-deep-rgb) / 0.04) 100%);
 }
 
 .discography-parallax {
@@ -1027,15 +1060,26 @@ section.section-ambient + section.section-ambient {
 }
 
 .section-ambient-experience::before {
-  background-image: radial-gradient(circle at 18% 76%, rgba(181, 47, 29, 0.18) 0%, transparent 42%);
+  --section-liquid-blend:
+    radial-gradient(circle at 18% 76%, rgba(181, 47, 29, 0.2) 0%, transparent 42%),
+    radial-gradient(circle at 82% 20%, rgba(128, 110, 188, 0.16) 0%, transparent 38%),
+    radial-gradient(circle at 46% 26%, rgba(243, 215, 176, 0.09) 0%, transparent 28%);
 }
 
 .section-ambient-bookings::before {
-  background-image: radial-gradient(circle at 78% 20%, rgba(40, 167, 193, 0.18) 0%, transparent 40%);
+  --section-liquid-opacity: 0.72;
+  --section-liquid-blend:
+    radial-gradient(circle at 18% 80%, rgb(var(--ambient-copper-rgb) / 0.16) 0%, transparent 40%),
+    radial-gradient(circle at 78% 20%, rgb(var(--ambient-teal-rgb) / 0.18) 0%, transparent 40%),
+    radial-gradient(circle at 42% 18%, rgb(var(--ambient-sand-rgb) / 0.09) 0%, transparent 28%);
 }
 
 .section-ambient-contact::before {
-  background-image: radial-gradient(circle at 16% 18%, rgba(242, 139, 14, 0.16) 0%, transparent 42%);
+  --section-liquid-opacity: 0.74;
+  --section-liquid-blend:
+    radial-gradient(circle at 16% 18%, rgb(var(--ambient-amber-rgb) / 0.18) 0%, transparent 42%),
+    radial-gradient(circle at 84% 72%, rgb(var(--ambient-teal-rgb) / 0.14) 0%, transparent 36%),
+    radial-gradient(circle at 58% 26%, rgb(var(--ambient-sand-rgb) / 0.08) 0%, transparent 26%);
 }
 
 .hero-spotlight-shell {
@@ -1069,6 +1113,36 @@ section.section-ambient + section.section-ambient {
     radial-gradient(circle at calc(var(--hero-spot-x) - 8%) calc(var(--hero-spot-y) + 14%), rgba(52, 96, 128, 0.12) 0%, transparent 34%);
   transition: background 220ms linear;
   animation: heroSpotlightBreath 7.8s ease-in-out infinite;
+}
+
+@keyframes sectionLiquidDrift {
+  0% {
+    transform: translate3d(-1.5%, -1%, 0) scale(1);
+    background-position: 0% 0%, 100% 0%, 48% 100%;
+  }
+  50% {
+    transform: translate3d(1%, 1.25%, 0) scale(1.035);
+    background-position: 8% 6%, 92% 10%, 44% 92%;
+  }
+  100% {
+    transform: translate3d(-0.5%, 1.5%, 0) scale(1.02);
+    background-position: 4% 10%, 96% 4%, 52% 96%;
+  }
+}
+
+@keyframes sectionLiquidDriftReverse {
+  0% {
+    transform: translate3d(1%, 0%, 0) scale(1.01);
+    background-position: 20% 12%, 82% 38%, center;
+  }
+  50% {
+    transform: translate3d(-1.2%, -1%, 0) scale(1.04);
+    background-position: 14% 20%, 88% 30%, center;
+  }
+  100% {
+    transform: translate3d(0.5%, 1.5%, 0) scale(1.015);
+    background-position: 24% 8%, 78% 42%, center;
+  }
 }
 
 .hero-scroll-indicator {

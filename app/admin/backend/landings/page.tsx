@@ -18,9 +18,9 @@ export default async function SuperAdminLandingsPage() {
     <main className="mx-auto w-full max-w-[1240px] px-4 py-12 sm:px-6">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-4xl">SEO landingspagina's</h1>
+          <h1 className="font-display text-4xl">SEO landingspagina&apos;s</h1>
           <p className="text-sm text-[#d9c6ac]">
-            Beheer de extra zoekpagina's voor muziekduo boeken, theaterconcert boeken, Kampvuurklanken, huiskamerconcert boeken en pers.
+            Beheer de extra zoekpagina&apos;s voor muziekduo boeken, theaterconcert boeken, Kampvuurklanken, huiskamerconcert boeken, live muziek, teamavonden, culturele events, luisterconcerten en pers.
           </p>
         </div>
         <div className="flex items-center gap-3">

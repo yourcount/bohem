@@ -18,11 +18,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: (route.key === "press" ? "monthly" : "weekly") as MetadataRoute.Sitemap[number]["changeFrequency"],
       priority:
-        route.key === "musicDuo"
+        route.key === "musicDuo" || route.key === "liveMusic"
           ? 0.9
-          : route.key === "theaterConcert" || route.key === "kampvuur"
+          : route.key === "theaterConcert" || route.key === "kampvuur" || route.key === "culturalEvent" || route.key === "listeningConcert"
             ? 0.85
-            : route.key === "huiskamerconcert"
+            : route.key === "huiskamerconcert" || route.key === "teamEvening"
               ? 0.8
               : 0.7
     }))

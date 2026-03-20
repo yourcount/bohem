@@ -95,7 +95,7 @@ const domains = [
   {
     key: "landings",
     title: "SEO landings",
-    description: "Muziekduo boeken, theaterconcert boeken, Kampvuurklanken, huiskamerconcert boeken en pers.",
+    description: "Muziekduo boeken, theaterconcert boeken, Kampvuurklanken, huiskamerconcert boeken, live muziek, teamavonden, culturele events, luisterconcerten en pers.",
     status: "Nieuw",
     href: "/admin/backend/landings"
   },

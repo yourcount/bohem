@@ -272,6 +272,10 @@ export type SiteContent = {
     theaterConcert: LandingPageContent;
     kampvuur: LandingPageContent;
     huiskamerconcert: LandingPageContent;
+    liveMusic: LandingPageContent;
+    teamEvening: LandingPageContent;
+    culturalEvent: LandingPageContent;
+    listeningConcert: LandingPageContent;
     press: LandingPageContent;
   };
   contact: {

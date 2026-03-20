@@ -5,7 +5,16 @@ import { useEffect, useMemo, useState } from "react";
 import { StickyStatusBar, formatFieldErrors, useUnsavedChangesGuard, type StatusTone } from "@/components/super-admin/admin-ui";
 import type { LandingExtraSection, LandingFaqItem, LandingHighlightItem, LandingPageContent, LandingSocialProofItem } from "@/lib/types";
 
-type LandingPageKey = "musicDuo" | "theaterConcert" | "kampvuur" | "huiskamerconcert" | "press";
+type LandingPageKey =
+  | "musicDuo"
+  | "theaterConcert"
+  | "kampvuur"
+  | "huiskamerconcert"
+  | "liveMusic"
+  | "teamEvening"
+  | "culturalEvent"
+  | "listeningConcert"
+  | "press";
 
 type LandingPageDraft = LandingPageContent;
 
@@ -50,6 +59,26 @@ const PAGE_META: Array<{
     key: "huiskamerconcert",
     title: "Huiskamerconcert boeken",
     description: "Pagina voor intieme, kleinschalige live settings."
+  },
+  {
+    key: "liveMusic",
+    title: "Live muziek boeken",
+    description: "Brede SEO-pagina voor organisatoren die live muziek zoeken zonder coverband-insteek."
+  },
+  {
+    key: "teamEvening",
+    title: "Muzikale teamavond",
+    description: "Niet-branded SEO-ingang voor teams en organisaties."
+  },
+  {
+    key: "culturalEvent",
+    title: "Muziek voor cultureel event",
+    description: "Pagina voor programmeurs, cultuurorganisaties en eventcuratoren."
+  },
+  {
+    key: "listeningConcert",
+    title: "Luisterconcert boeken",
+    description: "Pagina voor luisteravonden en aandachtige concertsettings."
   },
   {
     key: "press",
@@ -233,6 +262,10 @@ function normalizeLandingPages(value: unknown): LandingPagesDraft {
     theaterConcert: normalizeLandingPage(current.theaterConcert),
     kampvuur: normalizeLandingPage(current.kampvuur),
     huiskamerconcert: normalizeLandingPage(current.huiskamerconcert),
+    liveMusic: normalizeLandingPage(current.liveMusic),
+    teamEvening: normalizeLandingPage(current.teamEvening),
+    culturalEvent: normalizeLandingPage(current.culturalEvent),
+    listeningConcert: normalizeLandingPage(current.listeningConcert),
     press: normalizeLandingPage(current.press)
   };
 }
@@ -475,7 +508,7 @@ function PageSection({
               Vorm van het kernblok
               <select className={pageFieldClass()} value={value.highlightsVariant ?? "cards"} onChange={(event) => update("highlightsVariant", event.target.value as LandingPageDraft["highlightsVariant"])}>
                 <option value="cards">Losse kaarten</option>
-                <option value="split-scenarios">Scenario's naast elkaar</option>
+                <option value="split-scenarios">Scenario&apos;s naast elkaar</option>
                 <option value="editorial-list">Redactionele lijst</option>
                 <option value="host-flow">Verloop of host-flow</option>
                 <option value="facts">Kernfeiten</option>
@@ -672,7 +705,7 @@ function PageSection({
           <div className="grid gap-5 rounded-2xl border border-[rgba(67,135,133,0.45)] bg-[rgba(18,30,46,0.38)] p-5">
             <div>
               <h3 className="font-display text-2xl">Lokaal</h3>
-              <p className="text-sm text-[#d9c6ac]">Gebruik dit blok om deze landingspagina regionaal relevanter te maken zonder aparte stadspagina's te bouwen.</p>
+              <p className="text-sm text-[#d9c6ac]">Gebruik dit blok om deze landingspagina regionaal relevanter te maken zonder aparte stadspagina&apos;s te bouwen.</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
@@ -966,7 +999,7 @@ export function LandingPagesForm() {
   };
 
   if (isLoading || !form || !initial) {
-    return <p className="text-sm text-[#d9c6ac]">Landingspagina's laden...</p>;
+    return <p className="text-sm text-[#d9c6ac]">Landingspagina&apos;s laden...</p>;
   }
 
   return (

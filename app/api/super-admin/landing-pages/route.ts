@@ -116,6 +116,10 @@ export async function PATCH(request: Request) {
       revalidatePublicSiteCaches("/theaterconcert-boeken");
       revalidatePublicSiteCaches("/kampvuurklanken");
       revalidatePublicSiteCaches("/huiskamerconcert-boeken");
+      revalidatePublicSiteCaches("/live-muziek-boeken");
+      revalidatePublicSiteCaches("/muzikale-teamavond");
+      revalidatePublicSiteCaches("/muziek-voor-cultureel-event");
+      revalidatePublicSiteCaches("/luisterconcert-boeken");
       revalidatePublicSiteCaches("/pers");
     }
 

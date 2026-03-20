@@ -377,6 +377,58 @@ export function sanitizeSiteContent(content: SiteContent): SiteContent {
         localFaqItems: sanitizeLandingFaqItems(content.landingPages?.huiskamerconcert?.localFaqItems, siteContent.landingPages.huiskamerconcert.localFaqItems),
         localLinkHref: sanitizeOptionalHref(content.landingPages?.huiskamerconcert?.localLinkHref, siteContent.landingPages.huiskamerconcert.localLinkHref ?? "")
       },
+      liveMusic: {
+        ...siteContent.landingPages.liveMusic,
+        ...content.landingPages?.liveMusic,
+        cta: sanitizeLandingCta(content.landingPages?.liveMusic?.cta, siteContent.landingPages.liveMusic.cta),
+        faqItems: sanitizeLandingFaqItems(content.landingPages?.liveMusic?.faqItems, siteContent.landingPages.liveMusic.faqItems),
+        practicalInfoItems: sanitizeTextList(content.landingPages?.liveMusic?.practicalInfoItems, siteContent.landingPages.liveMusic.practicalInfoItems),
+        ctaProofItems: sanitizeTextList(content.landingPages?.liveMusic?.ctaProofItems, siteContent.landingPages.liveMusic.ctaProofItems),
+        socialProofItems: sanitizeLandingSocialProofItems(content.landingPages?.liveMusic?.socialProofItems, siteContent.landingPages.liveMusic.socialProofItems),
+        priorityCities: sanitizeTextList(content.landingPages?.liveMusic?.priorityCities, siteContent.landingPages.liveMusic.priorityCities),
+        localProofItems: sanitizeTextList(content.landingPages?.liveMusic?.localProofItems, siteContent.landingPages.liveMusic.localProofItems),
+        localFaqItems: sanitizeLandingFaqItems(content.landingPages?.liveMusic?.localFaqItems, siteContent.landingPages.liveMusic.localFaqItems),
+        localLinkHref: sanitizeOptionalHref(content.landingPages?.liveMusic?.localLinkHref, siteContent.landingPages.liveMusic.localLinkHref ?? "")
+      },
+      teamEvening: {
+        ...siteContent.landingPages.teamEvening,
+        ...content.landingPages?.teamEvening,
+        cta: sanitizeLandingCta(content.landingPages?.teamEvening?.cta, siteContent.landingPages.teamEvening.cta),
+        faqItems: sanitizeLandingFaqItems(content.landingPages?.teamEvening?.faqItems, siteContent.landingPages.teamEvening.faqItems),
+        practicalInfoItems: sanitizeTextList(content.landingPages?.teamEvening?.practicalInfoItems, siteContent.landingPages.teamEvening.practicalInfoItems),
+        ctaProofItems: sanitizeTextList(content.landingPages?.teamEvening?.ctaProofItems, siteContent.landingPages.teamEvening.ctaProofItems),
+        socialProofItems: sanitizeLandingSocialProofItems(content.landingPages?.teamEvening?.socialProofItems, siteContent.landingPages.teamEvening.socialProofItems),
+        priorityCities: sanitizeTextList(content.landingPages?.teamEvening?.priorityCities, siteContent.landingPages.teamEvening.priorityCities),
+        localProofItems: sanitizeTextList(content.landingPages?.teamEvening?.localProofItems, siteContent.landingPages.teamEvening.localProofItems),
+        localFaqItems: sanitizeLandingFaqItems(content.landingPages?.teamEvening?.localFaqItems, siteContent.landingPages.teamEvening.localFaqItems),
+        localLinkHref: sanitizeOptionalHref(content.landingPages?.teamEvening?.localLinkHref, siteContent.landingPages.teamEvening.localLinkHref ?? "")
+      },
+      culturalEvent: {
+        ...siteContent.landingPages.culturalEvent,
+        ...content.landingPages?.culturalEvent,
+        cta: sanitizeLandingCta(content.landingPages?.culturalEvent?.cta, siteContent.landingPages.culturalEvent.cta),
+        faqItems: sanitizeLandingFaqItems(content.landingPages?.culturalEvent?.faqItems, siteContent.landingPages.culturalEvent.faqItems),
+        practicalInfoItems: sanitizeTextList(content.landingPages?.culturalEvent?.practicalInfoItems, siteContent.landingPages.culturalEvent.practicalInfoItems),
+        ctaProofItems: sanitizeTextList(content.landingPages?.culturalEvent?.ctaProofItems, siteContent.landingPages.culturalEvent.ctaProofItems),
+        socialProofItems: sanitizeLandingSocialProofItems(content.landingPages?.culturalEvent?.socialProofItems, siteContent.landingPages.culturalEvent.socialProofItems),
+        priorityCities: sanitizeTextList(content.landingPages?.culturalEvent?.priorityCities, siteContent.landingPages.culturalEvent.priorityCities),
+        localProofItems: sanitizeTextList(content.landingPages?.culturalEvent?.localProofItems, siteContent.landingPages.culturalEvent.localProofItems),
+        localFaqItems: sanitizeLandingFaqItems(content.landingPages?.culturalEvent?.localFaqItems, siteContent.landingPages.culturalEvent.localFaqItems),
+        localLinkHref: sanitizeOptionalHref(content.landingPages?.culturalEvent?.localLinkHref, siteContent.landingPages.culturalEvent.localLinkHref ?? "")
+      },
+      listeningConcert: {
+        ...siteContent.landingPages.listeningConcert,
+        ...content.landingPages?.listeningConcert,
+        cta: sanitizeLandingCta(content.landingPages?.listeningConcert?.cta, siteContent.landingPages.listeningConcert.cta),
+        faqItems: sanitizeLandingFaqItems(content.landingPages?.listeningConcert?.faqItems, siteContent.landingPages.listeningConcert.faqItems),
+        practicalInfoItems: sanitizeTextList(content.landingPages?.listeningConcert?.practicalInfoItems, siteContent.landingPages.listeningConcert.practicalInfoItems),
+        ctaProofItems: sanitizeTextList(content.landingPages?.listeningConcert?.ctaProofItems, siteContent.landingPages.listeningConcert.ctaProofItems),
+        socialProofItems: sanitizeLandingSocialProofItems(content.landingPages?.listeningConcert?.socialProofItems, siteContent.landingPages.listeningConcert.socialProofItems),
+        priorityCities: sanitizeTextList(content.landingPages?.listeningConcert?.priorityCities, siteContent.landingPages.listeningConcert.priorityCities),
+        localProofItems: sanitizeTextList(content.landingPages?.listeningConcert?.localProofItems, siteContent.landingPages.listeningConcert.localProofItems),
+        localFaqItems: sanitizeLandingFaqItems(content.landingPages?.listeningConcert?.localFaqItems, siteContent.landingPages.listeningConcert.localFaqItems),
+        localLinkHref: sanitizeOptionalHref(content.landingPages?.listeningConcert?.localLinkHref, siteContent.landingPages.listeningConcert.localLinkHref ?? "")
+      },
       press: {
         ...siteContent.landingPages.press,
         ...content.landingPages?.press,

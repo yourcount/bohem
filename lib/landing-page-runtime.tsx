@@ -8,10 +8,14 @@ import { LandingLocalArea } from "@/components/landing/LandingLocalArea";
 import { LandingPracticalInfo } from "@/components/landing/LandingPracticalInfo";
 import { LandingSocialProof } from "@/components/landing/LandingSocialProof";
 import {
+  buildCulturalEventLanding,
   buildHuiskamerConcertLanding,
   buildKampvuurLanding,
+  buildListeningConcertLanding,
+  buildLiveMusicLanding,
   buildMusicDuoLanding,
   buildPersLanding,
+  buildTeamEveningLanding,
   buildTheaterConcertLanding,
   type LandingRouteView
 } from "@/components/landing/landing-content";
@@ -39,6 +43,14 @@ function getLandingRouteView(siteContent: SiteContent, landingKey: LandingPageKe
       return buildKampvuurLanding(siteContent);
     case "huiskamerconcert":
       return buildHuiskamerConcertLanding(siteContent);
+    case "liveMusic":
+      return buildLiveMusicLanding(siteContent);
+    case "teamEvening":
+      return buildTeamEveningLanding(siteContent);
+    case "culturalEvent":
+      return buildCulturalEventLanding(siteContent);
+    case "listeningConcert":
+      return buildListeningConcertLanding(siteContent);
     case "press":
       return buildPersLanding(siteContent);
     default:
@@ -57,6 +69,10 @@ function getStickyLandingSectionIds(landingKey: LandingPageKey, options: { hasHi
 
   if (landingKey === "musicDuo" || landingKey === "theaterConcert") {
     if (options.hasShows) ids.push("shows");
+  }
+
+  if (landingKey === "liveMusic" && options.hasShows) {
+    ids.push("shows");
   }
 
   if (landingKey === "huiskamerconcert" && options.hasLocalArea) {
@@ -87,7 +103,7 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
   const view = getLandingRouteView(siteContent, landingKey);
   const visibleShows = filterFutureShows(siteContent.bookings.upcomingShows);
   const showLandingShows =
-    (landingKey === "musicDuo" || landingKey === "theaterConcert" || landingKey === "huiskamerconcert") &&
+    (landingKey === "musicDuo" || landingKey === "theaterConcert" || landingKey === "huiskamerconcert" || landingKey === "liveMusic") &&
     visibleShows.length > 0 &&
     view.shows;
   const stickyVisibleSectionIds =
@@ -231,6 +247,43 @@ export async function renderLandingPage(landingKey: LandingPageKey) {
           {highlightSection}
           {practicalInfoSection}
           {localAreaSection}
+          {socialProofSection}
+          {faqSection}
+        </>
+      ) : null}
+
+      {landingKey === "liveMusic" ? (
+        <>
+          {highlightSection}
+          {showsSection}
+          {practicalInfoSection}
+          {socialProofSection}
+          {faqSection}
+        </>
+      ) : null}
+
+      {landingKey === "teamEvening" ? (
+        <>
+          {highlightSection}
+          {practicalInfoSection}
+          {socialProofSection}
+          {faqSection}
+        </>
+      ) : null}
+
+      {landingKey === "culturalEvent" ? (
+        <>
+          {highlightSection}
+          {practicalInfoSection}
+          {socialProofSection}
+          {faqSection}
+        </>
+      ) : null}
+
+      {landingKey === "listeningConcert" ? (
+        <>
+          {highlightSection}
+          {practicalInfoSection}
           {socialProofSection}
           {faqSection}
         </>

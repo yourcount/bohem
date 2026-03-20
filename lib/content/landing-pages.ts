@@ -35,6 +35,30 @@ export const LANDING_PAGE_ROUTES: LandingPageRoute[] = [
     homeLabel: "Huiskamerconcert"
   },
   {
+    key: "liveMusic",
+    slug: "/live-muziek-boeken",
+    label: "Live muziek boeken",
+    homeLabel: "Live muziek"
+  },
+  {
+    key: "teamEvening",
+    slug: "/muzikale-teamavond",
+    label: "Muzikale teamavond",
+    homeLabel: "Teamavond"
+  },
+  {
+    key: "culturalEvent",
+    slug: "/muziek-voor-cultureel-event",
+    label: "Muziek voor cultureel event",
+    homeLabel: "Cultureel event"
+  },
+  {
+    key: "listeningConcert",
+    slug: "/luisterconcert-boeken",
+    label: "Luisterconcert boeken",
+    homeLabel: "Luisterconcert"
+  },
+  {
     key: "press",
     slug: "/pers",
     label: "Pers",

@@ -250,7 +250,7 @@ export function buildLandingPageJsonLd(landingKey: LandingPageKey, content: Site
   const landing = content.landingPages[landingKey];
   const faqItems = (landing.faqItems ?? []).filter((item) => item.question?.trim() && item.answer?.trim());
   const events =
-    ["musicDuo", "theaterConcert", "huiskamerconcert"].includes(landingKey)
+    ["musicDuo", "theaterConcert", "huiskamerconcert", "liveMusic", "listeningConcert"].includes(landingKey)
       ? filterFutureShows(content.bookings.upcomingShows)
           ?.map((show) => buildMusicEventNode(content, show, { imageSrc: landing.image?.src }))
           .filter(Boolean) ?? []
@@ -408,7 +408,14 @@ export function buildLandingJsonLd(content: SiteContent, key: LandingPageKey) {
     ...buildFaqSchema(content, key)
   ];
 
-  const withEvents = key === "musicDuo" || key === "theaterConcert" || key === "huiskamerconcert" ? [...baseGraph, ...getUpcomingEventSchema(content)] : baseGraph;
+  const withEvents =
+    key === "musicDuo" ||
+    key === "theaterConcert" ||
+    key === "huiskamerconcert" ||
+    key === "liveMusic" ||
+    key === "listeningConcert"
+      ? [...baseGraph, ...getUpcomingEventSchema(content)]
+      : baseGraph;
 
   return {
     "@context": "https://schema.org",

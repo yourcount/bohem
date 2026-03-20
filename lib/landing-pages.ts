@@ -25,6 +25,30 @@ export const LANDING_PAGE_CONFIG = {
     shortTitle: "Huiskamerconcert boeken",
     navLabel: "Huiskamerconcert"
   },
+  liveMusic: {
+    key: "liveMusic",
+    slug: "live-muziek-boeken",
+    shortTitle: "Live muziek boeken",
+    navLabel: "Live muziek"
+  },
+  teamEvening: {
+    key: "teamEvening",
+    slug: "muzikale-teamavond",
+    shortTitle: "Muzikale teamavond",
+    navLabel: "Teamavond"
+  },
+  culturalEvent: {
+    key: "culturalEvent",
+    slug: "muziek-voor-cultureel-event",
+    shortTitle: "Muziek voor cultureel event",
+    navLabel: "Cultureel event"
+  },
+  listeningConcert: {
+    key: "listeningConcert",
+    slug: "luisterconcert-boeken",
+    shortTitle: "Luisterconcert boeken",
+    navLabel: "Luisterconcert"
+  },
   press: {
     key: "press",
     slug: "pers",

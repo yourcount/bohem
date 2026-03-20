@@ -287,6 +287,15 @@ export function ContactSection({ contact }: ContactSectionProps) {
     setMobileWidgetVisible(true);
   }, [canRenderMobileTurnstile, mobileWidgetId, turnstileSiteKey]);
 
+  useEffect(() => {
+    if (mobileStep === 2) return;
+    setMobileWidgetId(null);
+    setMobileWidgetVisible(false);
+    if (mobileTurnstileRef.current) {
+      mobileTurnstileRef.current.innerHTML = "";
+    }
+  }, [mobileStep]);
+
   const requestTurnstileToken = async (mode: "mobile" | "desktop") => {
     if (!turnstileEnabled) return "";
     const widgetId = mode === "mobile" ? mobileWidgetId : desktopWidgetId;
@@ -461,6 +470,14 @@ export function ContactSection({ contact }: ContactSectionProps) {
 
         <Reveal delayMs={120}>
       <form className="grid max-w-[820px] gap-3 md:hidden" action="#" method="post" onSubmit={handleSubmit} data-form-mode="mobile">
+            <input
+              type="text"
+              name="company_reference"
+              tabIndex={-1}
+              autoComplete="off"
+              className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden opacity-0"
+              aria-hidden="true"
+            />
             <div className="mb-1 flex items-center justify-between text-xs uppercase tracking-[0.12em] text-[#d6be9f]">
               <span>Stap {mobileStep} van 2</span>
               <span>{mobileStep === 1 ? "Contact" : "Bericht"}</span>
@@ -505,30 +522,6 @@ export function ContactSection({ contact }: ContactSectionProps) {
                     onValueChange={(nextValue) => setMobileFormValues((prev) => ({ ...prev, message: nextValue }))}
                   />
                 ) : null}
-                <div className="mt-3 flex flex-col gap-2">
-                  <FeedbackMessage className="leading-relaxed" />
-                  <div className="grid gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSubmitError("");
-                        setSubmitSuccess("");
-                        setMobileStep(1);
-                      }}
-                      className="soft-button-secondary inline-flex w-full items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-3 text-sm font-semibold"
-                    >
-                      Terug
-                    </button>
-                    <button
-                      type="submit"
-                      data-cta="contact_mobile_submit"
-                      disabled={isSubmitting}
-                      className="cta-glow inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
-                    >
-                      {isSubmitting ? submittingLabel : contact.ctaLabel}
-                    </button>
-                  </div>
-                </div>
                 {turnstileEnabled && canRenderMobileTurnstile ? (
                   <div className="mt-1">
                     <div className="relative min-h-[70px] max-h-[74px] overflow-hidden">
@@ -549,6 +542,30 @@ export function ContactSection({ contact }: ContactSectionProps) {
                     <p className="text-xs text-[#d6be9f]">Beveiligingscheck wordt geladen...</p>
                   </div>
                 ) : null}
+                <div className="mt-3 flex flex-col gap-2">
+                  <FeedbackMessage className="leading-relaxed" />
+                  <div className="grid gap-2">
+                    <button
+                      type="submit"
+                      data-cta="contact_mobile_submit"
+                      disabled={isSubmitting}
+                      className="cta-glow inline-flex w-full items-center justify-center rounded-full border border-transparent bg-[var(--color-accent-amber)] px-5 py-3 text-sm font-bold text-[var(--color-bg-deep)] transition-colors hover:bg-[var(--color-accent-copper)] hover:text-[var(--color-text-primary)]"
+                    >
+                      {isSubmitting ? submittingLabel : contact.ctaLabel}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSubmitError("");
+                        setSubmitSuccess("");
+                        setMobileStep(1);
+                      }}
+                      className="soft-button-secondary inline-flex w-full items-center justify-center rounded-full border border-[var(--color-line-muted)] px-5 py-3 text-sm font-semibold"
+                    >
+                      Terug
+                    </button>
+                  </div>
+                </div>
               </>
             )}
           </form>

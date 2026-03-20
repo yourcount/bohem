@@ -10,6 +10,7 @@ const YOUTUBE_CHANNEL_URL = `https://www.youtube.com/${YOUTUBE_CHANNEL_HANDLE}`;
 const YOUTUBE_FEED_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${YOUTUBE_CHANNEL_ID}`;
 const LOCAL_CACHE_KEY = "youtube_videos";
 const MAX_ITEMS = 3;
+const EXCLUDED_VIDEO_IDS = new Set(["Qvbkpm_7DAQ"]);
 
 let lastSuccessfulVideos: YoutubeVideoItem[] = [];
 
@@ -72,6 +73,10 @@ async function excludeShorts(items: YoutubeVideoItem[]) {
   );
 
   return resolved.filter((item) => item.kind === "standard");
+}
+
+function excludeManuallyBlockedVideos(items: YoutubeVideoItem[]) {
+  return items.filter((item) => !EXCLUDED_VIDEO_IDS.has(item.id));
 }
 
 function isValidVideo(item: Partial<YoutubeVideoItem>): item is YoutubeVideoItem {
@@ -199,7 +204,7 @@ async function fetchYoutubeVideosFromApi(limit: number): Promise<YoutubeVideoIte
     .filter((item): item is YoutubeVideoItem => item !== null)
     .slice(0, Math.max(limit + 3, 6));
 
-  return (await excludeShorts(filtered)).slice(0, limit);
+  return excludeManuallyBlockedVideos(await excludeShorts(filtered)).slice(0, limit);
 }
 
 async function fetchYoutubeVideosFromFeed(limit: number): Promise<YoutubeVideoItem[]> {
@@ -244,7 +249,7 @@ async function fetchYoutubeVideosFromFeed(limit: number): Promise<YoutubeVideoIt
     .filter((item): item is YoutubeVideoItem => item !== null)
     .slice(0, Math.max(limit + 3, 6));
 
-  return (await excludeShorts(filtered)).slice(0, limit);
+  return excludeManuallyBlockedVideos(await excludeShorts(filtered)).slice(0, limit);
 }
 
 async function fetchYoutubeVideosInternal(limit = MAX_ITEMS): Promise<YoutubeVideoItem[]> {

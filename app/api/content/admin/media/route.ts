@@ -30,6 +30,10 @@ function shouldUseBlobMediaStorage() {
   return Boolean(process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN);
 }
 
+function isVercelWithoutBlobStorage() {
+  return Boolean(process.env.VERCEL) && !process.env.BLOB_READ_WRITE_TOKEN;
+}
+
 function inferTagsFromPath(src: string) {
   const tags = new Set<string>();
   const lower = src.toLowerCase();
@@ -204,6 +208,12 @@ export async function POST(request: Request) {
   if (!limiter.allowed) {
     return NextResponse.json({ error: "Te veel uploads. Probeer later opnieuw.", code: "RATE_LIMITED" }, { status: 429 });
   }
+  if (isVercelWithoutBlobStorage()) {
+    return NextResponse.json(
+      { error: "Media-opslag is niet geconfigureerd. Voeg BLOB_READ_WRITE_TOKEN toe in Vercel.", code: "MEDIA_STORAGE_NOT_CONFIGURED" },
+      { status: 503 }
+    );
+  }
 
   let formData: FormData;
   try {
@@ -283,6 +293,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true, file: { src: publicUrl, name: filename, tags: indexEntry.tags } }, { status: 201 });
   } catch (error) {
+    console.error("Media upload failed", error);
     const message = error instanceof Error ? error.message : "FILE_SAVE_FAILED";
     if (message === "UNSUPPORTED_IMAGE_FORMAT") {
       return NextResponse.json({ error: "Afbeeldingsformaat niet toegestaan.", code: "UNSUPPORTED_FILE_TYPE" }, { status: 415 });
@@ -310,6 +321,12 @@ export async function DELETE(request: Request) {
   const limiter = await consumeRateLimit(`admin-media-delete:${ip}:${session.uid}`, 30, 15 * 60 * 1000);
   if (!limiter.allowed) {
     return NextResponse.json({ error: "Te veel verwijderacties. Probeer later opnieuw.", code: "RATE_LIMITED" }, { status: 429 });
+  }
+  if (isVercelWithoutBlobStorage()) {
+    return NextResponse.json(
+      { error: "Media-opslag is niet geconfigureerd. Voeg BLOB_READ_WRITE_TOKEN toe in Vercel.", code: "MEDIA_STORAGE_NOT_CONFIGURED" },
+      { status: 503 }
+    );
   }
 
   let payload: { src?: string };

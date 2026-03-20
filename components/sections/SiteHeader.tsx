@@ -59,38 +59,26 @@ export function SiteHeader({ brandName, navigation, homeHref = "#" }: SiteHeader
   };
 
   useEffect(() => {
-    const updateActiveSection = () => {
-      const viewportOffset = window.innerHeight * 0.35;
-      const pendingHref = pendingHrefRef.current;
+    const visibleSections = new Set<string>();
+    let observer: IntersectionObserver | null = null;
 
+    const updateActiveSection = () => {
+      const pendingHref = pendingHrefRef.current;
       if (pendingHref) {
         const pendingId = pendingHref.slice(1);
-        const pendingSection = document.getElementById(pendingId);
-        if (!pendingSection) {
+        if (visibleSections.has(pendingId)) {
           pendingHrefRef.current = null;
         } else {
-          const rect = pendingSection.getBoundingClientRect();
-          const isReached = rect.top <= viewportOffset && rect.bottom > viewportOffset;
-          if (isReached) {
-            pendingHrefRef.current = null;
-          } else {
-            // While smooth-scrolling to a clicked target, keep its active state stable.
-            return;
-          }
+          return;
         }
       }
 
       let current = "";
-
       sectionIds.forEach((id) => {
-        const section = document.getElementById(id);
-        if (!section) return;
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= viewportOffset) {
+        if (visibleSections.has(id)) {
           current = `#${id}`;
         }
       });
-
       setActiveHref(current);
     };
 
@@ -105,14 +93,35 @@ export function SiteHeader({ brandName, navigation, homeHref = "#" }: SiteHeader
     };
 
     updateFromHash();
-    updateActiveSection();
-    window.addEventListener("scroll", updateActiveSection, { passive: true });
-    window.addEventListener("resize", updateActiveSection);
+    observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.getAttribute("id");
+          if (!id) return;
+          if (entry.isIntersecting) {
+            visibleSections.add(id);
+          } else {
+            visibleSections.delete(id);
+          }
+        });
+        updateActiveSection();
+      },
+      {
+        root: null,
+        rootMargin: "-35% 0px -55% 0px",
+        threshold: 0
+      }
+    );
+
+    sectionIds.forEach((id) => {
+      const section = document.getElementById(id);
+      if (section) observer?.observe(section);
+    });
+
     window.addEventListener("hashchange", updateFromHash);
     return () => {
-      window.removeEventListener("scroll", updateActiveSection);
-      window.removeEventListener("resize", updateActiveSection);
       window.removeEventListener("hashchange", updateFromHash);
+      observer?.disconnect();
     };
   }, [navigation, pathname, sectionIds]);
 

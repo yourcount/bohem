@@ -2,16 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "Backslash";
-  src: url("/brand/font/backslash-regular.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
-  --font-display: "Backslash", "Times New Roman", serif;
+  --font-display: var(--font-backslash), "Times New Roman", serif;
   --font-body: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
   --color-bg-deep: #18293f;
   --color-bg-soft: #2b3550;

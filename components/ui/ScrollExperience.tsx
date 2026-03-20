@@ -9,10 +9,14 @@ export function ScrollExperience() {
 
     const root = document.documentElement;
     let rafId = 0;
+    let maxScroll = 1;
+
+    const updateMaxScroll = () => {
+      maxScroll = Math.max(root.scrollHeight - window.innerHeight, 1);
+    };
 
     const updateProgress = () => {
       const scrollTop = window.scrollY;
-      const maxScroll = Math.max(document.body.scrollHeight - window.innerHeight, 1);
       const progress = Math.min(Math.max(scrollTop / maxScroll, 0), 1);
       root.style.setProperty("--page-scroll-progress", progress.toFixed(4));
       rafId = 0;
@@ -23,14 +27,20 @@ export function ScrollExperience() {
       rafId = window.requestAnimationFrame(updateProgress);
     };
 
+    const onResize = () => {
+      updateMaxScroll();
+      onScroll();
+    };
+
+    updateMaxScroll();
     updateProgress();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize);
 
     return () => {
       if (rafId) window.cancelAnimationFrame(rafId);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 

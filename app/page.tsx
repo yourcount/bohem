@@ -11,10 +11,8 @@ import { ShowsSection } from "@/components/sections/ShowsSection";
 import { SiteFooter } from "@/components/sections/SiteFooter";
 import { SiteHeader } from "@/components/sections/SiteHeader";
 import { VideoSection } from "@/components/sections/VideoSection";
-import { MobileStickyCta } from "@/components/ui/MobileStickyCta";
-import { ScrollExperience } from "@/components/ui/ScrollExperience";
+import { DeferredHomeChrome } from "@/components/ui/DeferredHomeChrome";
 import { SectionMotifDivider } from "@/components/ui/SectionMotifDivider";
-import { StickyListenBar } from "@/components/ui/StickyListenBar";
 import { ensureShowsNavigationItem } from "@/lib/content/navigation";
 import { getLiveSiteContent } from "@/lib/content/live-content";
 import { filterFutureShows } from "@/lib/content/shows";
@@ -145,7 +143,6 @@ export default async function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <ScrollExperience />
 
       <a href="#main-content" className="skip-link">
         Ga direct naar inhoud
@@ -194,26 +191,34 @@ export default async function HomePage() {
         {hasBookingsSection ? <SectionMotifDivider /> : null}
         {hasContactSection ? <ContactSection contact={siteContent.contact} /> : null}
       </main>
-      {flags.enable_sticky_listen_bar && hasDiscographySection && hasSectionContent(siteContent.discography.featuredSingle) ? (
-        <StickyListenBar
-          visibleSectionIds={["bio", "discografie"]}
-          eyebrow={siteContent.discography.featuredSingleEyebrow || "Nu luisteren"}
-          trackTitle={siteContent.discography.featuredSingle.title}
-          trackHref={siteContent.discography.featuredSingle.href}
-          ctaLabel={siteContent.discography.featuredSingle.ctaLabel || "Speel op Spotify"}
-          artworkSrc={siteContent.discography.featuredSingle.image?.src || "/images/music/vroeger-cover.webp"}
-          artworkAlt={siteContent.discography.featuredSingle.image?.alt || siteContent.discography.featuredSingle.title}
-          artworkFocusX={siteContent.discography.featuredSingle.image?.focusX}
-          artworkFocusY={siteContent.discography.featuredSingle.image?.focusY}
-        />
-      ) : null}
-      {flags.enable_mobile_sticky_cta && hasBookingsSection && hasText(siteContent.bookings.cta.label) && hasText(siteContent.bookings.cta.href) ? (
-        <MobileStickyCta
-          href={siteContent.bookings.cta.href}
-          label={siteContent.bookings.cta.label}
-          visibleSectionIds={["bio", "discografie"]}
-        />
-      ) : null}
+      <DeferredHomeChrome
+        enableStickyListenBar={flags.enable_sticky_listen_bar && hasDiscographySection && hasSectionContent(siteContent.discography.featuredSingle)}
+        stickyListenBarProps={
+          flags.enable_sticky_listen_bar && hasDiscographySection && hasSectionContent(siteContent.discography.featuredSingle)
+            ? {
+                visibleSectionIds: ["bio", "discografie"],
+                eyebrow: siteContent.discography.featuredSingleEyebrow || "Nu luisteren",
+                trackTitle: siteContent.discography.featuredSingle.title,
+                trackHref: siteContent.discography.featuredSingle.href,
+                ctaLabel: siteContent.discography.featuredSingle.ctaLabel || "Speel op Spotify",
+                artworkSrc: siteContent.discography.featuredSingle.image?.src || "/images/music/vroeger-cover.webp",
+                artworkAlt: siteContent.discography.featuredSingle.image?.alt || siteContent.discography.featuredSingle.title,
+                artworkFocusX: siteContent.discography.featuredSingle.image?.focusX,
+                artworkFocusY: siteContent.discography.featuredSingle.image?.focusY
+              }
+            : null
+        }
+        enableMobileStickyCta={flags.enable_mobile_sticky_cta && hasBookingsSection && hasText(siteContent.bookings.cta.label) && hasText(siteContent.bookings.cta.href)}
+        mobileStickyCtaProps={
+          flags.enable_mobile_sticky_cta && hasBookingsSection && hasText(siteContent.bookings.cta.label) && hasText(siteContent.bookings.cta.href)
+            ? {
+                href: siteContent.bookings.cta.href,
+                label: siteContent.bookings.cta.label,
+                visibleSectionIds: ["bio", "discografie"]
+              }
+            : null
+        }
+      />
 
       <SiteFooter footer={siteContent.footer} />
     </>

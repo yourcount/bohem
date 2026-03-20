@@ -95,9 +95,11 @@ export function HeroSection({ hero }: HeroSectionProps) {
           fill
           className="hero-mobile-zoom object-cover object-top"
           style={{ objectPosition: getImageObjectPosition(hero.image, 50, 12) }}
-          priority
-          quality={92}
-          sizes="(max-width: 430px) 125vw, (max-width: 767px) 115vw, 100vw"
+          preload
+          fetchPriority="high"
+          loading="eager"
+          quality={74}
+          sizes="100vw"
         />
       </div>
       <div className="hero-mask absolute inset-0" />

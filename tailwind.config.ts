@@ -5,7 +5,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["Backslash", "Times New Roman", "serif"],
+        display: ["var(--font-backslash)", "Times New Roman", "serif"],
         body: ["Manrope", "Avenir Next", "Segoe UI", "sans-serif"]
       }
     }

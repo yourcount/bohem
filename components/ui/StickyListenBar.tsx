@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getExternalLinkProps } from "@/lib/ui/link-target";
 
-type StickyListenBarProps = {
+export type StickyListenBarProps = {
   visibleSectionIds: string[];
   hiddenSectionIds?: string[];
   eyebrow: string;
@@ -36,31 +36,37 @@ export function StickyListenBar({
   const [isManuallyOpen, setIsManuallyOpen] = useState(false);
 
   useEffect(() => {
-    const updateVisibility = () => {
-      const viewportOffset = window.innerHeight * 0.35;
-      const shouldSuppress = hiddenSectionIds.some((id) => {
-        const section = document.getElementById(id);
-        if (!section) return false;
-        const rect = section.getBoundingClientRect();
-        return rect.top <= viewportOffset && rect.bottom > viewportOffset;
-      });
-      const shouldShow = visibleSectionIds.some((id) => {
-        const section = document.getElementById(id);
-        if (!section) return false;
-        const rect = section.getBoundingClientRect();
-        return rect.top <= viewportOffset && rect.bottom > viewportOffset;
-      });
-      setIsSuppressed(shouldSuppress);
-      setIsEligible(shouldShow);
-    };
+    const visibleSet = new Set<string>();
+    const hiddenSet = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.getAttribute("id");
+          if (!id) return;
+          const targetSet = hiddenSectionIds.includes(id) ? hiddenSet : visibleSet;
+          if (entry.isIntersecting) {
+            targetSet.add(id);
+          } else {
+            targetSet.delete(id);
+          }
+        });
+        setIsSuppressed(hiddenSet.size > 0);
+        setIsEligible(visibleSet.size > 0);
+      },
+      {
+        root: null,
+        rootMargin: "-35% 0px -55% 0px",
+        threshold: 0
+      }
+    );
 
-    updateVisibility();
-    window.addEventListener("scroll", updateVisibility, { passive: true });
-    window.addEventListener("resize", updateVisibility);
+    [...visibleSectionIds, ...hiddenSectionIds].forEach((id) => {
+      const section = document.getElementById(id);
+      if (section) observer.observe(section);
+    });
 
     return () => {
-      window.removeEventListener("scroll", updateVisibility);
-      window.removeEventListener("resize", updateVisibility);
+      observer.disconnect();
     };
   }, [hiddenSectionIds, visibleSectionIds]);
 

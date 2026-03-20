@@ -48,8 +48,8 @@ export function AboutSection({ about }: AboutSectionProps) {
                     className="h-full w-full object-cover"
                     style={{ objectPosition: getImageObjectPosition(photo) }}
                     loading="lazy"
-                    quality={78}
-                    sizes="(max-width: 767px) 92vw, (max-width: 1279px) 46vw, 520px"
+                    quality={68}
+                    sizes="(max-width: 767px) 92vw, (max-width: 1279px) 42vw, 420px"
                   />
                 </figure>
               </Reveal>

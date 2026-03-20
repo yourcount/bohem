@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import localFont from "next/font/local";
 
-import { AnalyticsScripts } from "@/components/analytics/AnalyticsScripts";
 import { CookieConsentProvider } from "@/components/cookies/CookieConsentProvider";
-import { ConditionalLiquidBackground } from "@/components/ui/ConditionalLiquidBackground";
+import { DeferredBackground } from "@/components/ui/DeferredBackground";
+import { DeferredConsentClients } from "@/components/ui/DeferredConsentClients";
 import { getSiteUrl } from "@/lib/seo";
 
 import "./globals.css";
+
+const backslashFont = localFont({
+  src: "../public/brand/font/backslash-regular.otf",
+  variable: "--font-backslash",
+  display: "swap",
+  preload: true
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
@@ -27,17 +33,15 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="nl">
+    <html lang="nl" className={backslashFont.variable}>
       <body>
-        <ConditionalLiquidBackground />
+        <DeferredBackground />
         <div className="site-layer">
           <CookieConsentProvider>
-            <AnalyticsScripts />
+            <DeferredConsentClients />
             {children}
           </CookieConsentProvider>
         </div>
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

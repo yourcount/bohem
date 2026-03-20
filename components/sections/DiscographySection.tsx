@@ -67,7 +67,7 @@ export function DiscographySection({ discography }: DiscographySectionProps) {
       />
       <div
         className="pointer-events-none absolute -left-16 top-8 hidden h-56 w-56 opacity-[0.1] md:block"
-        style={{ backgroundImage: "url('/brand/elements/bohem-b-monogram-color.webp')", backgroundSize: "contain", backgroundRepeat: "no-repeat" }}
+        style={{ backgroundImage: "url('/brand/elements/bohem-b-monogram-color-compact.webp')", backgroundSize: "contain", backgroundRepeat: "no-repeat" }}
         aria-hidden="true"
       />
       <div className="relative z-10 mx-auto w-full max-w-[1120px] px-4 sm:px-6">

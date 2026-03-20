@@ -6,7 +6,7 @@ import type { MouseEvent } from "react";
 import { scrollToAnchor } from "@/lib/ui/anchor-scroll";
 import { getExternalLinkProps } from "@/lib/ui/link-target";
 
-type MobileStickyCtaProps = {
+export type MobileStickyCtaProps = {
   href: string;
   label: string;
   visibleSectionIds: string[];
@@ -18,7 +18,10 @@ export function MobileStickyCta({ href, label, visibleSectionIds }: MobileSticky
   const isCtaVisible = isVisible && hasScrolledIntoFlow;
 
   useEffect(() => {
-    const updateVisibility = () => {
+    const visibleSet = new Set<string>();
+    let observer: IntersectionObserver | null = null;
+
+    const handleFlowVisibility = () => {
       if (window.innerWidth >= 768) {
         setIsVisible(false);
         setHasScrolledIntoFlow(false);
@@ -26,24 +29,41 @@ export function MobileStickyCta({ href, label, visibleSectionIds }: MobileSticky
       }
 
       setHasScrolledIntoFlow(window.scrollY > 80);
-
-      const viewportOffset = window.innerHeight * 0.35;
-      const shouldShow = visibleSectionIds.some((id) => {
-        const section = document.getElementById(id);
-        if (!section) return false;
-        const rect = section.getBoundingClientRect();
-        return rect.top <= viewportOffset && rect.bottom > viewportOffset;
-      });
-
-      setIsVisible(shouldShow);
+      setIsVisible(visibleSet.size > 0);
     };
 
-    updateVisibility();
-    window.addEventListener("scroll", updateVisibility, { passive: true });
-    window.addEventListener("resize", updateVisibility);
+    observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.getAttribute("id");
+          if (!id) return;
+          if (entry.isIntersecting) {
+            visibleSet.add(id);
+          } else {
+            visibleSet.delete(id);
+          }
+        });
+        handleFlowVisibility();
+      },
+      {
+        root: null,
+        rootMargin: "-35% 0px -55% 0px",
+        threshold: 0
+      }
+    );
+
+    visibleSectionIds.forEach((id) => {
+      const section = document.getElementById(id);
+      if (section) observer?.observe(section);
+    });
+
+    handleFlowVisibility();
+    window.addEventListener("scroll", handleFlowVisibility, { passive: true });
+    window.addEventListener("resize", handleFlowVisibility);
     return () => {
-      window.removeEventListener("scroll", updateVisibility);
-      window.removeEventListener("resize", updateVisibility);
+      window.removeEventListener("scroll", handleFlowVisibility);
+      window.removeEventListener("resize", handleFlowVisibility);
+      observer?.disconnect();
     };
   }, [visibleSectionIds]);
 

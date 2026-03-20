@@ -28,10 +28,18 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="nl">
       <body>
-        <CookieConsentProvider>
-          <AnalyticsScripts />
-          {children}
-        </CookieConsentProvider>
+        <div aria-hidden="true" className="liquid-gradient-bg">
+          <span className="liquid-blob liquid-blob-a" />
+          <span className="liquid-blob liquid-blob-b" />
+          <span className="liquid-blob liquid-blob-c" />
+          <span className="liquid-mesh" />
+        </div>
+        <div className="site-layer">
+          <CookieConsentProvider>
+            <AnalyticsScripts />
+            {children}
+          </CookieConsentProvider>
+        </div>
         <Analytics />
         <SpeedInsights />
       </body>

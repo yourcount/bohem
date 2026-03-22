@@ -70,6 +70,7 @@ export function SiteHeader({ brandName, navigation, homeHref = "#" }: SiteHeader
 
   useEffect(() => {
     const visibleSections = new Set<string>();
+    const visibleCounts = new Map<string, number>();
     let observer: IntersectionObserver | null = null;
 
     const updateActiveSection = () => {
@@ -111,9 +112,18 @@ export function SiteHeader({ brandName, navigation, homeHref = "#" }: SiteHeader
           const canonicalId = observedSectionAliases.get(id);
           if (!canonicalId) return;
           if (entry.isIntersecting) {
+            const nextCount = (visibleCounts.get(canonicalId) ?? 0) + 1;
+            visibleCounts.set(canonicalId, nextCount);
             visibleSections.add(canonicalId);
           } else {
-            visibleSections.delete(canonicalId);
+            const currentCount = visibleCounts.get(canonicalId) ?? 0;
+            const nextCount = Math.max(0, currentCount - 1);
+            if (nextCount === 0) {
+              visibleCounts.delete(canonicalId);
+              visibleSections.delete(canonicalId);
+            } else {
+              visibleCounts.set(canonicalId, nextCount);
+            }
           }
         });
         updateActiveSection();

@@ -34,6 +34,9 @@ export function StickyListenBar({
   const [isSuppressed, setIsSuppressed] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const [isManuallyOpen, setIsManuallyOpen] = useState(false);
+  const singlePrefixMatch = trackTitle.match(/^(Nieuwe single:)\s*(.+)$/i);
+  const displayEyebrow = singlePrefixMatch ? singlePrefixMatch[1] : eyebrow;
+  const displayTitle = singlePrefixMatch ? singlePrefixMatch[2] : trackTitle;
 
   useEffect(() => {
     const visibleSet = new Set<string>();
@@ -93,8 +96,8 @@ export function StickyListenBar({
             <div className="sticky-listen-vinyl-label">B</div>
           </div>
           <div className="sticky-listen-content">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#f3d7b0]">{eyebrow}</p>
-            <p className="sticky-listen-title">{trackTitle}</p>
+            <p className="sticky-listen-eyebrow">{displayEyebrow}</p>
+            <p className="sticky-listen-title">{displayTitle}</p>
           </div>
         </div>
 

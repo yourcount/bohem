@@ -891,6 +891,17 @@ p {
   padding-top: 2px;
 }
 
+.sticky-listen-eyebrow {
+  margin: 0;
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f3d7b0;
+}
+
 .sticky-listen-title {
   margin: 8px 0 0;
   max-width: 28ch;

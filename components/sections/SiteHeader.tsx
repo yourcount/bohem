@@ -28,6 +28,16 @@ export function SiteHeader({ brandName, navigation, homeHref = "#" }: SiteHeader
         .map((href) => href.slice(1)),
     [navigation]
   );
+  const observedSectionAliases = useMemo(() => {
+    const aliases = new Map<string, string>();
+
+    sectionIds.forEach((id) => aliases.set(id, id));
+    if (sectionIds.includes("discografie")) {
+      aliases.set("video", "discografie");
+    }
+
+    return aliases;
+  }, [sectionIds]);
 
   const handleCloseMenu = () => setIsMenuOpen(false);
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
@@ -98,10 +108,12 @@ export function SiteHeader({ brandName, navigation, homeHref = "#" }: SiteHeader
         entries.forEach((entry) => {
           const id = entry.target.getAttribute("id");
           if (!id) return;
+          const canonicalId = observedSectionAliases.get(id);
+          if (!canonicalId) return;
           if (entry.isIntersecting) {
-            visibleSections.add(id);
+            visibleSections.add(canonicalId);
           } else {
-            visibleSections.delete(id);
+            visibleSections.delete(canonicalId);
           }
         });
         updateActiveSection();
@@ -113,7 +125,7 @@ export function SiteHeader({ brandName, navigation, homeHref = "#" }: SiteHeader
       }
     );
 
-    sectionIds.forEach((id) => {
+    observedSectionAliases.forEach((_, id) => {
       const section = document.getElementById(id);
       if (section) observer?.observe(section);
     });
@@ -123,7 +135,7 @@ export function SiteHeader({ brandName, navigation, homeHref = "#" }: SiteHeader
       window.removeEventListener("hashchange", updateFromHash);
       observer?.disconnect();
     };
-  }, [navigation, pathname, sectionIds]);
+  }, [navigation, observedSectionAliases, pathname, sectionIds]);
 
   return (
     <header id="site-header" className="sticky top-0 z-30 border-b border-[var(--color-line-muted)] bg-[rgba(26,20,18,0.82)] backdrop-blur">
